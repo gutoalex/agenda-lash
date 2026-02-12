@@ -5,30 +5,1189 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agenda da Le - Ls Cílios</title>
     
-    <!-- React e ReactDOM (O Motor do App) -->
+    <!-- Dependências -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- Babel (Tradutor de código para o navegador) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Tailwind CSS (Estilos prontos) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonte Google (Bonita) -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <!-- SEU ARQUIVO DE ESTILOS -->
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #fdf2f8; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #fbcfe8; border-radius: 10px; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #db2777; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .sparkle-icon { animation: sparkle 2s infinite; }
+        @keyframes sparkle { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(0.5); } }
+        
+        /* --- CORREÇÃO AVANÇADA PARA IOS (IPHONE) --- */
+        input[type="date"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            min-height: 52px; /* Altura maior para toque */
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 0 16px;
+            width: 100%;
+            color: #1f2937; /* Cinza escuro forte */
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            line-height: 52px; /* Centraliza verticalmente */
+            display: block;
+            color-scheme: light; /* Força modo claro no calendário nativo */
+        }
+        
+        /* Corrige alinhamento do texto da data no iOS */
+        input[type="date"]::-webkit-date-and-time-value {
+            text-align: left;
+            display: block;
+            height: 52px;
+            line-height: 52px;
+        }
+
+        /* Estilo para input quando focado ou com valor */
+        .input-padrao {
+            min-height: 52px;
+            padding: 12px 16px;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Onde o App vai ser desenhado -->
-    <div id="root"></div>
+<div id="root"></div>
 
-    <!-- SEU CÓDIGO (Lógica do App) -->
-    <!-- O type="text/babel" é essencial para o navegador entender o React -->
-    <script type="text/babel" src="app.js"></script>
+<script type="text/babel">
+
+    const { useState, useEffect, useRef } = React;
+
+    // --- CONFIGURAÇÕES ---
+    const apiKey = "AIzaSyCcEiCG4mJYUP2stxgKszk2KQ6RaYmhhQo"; 
+
+    const CONFIG = {
+        nomeProfissional: "Le",
+        telefoneProfissional: "5511989224362", 
+        emailProfissional: "lscilios.contato@gmail.com", 
+        senhaAdmin: "1234",
+        
+        // URL DO SCRIPT GOOGLE
+        scriptGoogleUrl: "https://script.google.com/macros/s/AKfycbz64IT565CxQvlkOds-gqlnX-gJOIKZuWozhrrxkPmCcRQ8SNLRge_m6QPmGyaC3tF-QQ/exec", 
+        
+        icalUrlPrivate: "https://calendar.google.com/calendar/ical/lscilios.contato%40gmail.com/private-994f64be13e6b1d832cf279c97c36175/basic.ics",
+        icalUrlPublic: "https://calendar.google.com/calendar/ical/lscilios.contato%40gmail.com/public/basic.ics",
+        linkAgendaPublicaGoogle: "https://calendar.google.com/calendar/embed?src=lscilios.contato%40gmail.com&ctz=America%2FSao_Paulo", 
+        
+        depoimentos: [
+            { nome: "Cliente", texto: "Amo sua flexibilidade, paciência e atendimento. Você me dá a liberdade de escolher o estilo e a durabilidade é ótima!" },
+            { nome: "Cliente", texto: "Seu trabalho é ótimo! O espaço aconchegante. Higiene impecável e cuidado para não arder os olhos." },
+            { nome: "Cliente", texto: "Seu trabalho é sinceramente o melhor que já fiz e vejo. Não fico mais sem cílios e sem você!" },
+            { nome: "Cliente", texto: "Me sinto acolhida com seu atendimento. Facilita muito minha vida com duas crianças." }
+        ],
+
+        servicos: [
+            { id: 1, nome: "Volume Pamela", desc: "Fio a Fio Black. Ponta dupla, oco e leve.", fullDesc: "No Volume Pamela (Fio a Fio Black), é aplicado um fio do black em cada fio natural. Mais leve e com aspecto de mais volume com efeito rímel.", imagem: "img/pamela.jpg", duracao: 2, precos: { aplicacao: 115, manutencao: 95, remocao: 30 } },
+            { id: 2, nome: "Volume Paty", desc: "Brasileiro. Fios em Y, efeito entrelaçado.", fullDesc: "O Volume Paty (Brasileiro) utiliza fios em formato de Y. Proporciona volume e efeito de cílios entrelaçados.", imagem: "img/paty.jpg", duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
+            { id: 3, nome: "Volume Jaque", desc: "Fox Eyes. Olhar sensual e marcante.", fullDesc: "O Volume Jaque (Fox Eyes) deixa os olhos com formato mais alongado, proporcionando um olhar sensual.", imagem: "img/jaque.jpg", duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
+            { id: 4, nome: "Volume Emily", desc: "Efeito Delineado. Curvatura M.", fullDesc: "O Volume Emily oferece um efeito delineado sutil, ideal para quem deseja um olhar mais alongado com efeito lifting.", imagem: "img/emily.jpg", duracao: 2.5, precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
+            { id: 5, nome: "Volume Duda", desc: "Volume 3D. Fios ultrafinos.", fullDesc: "O Volume Duda (3D) utiliza fios ultrafinos com um fio mais marcante no meio. Efeito dramático.", imagem: "img/duda.jpg", duracao: 3, precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
+            { id: 6, nome: "Volume Carol", desc: "Inglês 5D. Volumoso e dramático.", fullDesc: "O Volume Carol (Inglês 5D) cria um efeito muito volumoso aplicando um 'leque' de até 5 fios.", imagem: "img/carol.jpg", duracao: 3, precos: { aplicacao: 155, manutencao: 105, remocao: 30 } },
+            { id: 7, nome: "Volume Nath", desc: "Efeito Molhado. Naturalidade.", fullDesc: "O efeito molhado cria a sensação de fios levemente úmidos. Marcante, elegante e natural.", imagem: "img/nath.jpg", duracao: 2.5, precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
+            { id: 8, nome: "Volume Grazi", desc: "Naturalmente marcante.", fullDesc: "Perfeita para quem ama um olhar discreto e delicado. Leve, natural e equilibrado.", imagem: "img/grazi.jpg", duracao: 2, precos: { aplicacao: 135, manutencao: 105, remocao: 30 } },
+            { id: 9, nome: "Volume Bia", desc: "Volume Sirena. Puxadinho.", fullDesc: "Aplicado do meio ao final dos olhos. Garante leveza e efeito delineado sem incomodar no canto interno.", imagem: "img/bia.jpg", duracao: 2.5, precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
+            { id: 10, nome: "Volume Fernanda", desc: "Delicado e elegante. 3 fios.", fullDesc: "Volume delicado feito com 3 fios. Garante um olhar marcante sem perder a leveza.", imagem: "img/fernanda.jpg", duracao: 2, precos: { aplicacao: 135, manutencao: 105, remocao: 30 } }
+        ]
+    };
+
+    // --- ÍCONES SVG ---
+    const Icons = {
+        Calendar: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
+        Check: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
+        Whatsapp: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>,
+        Lock: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
+        LogOut: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>,
+        Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
+        Trash: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
+        Eye: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8-11-8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>,
+        Mail: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>,
+        Cake: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M2 21h20"></path><path d="M7 8v2"></path><path d="M12 8v2"></path><path d="M17 8v2"></path><path d="M7 4h.01"></path><path d="M12 4h.01"></path><path d="M17 4h.01"></path></svg>,
+        Alert: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>,
+        Home: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
+        MapPin: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>,
+        Briefcase: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>,
+        Refresh: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>,
+        Info: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
+        Clock: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
+        EyeOff: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>,
+        CreditCard: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>,
+        Smartphone: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>,
+        Dollar: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>,
+        Close: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+        Gemini: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>,
+        Share: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>,
+        Star: () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="text-yellow-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>,
+        User: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
+        CloudDownload: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>,
+        Ghost: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2z"></path><path d="M9 9h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-6"></path><path d="M9 9a3 3 0 0 0-6 0"></path><path d="M9 6a6 6 0 0 1 12 0v3"></path></svg>,
+        Camera: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>,
+        Copy: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>,
+        Sparkles: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>,
+        Analysis: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h5"></path><path d="M17 12h5"></path><path d="M12 2v5"></path><path d="M12 17v5"></path><circle cx="12" cy="12" r="4"></circle><path d="M10 2 2.5 9.5"></path><path d="M14 2l7.5 7.5"></path><path d="M10 22l-7.5-7.5"></path><path d="M14 22l7.5-7.5"></path></svg>,
+        Chart: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>,
+        Robot: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>
+    };
+
+    // --- 3. FUNÇÕES AUXILIARES ---
+
+    async function chamarGemini(prompt, systemInstruction = "") {
+        if (!apiKey) {
+            alert("⚠️ Chave de API não configurada.");
+            return null;
+        }
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text;
+        } catch (error) {
+            console.error("Erro ao chamar Gemini:", error);
+            return null;
+        }
+    }
+
+    const getHorariosPorDia = (dateStr) => {
+        if(!dateStr) return [];
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const date = new Date(y, m - 1, d);
+        const day = date.getDay(); // 0=Dom, 1=Seg, ...
+
+        const gerar = (inicio, fim) => {
+            const lista = [];
+            for (let h = inicio; h <= fim; h++) {
+                lista.push((h < 10 ? '0' + h : h) + ':00');
+            }
+            return lista;
+        };
+
+        if (day === 0 || day === 1) return []; // Dom/Seg fechado
+        if (day === 2 || day === 4) return gerar(9, 19); // Ter/Qui 9-20:30 (ultimo slot 19)
+        if (day === 3) return gerar(10, 17); // Qua 10-18 (ultimo slot 17)
+        if (day === 5) return gerar(10, 16); // Sex 10-17 (ultimo slot 16)
+        if (day === 6) return gerar(9, 14); // Sab 9-15 (ultimo slot 14)
+
+        return [];
+    };
+
+    // Parse ICS date string to JS Date object
+    const parseIcsDate = (val) => {
+        if (!val) return null;
+        const clean = val.replace(/[^0-9TZ]/g, '');
+        const y = parseInt(clean.substring(0, 4));
+        const m = parseInt(clean.substring(4, 6)) - 1;
+        const d = parseInt(clean.substring(6, 8));
+        
+        if (!clean.includes('T')) {
+            return { isAllDay: true, date: new Date(y, m, d, 0, 0, 0) };
+        }
+        
+        const time = clean.split('T')[1];
+        const h = parseInt(time.substring(0, 2));
+        const min = parseInt(time.substring(2, 4));
+        
+        let date = new Date(y, m, d, h, min, 0);
+        
+        if (val.includes('Z')) {
+            date.setHours(date.getHours() - 3);
+        }
+        return { isAllDay: false, date: date };
+    };
+
+    // Função para buscar clientes da planilha (GET)
+    const fetchClientesPlanilha = async () => {
+        try {
+            const url = `${CONFIG.scriptGoogleUrl}?t=${Date.now()}`;
+            const response = await fetch(url);
+            if (!response.ok) return [];
+            const data = await response.json();
+            return Array.isArray(data) ? data : [];
+        } catch (e) {
+            console.error("Erro ao buscar clientes", e);
+            return [];
+        }
+    };
+
+    const fetchRawEvents = async (url, dateStr) => {
+        try {
+            const targetWithCache = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+            const proxyUrl = 'https://corsproxy.io/?'; 
+            const response = await fetch(proxyUrl + encodeURIComponent(targetWithCache));
+            if (!response.ok) return [];
+            const icsText = await response.text();
+            
+            const events = [];
+            const lines = icsText.split(/\r\n|\n|\r/);
+            let currentEvent = null;
+            
+            lines.forEach(line => {
+                if (line.startsWith('BEGIN:VEVENT')) { currentEvent = {}; } 
+                else if (line.startsWith('END:VEVENT')) { 
+                    if (currentEvent && currentEvent.dtstart) events.push(currentEvent); 
+                    currentEvent = null; 
+                } 
+                else if (currentEvent) {
+                    const colonIndex = line.indexOf(':');
+                    if (colonIndex > -1) {
+                        const keyPart = line.substring(0, colonIndex).split(';')[0];
+                        const value = line.substring(colonIndex + 1);
+                        if (keyPart === 'SUMMARY') currentEvent.summary = value;
+                        if (keyPart === 'LOCATION') currentEvent.location = value;
+                        if (keyPart.startsWith('DTSTART')) currentEvent.dtstart = value;
+                        if (keyPart.startsWith('DTEND')) currentEvent.dtend = value;
+                    }
+                }
+            });
+            
+            if (dateStr) {
+                const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
+                return events.filter(ev => {
+                    const startInfo = parseIcsDate(ev.dtstart);
+                    if (!startInfo) return false;
+                    const d = startInfo.date;
+                    return d.getFullYear() === tYear && d.getMonth() === tMonth - 1 && d.getDate() === tDay;
+                }).map(ev => {
+                    const startInfo = parseIcsDate(ev.dtstart);
+                    ev.localHour = startInfo ? startInfo.date.getHours() : -1;
+                    return ev;
+                });
+            }
+            return events;
+        } catch (e) {
+            console.error("Erro ao buscar eventos raw", e);
+            return [];
+        }
+    };
+
+    const fetchICSAndParse = async (url, dateStr, horariosDoDia = []) => {
+        try {
+            const targetWithCache = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+            const proxyUrl = 'https://corsproxy.io/?'; 
+            const response = await fetch(proxyUrl + encodeURIComponent(targetWithCache));
+            if (!response.ok) return [];
+            const icsText = await response.text();
+            
+            const events = [];
+            const lines = icsText.split(/\r\n|\n|\r/);
+            let currentEvent = null;
+            
+            lines.forEach(line => {
+                if (line.startsWith('BEGIN:VEVENT')) { currentEvent = {}; } 
+                else if (line.startsWith('END:VEVENT')) { 
+                    if (currentEvent && currentEvent.dtstart) events.push(currentEvent); 
+                    currentEvent = null; 
+                } 
+                else if (currentEvent) {
+                    const colonIndex = line.indexOf(':');
+                    if (colonIndex > -1) {
+                        const keyPart = line.substring(0, colonIndex).split(';')[0];
+                        const value = line.substring(colonIndex + 1);
+                        if (keyPart === 'SUMMARY') currentEvent.summary = value;
+                        if (keyPart === 'LOCATION') currentEvent.location = value;
+                        if (keyPart.startsWith('DTSTART')) currentEvent.dtstart = value;
+                        if (keyPart.startsWith('DTEND')) currentEvent.dtend = value;
+                    }
+                }
+            });
+
+            const ocupados = [];
+            const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
+            const targetDateStart = new Date(tYear, tMonth - 1, tDay, 0, 0, 0);
+            const targetDateEnd = new Date(tYear, tMonth - 1, tDay, 23, 59, 59);
+
+            events.forEach(ev => {
+                const startInfo = parseIcsDate(ev.dtstart);
+                if (!startInfo) return;
+
+                let startDate = startInfo.date;
+                let endDate = null;
+
+                if (ev.dtend) {
+                    const endInfo = parseIcsDate(ev.dtend);
+                    if (endInfo) endDate = endInfo.date;
+                }
+
+                if (startInfo.isAllDay) {
+                    if (startDate.getFullYear() === tYear && 
+                        startDate.getMonth() === (tMonth - 1) && 
+                        startDate.getDate() === tDay) {
+                        horariosDoDia.forEach(h => {
+                            if(!ocupados.includes(h)) ocupados.push(h);
+                        });
+                    }
+                    return;
+                }
+
+                if (!endDate) {
+                    endDate = new Date(startDate);
+                    endDate.setHours(endDate.getHours() + 1);
+                }
+
+                if (endDate <= targetDateStart || startDate >= targetDateEnd) {
+                    return;
+                }
+
+                if (horariosDoDia && horariosDoDia.length > 0) {
+                    horariosDoDia.forEach(slot => {
+                        const [sh, sm] = slot.split(':').map(Number);
+                        const slotDate = new Date(tYear, tMonth - 1, tDay, sh, sm, 0);
+                        if (slotDate >= startDate && slotDate < endDate) {
+                            if (!ocupados.includes(slot)) ocupados.push(slot);
+                        }
+                    });
+                }
+            });
+
+            return ocupados;
+        } catch (e) { console.error("Erro ao ler agenda", e); return []; }
+    };
+
+    const salvarAgendamentoPlanilha = async (dadosCliente) => {
+        if (!CONFIG.scriptGoogleUrl) return; 
+        try {
+            await fetch(CONFIG.scriptGoogleUrl, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(dadosCliente)
+            });
+        } catch (e) { console.error(e); }
+    };
+
+    // --- 4. COMPONENTES ---
+
+    function ChatbotIA() {
+        const [aberto, setAberto] = useState(false);
+        const [msg, setMsg] = useState('');
+        const [historico, setHistorico] = useState([{ role: 'bot', text: 'Olá! Sou a assistente virtual da Le. Tem alguma dúvida sobre os cílios ou valores? 💖' }]);
+        const [loading, setLoading] = useState(false);
+        const msgEndRef = useRef(null);
+        useEffect(() => { msgEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [historico]);
+        const enviarMsg = async () => {
+            if (!msg.trim()) return;
+            const novaMsg = { role: 'user', text: msg };
+            setHistorico(prev => [...prev, novaMsg]);
+            setMsg('');
+            setLoading(true);
+            const servicosTexto = CONFIG.servicos.map(s => `- ${s.nome}: Aplicação R$${s.precos.aplicacao}, Manutenção R$${s.precos.manutencao}`).join('\n');
+            const prompt = `Você é a assistente virtual da Ls Cílios, atendendo clientes da Le. Contexto: ${servicosTexto}. Informações: Manutenção cada 15-20 dias. Cuidados: Não molhar 24h, sem rímel. Pergunta: "${novaMsg.text}". Responda curto e simpática.`;
+            const respostaTexto = await chamarGemini(prompt, "Você é uma assistente virtual de beleza.");
+            setHistorico(prev => [...prev, { role: 'bot', text: respostaTexto || "Desculpe, tente de novo." }]);
+            setLoading(false);
+        };
+        return (
+            <React.Fragment>
+                <button onClick={() => setAberto(!aberto)} className="fixed bottom-4 left-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-full shadow-lg z-50 hover:scale-105 transition-transform flex items-center gap-2 font-bold text-xs">{aberto ? <Icons.Close /> : <span className="text-xl">🤖</span>}{!aberto && "Dúvidas?"}</button>
+                {aberto && (
+                    <div className="fixed bottom-20 left-4 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4" style={{maxHeight: '60vh'}}>
+                        <div className="bg-purple-600 p-3 text-white flex justify-between items-center"><span className="font-bold text-sm flex items-center gap-2">🤖 Assistente Ls Cílios</span><button onClick={() => setAberto(false)}><Icons.Close /></button></div>
+                        <div className="flex-1 p-3 overflow-y-auto bg-gray-50 space-y-3 text-xs">
+                            {historico.map((m, i) => (<div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[85%] p-2 rounded-xl ${m.role === 'user' ? 'bg-purple-100 text-purple-800 rounded-tr-none' : 'bg-white border border-gray-200 text-gray-600 rounded-tl-none'}`}>{m.text}</div></div>))}
+                            <div ref={msgEndRef} />
+                        </div>
+                        <div className="p-2 bg-white border-t border-gray-100 flex gap-2">
+                            <input type="text" className="flex-1 border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-500" placeholder="Digite..." value={msg} onChange={(e) => setMsg(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && enviarMsg()} />
+                            <button onClick={enviarMsg} disabled={loading} className="bg-purple-600 text-white p-2 rounded-lg">➤</button>
+                        </div>
+                    </div>
+                )}
+            </React.Fragment>
+        );
+    }
+
+    function TelaCliente({ verificarDisponibilidade, horariosOcupados, carregandoHorarios, horariosDoDia }) {
+        const [step, setStep] = useState(1);
+        const [dados, setDados] = useState({ nome: '', whatsapp: '', email: '', nascimento: '', servicoObj: null, tipoServico: '', precoFinal: '', data: '', hora: '', tipoAtendimento: 'studio', endereco: '', complemento: '' });
+        const [vendoAgenda, setVendoAgenda] = useState(false);
+        const [modalConfirmacao, setModalConfirmacao] = useState(false);
+        const [horarioPendente, setHorarioPendente] = useState('');
+        const [modalSucesso, setModalSucesso] = useState(false);
+        const [showCalendarAlert, setShowCalendarAlert] = useState(false);
+
+        const [servicoExpandido, setServicoExpandido] = useState(null);
+        const [modalDetalhes, setModalDetalhes] = useState(null);
+        const [showModalIA, setShowModalIA] = useState(false);
+        const [inputIA, setInputIA] = useState('');
+        const [loadingIA, setLoadingIA] = useState(false);
+        const [respostaIA, setRespostaIA] = useState(null);
+        const [depoimentoIndex, setDepoimentoIndex] = useState(0);
+
+        useEffect(() => { const interval = setInterval(() => { setDepoimentoIndex((prev) => (prev + 1) % CONFIG.depoimentos.length); }, 5000); return () => clearInterval(interval); }, []);
+        const hoje = new Date().toISOString().split('T')[0];
+
+        useEffect(() => { if (dados.data) { verificarDisponibilidade(dados.data); } }, [dados.data]);
+
+        const selectingServico = (servico, tipo) => {
+            let preco = 0;
+            if(tipo === 'aplicacao') preco = servico.precos.aplicacao;
+            if(tipo === 'manutencao') preco = servico.precos.manutencao;
+            if(tipo === 'remocao') preco = servico.precos.remocao;
+            setDados({ ...dados, servicoObj: servico, tipoServico: tipo, precoFinal: preco });
+            setModalDetalhes(null);
+            setStep(2);
+        };
+
+        const handleCliqueHorario = (hora) => { if (horariosOcupados.includes(hora)) return; setHorarioPendente(hora); setModalConfirmacao(true); };
+        const confirmarHorario = () => { setDados({ ...dados, hora: horarioPendente }); setModalConfirmacao(false); };
+
+        const enviarWhatsapp = () => {
+            const dataFormatada = dados.data.split('-').reverse().slice(0, 2).join('/');
+            let tipoTexto = "";
+            if(dados.tipoServico === 'aplicacao') tipoTexto = "Aplicação ✨";
+            if(dados.tipoServico === 'manutencao') tipoTexto = "Manutenção 🔧";
+            if(dados.tipoServico === 'remocao') tipoTexto = "Remoção 🧼";
+            let mensagem = `Oii ${CONFIG.nomeProfissional}! 💖\n\nMe chamo *${dados.nome}*.\nZap: ${dados.whatsapp}`;
+            if(dados.email) mensagem += `\nEmail: ${dados.email}`;
+            mensagem += `\n\nGostaria de agendar:\n*${dados.servicoObj.nome}*\nTipo: *${tipoTexto}* (R$ ${dados.precoFinal},00)\n\n🗓 Data: *${dataFormatada}*\n⏰ Horário: *${dados.hora}*`;
+            if(dados.tipoAtendimento === 'domicilio') { mensagem += `\n\n📍 *A DOMICÍLIO*\nLocal: ${dados.endereco}\n⚠️ *Ciente da taxa de Uber.*`; } else { mensagem += `\n\n📍 No Studio`; }
+            window.open(`https://wa.me/${CONFIG.telefoneProfissional}?text=${encodeURIComponent(mensagem)}`, '_blank');
+        };
+
+        const enviarInviteAgenda = () => {
+            if (!dados.nome || !dados.data || !dados.hora) { alert("Preencha data e hora!"); return; }
+            const dataLimpa = dados.data.replace(/-/g, '');
+            const horaLimpa = dados.hora.replace(':', '') + '00';
+            const inicio = `${dataLimpa}T${horaLimpa}`;
+            let horaFimNum = parseInt(dados.hora.split(':')[0]) + (dados.servicoObj.duracao || 2);
+            const fim = `${dataLimpa}T${horaFimNum < 10 ? '0'+Math.floor(horaFimNum) : Math.floor(horaFimNum)}0000`;
+            const titulo = `Cílios: ${dados.nome}`;
+            let detalhes = `Cliente: ${dados.nome}\nServiço: ${dados.servicoObj.nome} (${dados.tipoServico})\nZap: ${dados.whatsapp}`;
+            if(dados.tipoAtendimento === 'domicilio') detalhes += `\nLocal: ${dados.endereco}`;
+            const linkGoogle = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&dates=${inicio}/${fim}&details=${encodeURIComponent(detalhes)}&add=${CONFIG.emailProfissional}`;
+            window.open(linkGoogle, '_blank');
+            setShowCalendarAlert(false);
+        };
+
+        const salvarEAvancar = () => {
+            if (!dados.nome || !dados.data || !dados.hora) { alert("Preencha data e hora!"); return; }
+            salvarAgendamentoPlanilha(dados);
+            setModalSucesso(true);
+        };
+
+        const consultarEstiloIA = async () => {
+            if (!inputIA.trim()) return;
+            setLoadingIA(true);
+            setRespostaIA(null);
+            const catalogoTexto = CONFIG.servicos.map(s => `ID: ${s.id}, Nome: ${s.nome}, Descrição: ${s.fullDesc}`).join('\n');
+            const prompt = `Você é uma especialista em cílios da 'Ls Cílios'. O catálogo é: \n${catalogoTexto}\n\nA cliente disse: "${inputIA}".\n\nRecomende 1 (um) serviço ideal. Responda APENAS um JSON válido neste formato: { "id": number, "motivo": "string curta explicando o porquê de forma amigável" }`;
+            const resultado = await chamarGemini(prompt, "Você é um assistente de estilo útil.");
+            if (resultado) {
+                try { 
+                    let cleanJson = resultado.replace(/```json/g, "").replace(/```/g, "").trim();
+                    const recomendacao = JSON.parse(cleanJson); 
+                    setRespostaIA(recomendacao); 
+                } catch (e) { 
+                    setRespostaIA({ motivo: "Desculpe, não consegui entender perfeitamente, mas sugiro dar uma olhada no Volume Brasileiro!" }); 
+                }
+            } else { setRespostaIA({ motivo: "Opa, minha inteligência está tirando um cochilo. Tente novamente!" }); }
+            setLoadingIA(false);
+        };
+
+        return (
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden fade-in border border-pink-100 relative">
+                <div className="bg-pink-50 h-2 w-full flex"><div className={`h-full bg-pink-500 transition-all duration-300 ${step === 1 ? 'w-1/2' : 'w-full'}`}></div></div>
+                <div className="p-6">
+                    {step === 1 && (
+                        <div className="fade-in">
+                            <h2 className="text-xl font-bold text-gray-800 mb-4 flex justify-between items-center">
+                                Escolha o Procedimento
+                                <button onClick={() => setShowModalIA(true)} className="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-full font-bold flex items-center gap-1 hover:bg-purple-200 transition-colors sparkle-icon"><Icons.Gemini /> Me ajude a escolher</button>
+                            </h2>
+                            <div className="space-y-4">
+                                {CONFIG.servicos.map((s) => (
+                                    <div key={s.id} className="border border-pink-100 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all">
+                                        <div onClick={() => setServicoExpandido(servicoExpandido === s.id ? null : s.id)} className="w-full text-left p-4 flex gap-4 items-center bg-gray-50 hover:bg-pink-50 transition-colors relative cursor-pointer">
+                                            <div className="w-16 h-16 shrink-0 bg-white rounded-lg border border-pink-100 overflow-hidden relative group" onClick={(e) => { e.stopPropagation(); setModalDetalhes(s); }}>
+                                                <img 
+                                                    src={s.imagem} 
+                                                    alt={s.nome} 
+                                                    className="w-full h-full object-cover" 
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        e.target.parentNode.style.backgroundColor = '#f3f4f6';
+                                                        e.target.parentNode.style.display = 'flex';
+                                                        e.target.parentNode.style.alignItems = 'center';
+                                                        e.target.parentNode.style.justifyContent = 'center';
+                                                        e.target.parentNode.style.fontSize = '10px';
+                                                        e.target.parentNode.style.color = '#9ca3af';
+                                                        e.target.parentNode.innerText = s.nome;
+                                                    }} 
+                                                />
+                                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><span className="text-white text-xs font-bold">+Info</span></div>
+                                            </div>
+                                            <div className="flex-1"><div className="flex justify-between items-start"><span className="font-bold text-gray-700 block">{s.nome}</span><button onClick={(e) => { e.stopPropagation(); setModalDetalhes(s); }} className="text-pink-400 hover:text-pink-600 text-xs px-2 py-1 rounded bg-pink-50"><Icons.Info /></button></div><span className="text-[10px] text-gray-500 line-clamp-2 mt-1">{s.desc}</span></div>
+                                            <div className="text-pink-400 pl-2">{servicoExpandido === s.id ? '▼' : '▶'}</div>
+                                        </div>
+                                        {servicoExpandido === s.id && (
+                                            <div className="p-3 bg-white grid gap-2 animate-in fade-in slide-in-from-top-2 border-t border-pink-50">
+                                                <button onClick={() => selectingServico(s, 'aplicacao')} className="w-full text-left p-3 rounded-lg border border-gray-100 hover:border-pink-300 hover:bg-pink-50 flex justify-between items-center group"><span className="text-sm font-medium text-gray-600 group-hover:text-pink-600">✨ Aplicação Nova</span><span className="font-bold text-pink-500">R$ {s.precos.aplicacao}</span></button>
+                                                <button onClick={() => selectingServico(s, 'manutencao')} className="w-full text-left p-3 rounded-lg border border-gray-100 hover:border-purple-300 hover:bg-purple-50 flex justify-between items-center group"><span className="text-sm font-medium text-gray-600 group-hover:text-purple-600">🔧 Manutenção</span><span className="font-bold text-purple-500">R$ {s.precos.manutencao}</span></button>
+                                                <button onClick={() => selectingServico(s, 'remocao')} className="w-full text-left p-3 rounded-lg border border-gray-100 hover:border-red-300 hover:bg-red-50 flex justify-between items-center group"><span className="text-sm font-medium text-gray-600 group-hover:text-red-600">🧼 Remoção</span><span className="font-bold text-red-400">R$ {s.precos.remocao}</span></button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            {/* Depoimentos */}
+                            <div className="mt-8 mb-4">
+                                <h3 className="text-center font-bold text-gray-400 text-xs uppercase mb-4 tracking-widest">O que dizem sobre a Le</h3>
+                                <div className="bg-pink-50 p-4 rounded-xl border border-pink-100 relative">
+                                    <div className="absolute -top-3 left-4 bg-pink-500 text-white p-1 rounded-full"><Icons.Star /></div>
+                                    <p className="text-gray-600 text-xs italic text-center leading-relaxed">"{CONFIG.depoimentos[depoimentoIndex].texto}"</p>
+                                    <p className="text-center text-[10px] font-bold text-pink-400 mt-2 uppercase">- {CONFIG.depoimentos[depoimentoIndex].nome}</p>
+                                    <div className="flex justify-center gap-1 mt-3">{CONFIG.depoimentos.map((_, idx) => (<div key={idx} className={`h-1.5 rounded-full transition-all ${idx === depoimentoIndex ? 'w-4 bg-pink-400' : 'w-1.5 bg-pink-200'}`}></div>))}</div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 2 && (
+                        <div className="fade-in">
+                            <button onClick={() => setStep(1)} className="text-xs text-gray-400 mb-2 hover:text-pink-500 flex items-center gap-1">← Voltar</button>
+                            <h2 className="text-xl font-bold text-gray-800 mb-1">Seus Dados e Horário</h2>
+                            <p className="text-sm text-gray-500 mb-4">Agendando: <strong className="text-pink-500">{dados.servicoObj.nome}</strong></p>
+                            <div className="bg-pink-50 p-2 rounded-lg text-center mb-4 border border-pink-100"><span className="text-xs uppercase font-bold text-gray-500 block mb-1">Tipo de Serviço</span><span className="text-lg font-bold text-pink-600 uppercase">{dados.tipoServico}</span><span className="block text-sm font-bold text-gray-700">Valor: R$ {dados.precoFinal},00</span></div>
+                            {dados.tipoServico === 'manutencao' && (<div className="mb-4 bg-purple-50 border border-purple-200 rounded-xl p-3 text-xs text-gray-700 leading-relaxed fade-in flex gap-2 items-start"><div className="shrink-0 text-purple-500 pt-0.5"><Icons.Info /></div><div><strong>Sobre a Manutenção:</strong> Sugerimos uma manutenção a cada 15 a 20 dias para acompanhar o crescimento dos nossos fios naturais, mas olha, não é uma regra definitiva, viu? Quando sentir aquela coceirinha de manutenção, é só dar um grito!</div></div>)}
+                            <div className="mb-4 bg-white border border-gray-100 rounded-xl p-3 shadow-sm"><h3 className="text-xs font-bold text-gray-500 mb-2 uppercase flex items-center gap-1">Antes de vir:</h3><div className="grid grid-cols-2 gap-2 text-[10px] text-gray-600"><div className="flex items-center gap-1"><Icons.Clock /><span className="text-[9px]">Duração: 1h30 a 2h30</span></div><div className="flex items-center gap-1"><Icons.EyeOff /><span className="text-[9px]">Sem Rímel</span></div><div className="flex items-center gap-1"><span className="text-xs">👓</span><span className="text-[9px]">Remover Lentes</span></div><div className="flex items-center gap-1"><span className="text-xs">⏰</span><span className="text-[9px]">Tolerância 15min</span></div></div><div className="mt-2 pt-2 border-t border-gray-100 text-[9px] text-red-400 leading-tight">⚠️ <strong>Contraindicações:</strong> Alergias, doenças oculares ativas (conjuntivite) ou pele extremamente sensível.</div></div>
+                            <div className="space-y-3">
+                                <input type="text" className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="Seu Nome *" value={dados.nome} onChange={(e) => setDados({...dados, nome: e.target.value})} />
+                                <input type="tel" className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="WhatsApp *" value={dados.whatsapp} onChange={(e) => setDados({...dados, whatsapp: e.target.value})} />
+                                <div className="flex gap-2"><input type="email" className="flex-1 p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="E-mail" value={dados.email} onChange={(e) => setDados({...dados, email: e.target.value})} /><div className="w-2/5">
+                                    <input 
+                                        type="text" 
+                                        onFocus={(e) => e.target.type = 'date'} 
+                                        onBlur={(e) => { if(!e.target.value) e.target.type = 'text'; }} 
+                                        className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" 
+                                        placeholder="Nascimento" 
+                                        value={dados.nascimento} 
+                                        onChange={(e) => setDados({...dados, nascimento: e.target.value})} 
+                                    />
+                                </div></div>
+                                <hr className="border-dashed border-gray-200 my-2"/>
+                                <div className="p-3 bg-gray-50 rounded-xl border border-gray-200"><label className="block text-xs font-bold text-gray-500 mb-2">ONDE SERÁ O ATENDIMENTO?</label><div className="flex gap-2 mb-3"><button onClick={() => setDados({...dados, tipoAtendimento: 'studio'})} className={`flex-1 py-2 text-sm rounded-lg border font-medium flex items-center justify-center gap-2 ${dados.tipoAtendimento === 'studio' ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-500'}`}><Icons.Briefcase /> No Studio</button><button onClick={() => setDados({...dados, tipoAtendimento: 'domicilio'})} className={`flex-1 py-2 text-sm rounded-lg border font-medium flex items-center justify-center gap-2 ${dados.tipoAtendimento === 'domicilio' ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-500'}`}><Icons.Home /> A Domicílio</button></div>{dados.tipoAtendimento === 'domicilio' && (<div className="fade-in"><div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-[10px] text-yellow-800 mb-2">⚠️ Taxa de Uber será cobrada.</div><input type="text" className="w-full p-2 bg-white rounded-lg border text-sm mb-2 text-gray-900 placeholder-gray-400" placeholder="Endereço *" value={dados.endereco} onChange={(e) => setDados({...dados, endereco: e.target.value})} /><input type="text" className="w-full p-2 bg-white rounded-lg border text-sm" placeholder="Complemento" value={dados.complemento} onChange={(e) => setDados({...dados, complemento: e.target.value})} /></div>)}</div>
+                                <div className="pt-2">
+                                    <label className="block text-xs font-bold text-gray-500 mb-1">ESCOLHA DATA E HORA</label>
+                                    <input type="date" min={hoje} className="w-full p-3 bg-white rounded-xl border border-gray-200 mb-3 font-bold text-gray-700" value={dados.data} onChange={(e) => setDados({...dados, data: e.target.value})} />
+                                    {dados.data && (
+                                        <div>
+                                            {carregandoHorarios ? (
+                                                <div className="flex items-center justify-center gap-2 py-4 text-gray-400 text-sm"><div className="loader"></div> Verificando agenda...</div>
+                                            ) : (
+                                                <div className="grid grid-cols-4 gap-2 pb-2">
+                                                    {horariosDoDia.length === 0 ? (
+                                                        <div className="col-span-4 text-center text-sm text-red-400 font-bold py-4 bg-red-50 rounded-xl border border-red-100">
+                                                            Poxa, estamos fechados ou sem agenda neste dia! 😢<br/><span className="text-xs font-normal text-red-300">Tente outro dia (Seg/Dom fechado).</span>
+                                                        </div>
+                                                    ) : (
+                                                        horariosDoDia.map((h) => {
+                                                            const isOcupado = horariosOcupados.includes(h);
+                                                            return (<button key={h} disabled={isOcupado} onClick={() => handleCliqueHorario(h)} className={`py-2 text-xs rounded-lg font-bold transition-all border relative overflow-hidden ${isOcupado ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed opacity-50' : dados.hora === h ? 'bg-pink-500 text-white border-pink-500 shadow-md transform scale-105' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'}`}>{h}{isOcupado && <div className="absolute inset-0 flex items-center justify-center bg-gray-100/50"><span className="text-[8px] transform -rotate-12 bg-red-100 px-1 text-red-500 font-bold border border-red-200 rounded">OCUPADO</span></div>}</button>)
+                                                        })
+                                                    )}
+                                                </div>
+                                            )}
+                                            <button onClick={() => setVendoAgenda(!vendoAgenda)} className="w-full mt-2 text-xs text-purple-400 hover:text-purple-600 underline flex items-center justify-center gap-1">{vendoAgenda ? 'Ocultar Calendário' : 'Ver Calendário Completo (Dúvida)'}</button>
+                                            {vendoAgenda && <div className="mt-2 mb-4 rounded-xl overflow-hidden border border-gray-200 shadow-inner fade-in"><iframe src={CONFIG.linkAgendaPublicaGoogle} style={{border: 0}} width="100%" height="300" frameBorder="0" scrolling="no"></iframe></div>}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex justify-center gap-4 text-gray-400 py-2 border-t border-gray-100"><div className="flex flex-col items-center gap-1"><Icons.Smartphone /><span className="text-[8px]">Pix</span></div><div className="flex flex-col items-center gap-1"><Icons.CreditCard /><span className="text-[8px]">Cartão</span></div><div className="flex flex-col items-center gap-1"><Icons.Dollar /><span className="text-[8px]">Dinheiro</span></div></div>
+                                {dados.hora && (<div className="fade-in space-y-3 pt-2">
+                                    <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 text-center mb-2">
+                                        <p className="text-xs text-blue-800 mb-2">Antes de finalizar:</p>
+                                        <button onClick={() => setShowCalendarAlert(true)} className="w-full bg-white text-blue-600 font-bold py-2 rounded-lg border border-blue-200 hover:bg-blue-50 flex items-center justify-center gap-2 text-sm shadow-sm"><Icons.Calendar /> Adicionar ao Google Agenda</button>
+                                    </div>
+                                    <button onClick={salvarEAvancar} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transform transition hover:-translate-y-1">Agendar e Enviar Zap <Icons.Whatsapp /></button>
+                                </div>)}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* MODAIS (Resumidos) */}
+                {showModalIA && ( <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setShowModalIA(false)}><div className="bg-white rounded-2xl max-w-sm w-full shadow-2xl scale-in overflow-hidden relative" onClick={e => e.stopPropagation()}><div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4 text-white text-center"><h3 className="text-xl font-bold flex items-center justify-center gap-2"><Icons.Gemini /> Consultora IA</h3><p className="text-xs opacity-90">Me conte o que você procura...</p></div><div className="p-6">{!respostaIA ? (<><textarea className="w-full p-3 border border-gray-300 rounded-xl text-sm mb-4 focus:ring-2 focus:ring-purple-500 outline-none" rows="4" placeholder="Ex: Quero algo bem natural..." value={inputIA} onChange={(e) => setInputIA(e.target.value)}></textarea><button onClick={consultarEstiloIA} disabled={loadingIA || !inputIA.trim()} className="w-full bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 transition-all flex justify-center items-center gap-2 disabled:opacity-50">{loadingIA ? <div className="loader border-white border-t-purple-600 w-4 h-4"></div> : '✨ Encontrar meu estilo'}</button></>) : (<div className="fade-in"><div className="bg-purple-50 p-4 rounded-xl border border-purple-100 mb-4"><p className="text-sm text-gray-700 italic">"{respostaIA.motivo}"</p></div>{respostaIA.id && (<button onClick={() => { const servico = CONFIG.servicos.find(s => s.id === respostaIA.id); if(servico) { setServicoExpandido(servico.id); setShowModalIA(false); } }} className="w-full bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600 transition-all">Ver {CONFIG.servicos.find(s => s.id === respostaIA.id)?.nome}</button>)}<button onClick={() => setRespostaIA(null)} className="w-full mt-2 text-gray-400 text-xs underline">Tentar de novo</button></div>)}</div></div></div> )}
+                {modalDetalhes && ( <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setModalDetalhes(null)}><div className="bg-white rounded-2xl max-w-sm w-full shadow-2xl scale-in overflow-hidden relative" onClick={e => e.stopPropagation()}><button onClick={() => setModalDetalhes(null)} className="absolute top-3 right-3 bg-black/50 text-white rounded-full p-1 z-10"><Icons.Close /></button><div className="h-64 bg-gray-100">
+                    <img 
+                        src={modalDetalhes.imagem} 
+                        alt={modalDetalhes.nome} 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.parentNode.style.backgroundColor = '#f3f4f6';
+                            e.target.parentNode.style.display = 'flex';
+                            e.target.parentNode.style.alignItems = 'center';
+                            e.target.parentNode.style.justifyContent = 'center';
+                            e.target.parentNode.style.fontSize = '12px';
+                            e.target.parentNode.style.color = '#9ca3af';
+                            e.target.parentNode.innerText = modalDetalhes.nome;
+                        }} 
+                    />
+                </div><div className="p-6"><h3 className="text-2xl font-bold text-gray-800 mb-2">{modalDetalhes.nome}</h3><div className="h-1 w-12 bg-pink-500 rounded mb-4"></div><p className="text-gray-600 text-sm leading-relaxed mb-6 text-justify">{modalDetalhes.fullDesc || modalDetalhes.desc}</p><button onClick={() => { setServicoExpandido(modalDetalhes.id); setModalDetalhes(null); }} className="w-full bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600 transition-all shadow-lg flex items-center justify-center gap-2"><Icons.Check /> Escolher este modelo</button></div></div></div> )}
+                {modalConfirmacao && ( <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 fade-in"><div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl scale-in text-center"><div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4"><Icons.Check /></div><h3 className="text-lg font-bold text-gray-800 mb-2">Confirmar Horário?</h3><p className="text-gray-600 text-sm mb-6">Você escolheu <strong>{horarioPendente}</strong>.<br/>Vamos prosseguir?</p><div className="flex flex-col gap-2"><button onClick={confirmarHorario} className="w-full bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600">Sim, Confirmar</button><button onClick={() => setModalConfirmacao(false)} className="w-full bg-gray-100 text-gray-500 font-bold py-3 rounded-xl hover:bg-gray-200">Escolher outro</button></div></div></div> )}
+                
+                {/* ALERTA GOOGLE CALENDAR */}
+                {showCalendarAlert && (
+                    <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in">
+                        <div className="bg-white rounded-2xl max-w-xs w-full shadow-2xl scale-in p-6 text-center">
+                            <div className="text-3xl mb-2">📅</div>
+                            <h3 className="font-bold text-gray-800 mb-2">Atenção!</h3>
+                            <p className="text-gray-600 text-sm mb-4">
+                                Vou abrir sua agenda do Google para você salvar o lembrete.
+                                <br/><br/>
+                                <strong>Importante:</strong> Depois de salvar, volte aqui para clicar no botão roxo e me enviar o comprovante no WhatsApp, tá?
+                            </p>
+                            <button onClick={enviarInviteAgenda} className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700">Entendi, abrir Agenda</button>
+                            <button onClick={() => setShowCalendarAlert(false)} className="w-full mt-2 text-gray-400 text-xs">Cancelar</button>
+                        </div>
+                    </div>
+                )}
+
+                {/* MODAL SUCESSO (Com Texto Ajustado) */}
+                {modalSucesso && (
+                    <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in">
+                        <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl scale-in p-8 text-center relative">
+                            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                                <div className="text-green-500 scale-150"><Icons.Check /></div>
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-2">Oba, {dados.nome.split(' ')[0]}! 🎉</h2>
+                            <h3 className="text-lg font-semibold text-pink-600 mb-4">Solicitação Enviada!</h3>
+                            
+                            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                                Agora aguarde a Le te responder confirmando o seu horário! 💖
+                            </p>
+                            <button 
+                                onClick={enviarWhatsapp} 
+                                className="w-full bg-[#25D366] hover:bg-[#1ebd59] text-white font-bold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 mb-3 transform transition hover:-translate-y-1"
+                            >
+                                <Icons.Whatsapp /> Enviar no Zap Agora
+                            </button>
+                            <button 
+                                onClick={() => { setModalSucesso(false); setStep(1); setDados({ ...dados, hora: '', data: '' }); }} 
+                                className="text-gray-400 hover:text-gray-600 text-sm underline"
+                            >
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    function TelaFinanceiro({ listaClientes }) {
+        const [despesas, setDespesas] = useState([]);
+        const [novaDespesa, setNovaDespesa] = useState({ nome: '', valor: '', tipo: 'fixa' });
+        
+        useEffect(() => {
+            const saved = localStorage.getItem('ls_despesas');
+            if(saved) setDespesas(JSON.parse(saved));
+        }, []);
+
+        const salvarDespesa = () => {
+            if(!novaDespesa.nome || !novaDespesa.valor) return;
+            const updated = [...despesas, { ...novaDespesa, id: Date.now() }];
+            setDespesas(updated);
+            localStorage.setItem('ls_despesas', JSON.stringify(updated));
+            setNovaDespesa({ nome: '', valor: '', tipo: 'fixa' });
+        };
+
+        const receitaTotal = listaClientes.reduce((acc, curr) => {
+            // Estimativa baseada no serviço (mockado pois não salvamos valor exato na lista simples)
+            return acc + 120; 
+        }, 0);
+
+        const despesaTotal = despesas.reduce((acc, curr) => acc + parseFloat(curr.valor), 0);
+        const lucro = receitaTotal - despesaTotal;
+
+        return (
+            <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
+                {/* Cards Resumo */}
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                    <div className="bg-green-50 p-3 rounded-xl border border-green-100 text-center">
+                        <span className="text-[10px] uppercase font-bold text-green-400 block">Receita</span>
+                        <span className="text-lg font-bold text-green-700">R${receitaTotal}</span>
+                    </div>
+                    <div className="bg-red-50 p-3 rounded-xl border border-red-100 text-center">
+                        <span className="text-[10px] uppercase font-bold text-red-400 block">Despesas</span>
+                        <span className="text-lg font-bold text-red-700">R${despesaTotal}</span>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 text-center">
+                        <span className="text-[10px] uppercase font-bold text-blue-400 block">Lucro</span>
+                        <span className="text-lg font-bold text-blue-700">R${lucro}</span>
+                    </div>
+                </div>
+                
+                {/* Barras Visuais */}
+                <div className="flex gap-1 h-2 w-full rounded-full overflow-hidden mb-4 bg-gray-100">
+                     <div style={{width: `${(receitaTotal / (receitaTotal + despesaTotal || 1)) * 100}%`}} className="bg-green-400"></div>
+                     <div style={{width: `${(despesaTotal / (receitaTotal + despesaTotal || 1)) * 100}%`}} className="bg-red-400"></div>
+                </div>
+
+                {/* Lista de Devedores / Pendentes (Estilo Imagem) */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div className="bg-purple-600 p-3 flex justify-between items-center text-white">
+                        <h3 className="font-bold text-sm flex items-center gap-2"><Icons.Alert /> Agendamentos (Cobrança)</h3>
+                    </div>
+                    <div className="divide-y divide-gray-100 max-h-60 overflow-y-auto">
+                        {listaClientes.length === 0 ? (
+                            <div className="p-4 text-center text-xs text-gray-400">Nenhum agendamento carregado.</div>
+                        ) : (
+                            listaClientes.map(d => (
+                                <div key={d.id} className="p-3 flex justify-between items-center hover:bg-gray-50">
+                                    <div className="flex gap-3 items-center">
+                                        <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xs uppercase">{d.nome.charAt(0)}</div>
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-800">{d.nome}</p>
+                                            <p className="text-[10px] text-gray-500 flex items-center gap-1"><Icons.Clock /> {d.hora} - {d.tipo}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                         <span className="text-[10px] text-gray-400 block">Valor:</span>
+                                         <span className="text-red-500 font-bold text-xs bg-red-50 px-2 py-1 rounded">R$ 120,00</span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                {/* Lançar Despesas */}
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 className="font-bold text-gray-700 mb-3 text-sm flex gap-2"><Icons.Chart /> Nova Despesa</h3>
+                    <div className="flex gap-2 mb-2">
+                        <input type="text" placeholder="Ex: Luz" className="flex-1 p-2 rounded-lg border text-sm" value={novaDespesa.nome} onChange={e => setNovaDespesa({...novaDespesa, nome: e.target.value})} />
+                        <input type="number" placeholder="R$" className="w-20 p-2 rounded-lg border text-sm" value={novaDespesa.valor} onChange={e => setNovaDespesa({...novaDespesa, valor: e.target.value})} />
+                    </div>
+                    <div className="flex gap-2">
+                        <select className="p-2 rounded-lg border text-sm bg-white" value={novaDespesa.tipo} onChange={e => setNovaDespesa({...novaDespesa, tipo: e.target.value})}>
+                            <option value="fixa">Fixa</option>
+                            <option value="variavel">Variável</option>
+                        </select>
+                        <button onClick={salvarDespesa} className="bg-red-500 text-white flex-1 rounded-lg text-sm font-bold hover:bg-red-600">Adicionar</button>
+                    </div>
+                    {/* Lista mini de despesas */}
+                    <div className="mt-3 space-y-1">
+                        {despesas.slice(-3).map(d => (
+                            <div key={d.id} className="flex justify-between text-xs text-gray-500 border-b border-gray-200 pb-1">
+                                <span>{d.nome}</span>
+                                <span>- R${d.valor}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // --- NOVO COMPONENTE: TELA ESTRATEGIA IA ---
+    
+    function TelaEstrategiaIA({ listaClientes, despesas }) {
+        const [analiseGeral, setAnaliseGeral] = useState("");
+        const [loadingGeral, setLoadingGeral] = useState(false);
+        const [pergunta, setPergunta] = useState("");
+        const [respostaChat, setRespostaChat] = useState("");
+        const [loadingChat, setLoadingChat] = useState(false);
+
+        const gerarAnaliseFinanceira = async () => {
+            setLoadingGeral(true);
+            const receitaEst = listaClientes.reduce((acc, curr) => acc + 120, 0); // Mock
+            const despesaEst = despesas.reduce((acc, curr) => acc + parseFloat(curr.valor), 0);
+            
+            const prompt = `
+                Você é uma consultora financeira especialista em Lash Designers.
+                Analise os dados:
+                - Receita Estimada do dia/período: R$ ${receitaEst}
+                - Despesas Totais cadastradas: R$ ${despesaEst}
+                - Número de atendimentos listados: ${listaClientes.length}
+                
+                Gere um relatório curto e estratégico com:
+                1. Ticket Médio (calculado).
+                2. Sugestão de ação para aumentar lucro (ex: combo, aumento de preço).
+                3. Um elogio ou alerta sobre os números.
+                Use emojis e formatação bonita.
+            `;
+            
+            const resposta = await chamarGemini(prompt, "Aja como uma especialista financeira de beleza.");
+            setAnaliseGeral(resposta || "Não foi possível gerar análise.");
+            setLoadingGeral(false);
+        };
+
+        const perguntarConselheira = async () => {
+            if(!pergunta) return;
+            setLoadingChat(true);
+            const prompt = `
+                Contexto: Sou Lash Designer. Tenho ${listaClientes.length} clientes agendadas hoje.
+                Minha pergunta estratégica é: "${pergunta}"
+                Responda de forma curta, direta e motivadora.
+            `;
+            const resposta = await chamarGemini(prompt, "Você é a Conselheira do Studio, uma mentora de negócios de beleza.");
+            setRespostaChat(resposta || "Erro ao conectar.");
+            setLoadingChat(false);
+        };
+
+        return (
+            <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
+                {/* Cabeçalho */}
+                <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 rounded-xl text-white shadow-md">
+                    <h3 className="font-bold text-lg flex items-center gap-2"><Icons.Sparkles /> Inteligência Financeira</h3>
+                    <p className="text-xs opacity-90">Sua mente mestra para lucrar mais.</p>
+                </div>
+
+                {/* Botão Gerar Relatório */}
+                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                    <h4 className="font-bold text-gray-700 text-sm mb-2">📊 Análise de Faturamento</h4>
+                    {!analiseGeral ? (
+                        <button onClick={gerarAnaliseFinanceira} disabled={loadingGeral} className="w-full bg-purple-100 text-purple-700 font-bold py-3 rounded-xl hover:bg-purple-200 transition-all flex items-center justify-center gap-2">
+                            {loadingGeral ? "Analisando..." : "Gerar Relatório Inteligente ✨"}
+                        </button>
+                    ) : (
+                        <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 animate-in fade-in">
+                            <div dangerouslySetInnerHTML={{ __html: analiseGeral.replace(/\n/g, '<br/>') }} />
+                            <button onClick={() => setAnaliseGeral("")} className="mt-3 text-xs text-purple-500 font-bold underline">Nova Análise</button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Conselheira Chat */}
+                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-1 flex flex-col">
+                    <h4 className="font-bold text-gray-700 text-sm mb-2 flex items-center gap-2"><Icons.Robot /> Conselheira do Studio</h4>
+                    <div className="flex-1 bg-gray-50 rounded-lg p-3 mb-3 text-sm text-gray-600 overflow-y-auto max-h-40">
+                        {respostaChat ? (
+                            <p>{respostaChat}</p>
+                        ) : (
+                            <p className="text-gray-400 italic text-xs">Ex: "Devo fazer promoção hoje?" ou "Qual combo vender?"</p>
+                        )}
+                    </div>
+                    <div className="flex gap-2">
+                        <input 
+                            type="text" 
+                            className="flex-1 border rounded-lg px-3 py-2 text-sm" 
+                            placeholder="Pergunte algo..." 
+                            value={pergunta} 
+                            onChange={(e) => setPergunta(e.target.value)}
+                        />
+                        <button onClick={perguntarConselheira} disabled={loadingChat} className="bg-pink-500 text-white p-2 rounded-lg">➤</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    function TelaProfissional({ onSair }) {
+        const [aba, setAba] = useState('confirma'); 
+        const getAmanha = () => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; };
+        const [dataLote, setDataLote] = useState(getAmanha());
+        const [listaClientes, setListaClientes] = useState([]);
+        const [bancoClientes, setBancoClientes] = useState([]);
+        const [loadingSync, setLoadingSync] = useState(false);
+        const [loadingPlanilha, setLoadingPlanilha] = useState(false);
+        const [despesas, setDespesas] = useState([]); // Estado levantado para compartilhar com EstrategiaIA
+        const [modalMsgIA, setModalMsgIA] = useState(null); 
+        const [msgGeradaIA, setMsgGeradaIA] = useState('');
+        const [loadingMsgIA, setLoadingMsgIA] = useState(false);
+        const [postIA, setPostIA] = useState({ servico: '', tom: 'divertido', legenda: '' });
+        const [modalAnaliseIA, setModalAnaliseIA] = useState(null);
+        const [analiseIA, setAnaliseIA] = useState(null);
+
+        // Ao carregar a tela profissional, já busca os clientes da planilha e despesas
+        useEffect(() => {
+            baixarClientesPlanilha();
+            const savedDespesas = localStorage.getItem('ls_despesas');
+            if(savedDespesas) setDespesas(JSON.parse(savedDespesas));
+        }, []);
+
+        const baixarClientesPlanilha = async () => {
+            setLoadingPlanilha(true);
+            try {
+                // Chama o doGet do script
+                const response = await fetch(`${CONFIG.scriptGoogleUrl}?t=${Date.now()}`);
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    setBancoClientes(data);
+                }
+            } catch (e) {
+                console.error("Erro ao baixar clientes:", e);
+            }
+            setLoadingPlanilha(false);
+        };
+        
+        const sincronizarGoogleAgenda = async () => { 
+            setLoadingSync(true); 
+            // Usa o .ics público apenas para ver ocupados e montar a lista de "hoje"
+            const eventos = await fetchRawEvents(CONFIG.icalUrlPrivate, dataLote); 
+            const listaFinal = eventos.map(ev => ({ 
+                id: Date.now() + Math.random(), 
+                nome: ev.summary ? ev.summary.split('-')[0].trim() : 'Cliente', 
+                hora: ev.localHour ? (ev.localHour < 10 ? '0'+ev.localHour : ev.localHour) + ":00" : "00:00", 
+                status: 'pendente', 
+                tipo: ev.location && ev.location.length > 5 ? 'domicilio' : 'studio' 
+            }));
+            setListaClientes(listaFinal);
+            setLoadingSync(false); 
+        };
+
+        const gerarLegendaInstagram = async () => {
+            if (!postIA.servico) return;
+            setLoadingMsgIA(true);
+            const prompt = `Crie uma legenda para Instagram para uma Lash Designer. Serviço: ${postIA.servico}. Tom de voz: ${postIA.tom}. A legenda deve ser engajadora, usar emojis e hashtags relevantes.`;
+            const texto = await chamarGemini(prompt, "Você é um especialista em Marketing Digital para beleza.");
+            if(texto) { setPostIA({...postIA, legenda: texto}); }
+            setLoadingMsgIA(false);
+        };
+        
+        // --- FUNÇÕES DE ANÁLISE IA (Restauradas) ---
+        const getDiasSemVisita = (dataUltimaVisita) => {
+            if (!dataUltimaVisita) return 999;
+            const ultima = new Date(dataUltimaVisita);
+            const hoje = new Date();
+            const diffTime = Math.abs(hoje - ultima);
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        };
+
+        const isAniversariante = (dataNasc) => {
+            if (!dataNasc) return false;
+            let dia, mes;
+            if (dataNasc.includes('/')) {
+                [dia, mes] = dataNasc.split('/');
+            } else {
+                [, mes, dia] = dataNasc.split('-');
+            }
+            const hoje = new Date();
+            return parseInt(dia) === hoje.getDate() && parseInt(mes) === (hoje.getMonth() + 1);
+        };
+        
+        const gerarMensagemSaudade = (cliente) => {
+            const msg = `Oii ${cliente.nome}, sumida! 👻\nEstamos com saudades de você aqui no LS Cílios!\n\nQue tal agendar uma manutenção ou uma nova aplicação para renovar o olhar? 🥰\n\nMe chama aqui!`;
+            const link = `https://wa.me/55${cliente.zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
+            window.open(link, '_blank');
+        };
+
+        const gerarMensagemParabens = (cliente) => {
+            const msg = `Parabéns ${cliente.nome}! 🎂🥳\nHoje é o seu dia e queremos te desejar muitas felicidades!\n\nComo presente, que tal vir ficar ainda mais linda com a gente? ✨`;
+            const link = `https://wa.me/55${cliente.zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
+            window.open(link, '_blank');
+        };
+
+        const gerarAnaliseCliente = async (cliente) => {
+            setLoadingMsgIA(true);
+            const diasSemVisita = getDiasSemVisita(cliente.ultima_visita);
+            const hojeStr = new Date().toLocaleDateString();
+            const visitaStr = cliente.ultima_visita ? new Date(cliente.ultima_visita).toLocaleDateString() : 'Nenhuma';
+
+            const prompt = `Analise a cliente ${cliente.nome}. Última visita: ${visitaStr}. Hoje: ${hojeStr}. Dias sem visita: ${diasSemVisita}.
+            Com base nisso, defina:
+            1. Status do Ciclo (Recente / Manutenção / Recuperação).
+            2. Uma mensagem de WhatsApp curta, carinhosa e estratégica para esse status.
+            3. Uma dica de beleza rápida e útil sobre cuidados com cílios para enviar de brinde/conteúdo.
+            Responda EXATAMENTE neste formato JSON: { "status": "string", "mensagem": "string", "dica": "string" }`;
+
+            const resultado = await chamarGemini(prompt, "Você é um especialista em CRM de beleza.");
+            
+            if (resultado) {
+                try {
+                    let cleanJson = resultado.replace(/```json/g, "").replace(/```/g, "").trim();
+                    const analise = JSON.parse(cleanJson);
+                    setAnaliseIA(analise);
+                } catch (e) {
+                    console.error("Erro ao parsear JSON IA", e);
+                    setAnaliseIA({ status: "Erro", mensagem: "Não consegui analisar agora.", dica: "" });
+                }
+            }
+            setLoadingMsgIA(false);
+        };
+
+        const enviarMensagemAnalise = (zap, msg) => {
+            const link = `https://wa.me/55${zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
+            window.open(link, '_blank');
+        };
+
+        return (
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 fade-in relative min-h-[600px] flex flex-col">
+                <button onClick={onSair} className="absolute top-4 right-4 text-white hover:text-red-200 z-10"><Icons.LogOut /></button>
+                <div className="bg-purple-600 p-6 text-white">
+                    <h2 className="text-xl font-bold">Painel da Le</h2>
+                    <div className="flex gap-4 mt-4 text-xs font-bold overflow-x-auto whitespace-nowrap pb-2">
+                        <button onClick={() => setAba('confirma')} className={`pb-1 border-b-2 transition-colors ${aba === 'confirma' ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>AGENDA</button>
+                        <button onClick={() => setAba('financeiro')} className={`pb-1 border-b-2 transition-colors ${aba === 'financeiro' ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>FINANCEIRO</button>
+                        <button onClick={() => setAba('estrategia')} className={`pb-1 border-b-2 transition-colors ${aba === 'estrategia' ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>ESTRATÉGIA</button>
+                        <button onClick={() => setAba('clientes')} className={`pb-1 border-b-2 transition-colors ${aba === 'clientes' ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>CLIENTES</button>
+                        <button onClick={() => setAba('marketing')} className={`pb-1 border-b-2 transition-colors ${aba === 'marketing' ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>MKT</button>
+                    </div>
+                </div>
+
+                {aba === 'confirma' && (
+                    <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
+                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                             <div className="flex gap-2 mb-2">
+                                <input type="date" className="flex-1 p-2 rounded-lg border text-sm font-bold text-gray-600" value={dataLote} onChange={e => setDataLote(e.target.value)} />
+                                <button onClick={sincronizarGoogleAgenda} className="bg-blue-600 text-white px-3 rounded-lg text-xs font-bold flex items-center gap-1 shadow hover:bg-blue-700">{loadingSync ? '...' : <Icons.Refresh />} Buscar</button>
+                             </div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto space-y-2">
+                            {listaClientes.length === 0 && <p className="text-center text-gray-400 text-xs mt-4">Nenhum agendamento para este dia.</p>}
+                            {listaClientes.map((cliente) => (
+                                <div key={cliente.id} className="p-3 rounded-xl border flex flex-col gap-2 bg-white">
+                                    <div className="flex justify-between items-start">
+                                        <div><p className="font-bold text-sm text-gray-800">{cliente.nome}</p><span className="bg-gray-100 text-xs px-1.5 rounded text-gray-600">{cliente.hora}</span></div>
+                                        <div className={`text-xs font-bold px-2 py-1 rounded border ${cliente.tipo === 'domicilio' ? 'bg-yellow-50 text-yellow-700' : 'bg-purple-50 text-purple-700'}`}>{cliente.tipo === 'domicilio' ? 'Casa' : 'Studio'}</div>
+                                    </div>
+                                    <button onClick={() => { const link = `https://wa.me/?text=Olá ${cliente.nome}, confirmando!`; window.open(link, '_blank'); }} className="w-full py-1 rounded-lg font-bold text-xs flex items-center justify-center gap-1 bg-green-500 text-white">Confirmar <Icons.Whatsapp /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {aba === 'financeiro' && (
+                    <TelaFinanceiro listaClientes={listaClientes} />
+                )}
+
+                {aba === 'estrategia' && (
+                    <TelaEstrategiaIA listaClientes={listaClientes} despesas={despesas} />
+                )}
+
+                {aba === 'clientes' && (
+                    <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
+                         <button onClick={baixarClientesPlanilha} className="w-full bg-green-100 text-green-700 font-bold py-2 rounded-lg text-xs mb-2 flex items-center justify-center gap-1">{loadingPlanilha ? 'Atualizando...' : '🔄 Atualizar Lista'}</button>
+                         {bancoClientes.length === 0 ? <p className="text-center text-gray-400 text-xs">Nenhum cliente encontrado.</p> : bancoClientes.map((c, i) => {
+                             const diasSumida = getDiasSemVisita(c.ultima_visita);
+                             const isNiver = isAniversariante(c.nascimento);
+                             const isSumida = diasSumida > 45;
+                             
+                             return (
+                                 <div key={i} className={`p-3 rounded-xl border mb-2 relative ${isNiver ? 'bg-pink-50 border-pink-200' : 'bg-white border-gray-200'}`}>
+                                     {isNiver && <span className="absolute top-2 right-2 bg-pink-500 text-white text-[9px] px-2 py-0.5 rounded-full animate-bounce">🎂 Niver Hoje!</span>}
+                                     {!isNiver && isSumida && <span className="absolute top-2 right-2 bg-gray-200 text-gray-500 text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1">👻 Sumida ({diasSumida}d)</span>}
+                                     
+                                     <p className="font-bold text-sm text-gray-800">{c.nome}</p>
+                                     <p className="text-xs text-gray-400 mb-2">Zap: {c.zap}</p>
+                                     
+                                     <div className="flex gap-2">
+                                         <button onClick={() => { setModalAnaliseIA(c); gerarAnaliseCliente(c); }} className="flex-1 bg-purple-100 text-purple-600 py-1 rounded text-[10px] font-bold hover:bg-purple-200 flex items-center justify-center gap-1">✨ Analisar</button>
+                                         {isNiver && (<button onClick={() => gerarMensagemParabens(c)} className="flex-1 bg-pink-100 text-pink-600 py-1 rounded text-[10px] font-bold hover:bg-pink-200">Parabéns 🎉</button>)}
+                                         {isSumida && !isNiver && (<button onClick={() => gerarMensagemSaudade(c)} className="flex-1 bg-gray-100 text-gray-600 py-1 rounded text-[10px] font-bold hover:bg-gray-200">Mandar Oi Sumida 👋</button>)}
+                                     </div>
+                                 </div>
+                             )
+                         })}
+                    </div>
+                )}
+
+                {aba === 'marketing' && (
+                    <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
+                        <div className="bg-pink-50 p-4 rounded-xl border border-pink-200">
+                            <h3 className="font-bold text-pink-700 text-sm mb-3 flex items-center gap-2"><Icons.Gemini /> Gerador de Legenda</h3>
+                            <label className="text-xs font-bold text-gray-500">Sobre qual serviço?</label>
+                            <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.servico} onChange={(e) => setPostIA({...postIA, servico: e.target.value})}><option value="">Selecione...</option>{CONFIG.servicos.map(s => <option key={s.id} value={s.nome}>{s.nome}</option>)}</select>
+                            <label className="text-xs font-bold text-gray-500">Qual o tom?</label>
+                            <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.tom} onChange={(e) => setPostIA({...postIA, tom: e.target.value})}><option value="Divertido">Divertido 😄</option><option value="Profissional">Profissional 💼</option><option value="Inspirador">Inspirador ✨</option><option value="Promocional">Promocional 🏷️</option></select>
+                            <button onClick={gerarLegendaInstagram} disabled={loadingMsgIA || !postIA.servico} className="w-full bg-pink-500 text-white font-bold py-2 rounded-lg text-sm hover:bg-pink-600 disabled:opacity-50">{loadingMsgIA ? 'Criando mágica...' : '✨ Criar Legenda'}</button>
+                        </div>
+                        {postIA.legenda && (<div className="flex-1 bg-white p-4 rounded-xl border border-gray-200 flex flex-col relative fade-in"><h4 className="text-xs font-bold text-gray-500 mb-2">Resultado:</h4><textarea className="w-full h-32 p-2 bg-gray-50 rounded border text-sm mb-2" value={postIA.legenda} readOnly></textarea><button onClick={() => { navigator.clipboard.writeText(postIA.legenda); alert("Copiado!"); }} className="absolute top-4 right-4 text-gray-400 hover:text-purple-600" title="Copiar"><Icons.Copy /></button></div>)}
+                    </div>
+                )}
+                
+                {/* MODAL ANALISE IA */}
+                {modalAnaliseIA && (
+                    <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setModalAnaliseIA(null)}>
+                        <div className="bg-white rounded-xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
+                            <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 text-white"><button onClick={() => setModalAnaliseIA(null)} className="absolute top-4 right-4"><Icons.Close /></button><h3 className="font-bold text-lg flex gap-2 items-center"><Icons.Analysis /> Análise de Perfil</h3><p className="text-xs opacity-90">{modalAnaliseIA.nome}</p></div>
+                            <div className="p-5 space-y-4">
+                                {loadingMsgIA ? (<div className="flex flex-col items-center py-8 gap-3"><div className="loader border-purple-200 border-t-purple-600"></div><p className="text-xs text-gray-500">Analisando ciclo da cliente...</p></div>) : analiseIA ? (<><div className="flex items-center gap-3 bg-purple-50 p-3 rounded-lg border border-purple-100"><div className="text-2xl">📊</div><div><p className="text-[10px] text-gray-500 uppercase font-bold">Status Atual</p><p className="text-sm font-bold text-purple-700">{analiseIA.status}</p></div></div><div><p className="text-xs font-bold text-gray-500 mb-1 flex gap-1 items-center"><Icons.Sparkles /> Sugestão de Mimo (Dica)</p><div className="bg-yellow-50 p-3 rounded-lg border border-yellow-100 text-xs text-gray-700 italic">"{analiseIA.dica}"</div><button onClick={() => enviarMensagemAnalise(modalAnaliseIA.zap, `Oi ${modalAnaliseIA.nome}! ✨ Lembrei de você com essa dica: ${analiseIA.dica}`)} className="w-full mt-2 text-xs text-yellow-600 font-bold hover:underline text-right">Enviar Dica 🎁</button></div><div><p className="text-xs font-bold text-gray-500 mb-1 flex gap-1 items-center"><Icons.Whatsapp /> Mensagem Estratégica</p><textarea className="w-full h-24 p-3 border rounded-lg text-sm bg-gray-50" value={analiseIA.mensagem} readOnly></textarea><button onClick={() => enviarMensagemAnalise(modalAnaliseIA.zap, analiseIA.mensagem)} className="w-full mt-2 bg-green-500 text-white py-2 rounded-lg text-xs font-bold hover:bg-green-600 flex justify-center gap-2">Enviar Agora <Icons.Whatsapp /></button></div></>) : ( <p className="text-center text-gray-500 text-sm">Não foi possível gerar a análise. Verifique sua chave API.</p> )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+    
+    // --- COMPONENTE DE LOGIN ---
+    function TelaLogin({ onLogin }) {
+        const [pass, setPass] = useState('');
+        const [erro, setErro] = useState(false);
+        const tentarLogin = () => { if(pass === CONFIG.senhaAdmin) { onLogin(); } else { setErro(true); } };
+
+        return (
+            <div className="flex items-center justify-center min-h-[300px] p-8 fade-in">
+                <div className="w-full max-w-xs text-center">
+                    <div className="mb-4 text-purple-600 text-5xl"><Icons.Lock /></div>
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">Acesso Restrito</h2>
+                    <input type="password" placeholder="Senha" className="w-full p-3 border rounded-xl mb-3 text-center" value={pass} onChange={e => {setPass(e.target.value); setErro(false);}} />
+                    {erro && <p className="text-red-500 text-xs font-bold mb-3">Senha incorreta!</p>}
+                    <button onClick={tentarLogin} className="w-full bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700">Entrar</button>
+                    <button onClick={() => window.location.reload()} className="mt-4 text-xs text-gray-400 hover:text-gray-600">Voltar para o site</button>
+                </div>
+            </div>
+        )
+    }
+
+    // --- APP PRINCIPAL ---
+    function App() {
+        const [tela, setTela] = useState('cliente');
+        const [horariosOcupados, setHorariosOcupados] = useState([]);
+        const [horariosDoDia, setHorariosDoDia] = useState([]); 
+        const [carregandoHorarios, setCarregandoHorarios] = useState(false);
+
+        const verificarDisponibilidade = async (data) => {
+            setCarregandoHorarios(true);
+            setHorariosOcupados([]); 
+            const slotsPossiveis = getHorariosPorDia(data);
+            setHorariosDoDia(slotsPossiveis);
+            if (slotsPossiveis.length === 0) { setCarregandoHorarios(false); return; }
+            const ocupados = await fetchICSAndParse(CONFIG.icalUrlPublic, data, slotsPossiveis);
+            setHorariosOcupados(ocupados);
+            setCarregandoHorarios(false);
+        };
+
+        return (
+            <div className="min-h-screen bg-pink-50 p-4 md:p-8 font-sans">
+                <div className="max-w-md mx-auto relative">
+                    <div className="text-center mb-6 pt-4 flex flex-col items-center">
+                        <img src="img/logo.png" alt="Logo" className="w-20 h-20 mb-2 object-contain" onError={(e) => { e.target.style.display = 'none'; }} />
+                        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Ls <span className="text-pink-600">Cílios</span></h1>
+                        <p className="text-sm text-gray-500 tracking-widest uppercase mt-1">Realce sua beleza</p>
+                    </div>
+                    <div className="relative">
+                        {tela === 'cliente' && (
+                            <>
+                                <TelaCliente verificarDisponibilidade={verificarDisponibilidade} horariosOcupados={horariosOcupados} carregandoHorarios={carregandoHorarios} horariosDoDia={horariosDoDia} />
+                                <div className="text-center mt-8 opacity-30 hover:opacity-100 transition-opacity"><button onClick={() => setTela('login')} className="text-xs text-gray-400 flex items-center justify-center gap-1 mx-auto"><Icons.Lock /> Área Profissional</button></div>
+                                <ChatbotIA />
+                            </>
+                        )}
+                        {tela === 'login' && <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100"><TelaLogin onLogin={() => setTela('profissional')} /></div>}
+                        {tela === 'profissional' && <TelaProfissional onSair={() => setTela('cliente')} />}
+                    </div>
+                    <div className="text-center mt-8 pb-4"><p className="text-[10px] text-gray-400">© 2024 Ls Cílios - Desenvolvido com carinho 💖</p></div>
+                </div>
+            </div>
+        );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+
+</script>
 
 </body>
 </html>
