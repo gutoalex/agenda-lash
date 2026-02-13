@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Agenda da Le - Ls Cílios</title>
     
     <!-- Dependências -->
@@ -23,37 +23,39 @@
         .sparkle-icon { animation: sparkle 2s infinite; }
         @keyframes sparkle { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(0.5); } }
         
-        /* --- CORREÇÃO AVANÇADA PARA IOS (IPHONE) --- */
+        /* --- CORREÇÃO CRÍTICA PARA IOS (IPHONE) --- */
         input[type="date"] {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            min-height: 52px; /* Altura maior para toque */
-            background-color: white;
+            display: block;
+            width: 100%;
+            height: 52px; /* Altura fixa para toque */
+            padding: 10px 15px;
+            background-color: #ffffff !important;
             border: 1px solid #e5e7eb;
             border-radius: 0.75rem;
-            padding: 0 16px;
-            width: 100%;
-            color: #1f2937; /* Cinza escuro forte */
             font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            line-height: 52px; /* Centraliza verticalmente */
-            display: block;
-            color-scheme: light; /* Força modo claro no calendário nativo */
+            font-size: 16px; /* Evita zoom automático no iOS */
+            color: #374151;
+            line-height: 1.5;
+            box-shadow: none;
         }
         
-        /* Corrige alinhamento do texto da data no iOS */
-        input[type="date"]::-webkit-date-and-time-value {
-            text-align: left;
+        /* Remove ícone padrão feio se necessário, mas mantém funcionalidade */
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-calendar-picker-indicator {
             display: block;
-            height: 52px;
-            line-height: 52px;
-        }
-
-        /* Estilo para input quando focado ou com valor */
-        .input-padrao {
-            min-height: 52px;
-            padding: 12px 16px;
+            -webkit-appearance: none;
+            opacity: 1; 
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" viewBox="0 0 24 24"><path fill="%23db2777" d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 20px;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -373,6 +375,23 @@
         } catch (e) { console.error(e); }
     };
 
+    // --- FUNÇÕES DE VALIDAÇÃO E MÁSCARA ---
+
+    const formatarTelefone = (value) => {
+        const numero = value.replace(/\D/g, "");
+        if (numero.length <= 10) {
+            return numero.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+        } else {
+            return numero.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, "($1) $2-$3");
+        }
+    };
+
+    const validarEmail = (email) => {
+        if (!email) return true; // Email é opcional
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+
     // --- 4. COMPONENTES ---
 
     function ChatbotIA() {
@@ -449,6 +468,11 @@
         const handleCliqueHorario = (hora) => { if (horariosOcupados.includes(hora)) return; setHorarioPendente(hora); setModalConfirmacao(true); };
         const confirmarHorario = () => { setDados({ ...dados, hora: horarioPendente }); setModalConfirmacao(false); };
 
+        const handlePhoneChange = (e) => {
+            const formatted = formatarTelefone(e.target.value);
+            setDados({ ...dados, whatsapp: formatted });
+        };
+
         const enviarWhatsapp = () => {
             const dataFormatada = dados.data.split('-').reverse().slice(0, 2).join('/');
             let tipoTexto = "";
@@ -478,7 +502,36 @@
         };
 
         const salvarEAvancar = () => {
-            if (!dados.nome || !dados.data || !dados.hora) { alert("Preencha data e hora!"); return; }
+            // Validações específicas e amigáveis
+            if (!dados.nome || dados.nome.trim() === "") { 
+                alert("Opa! Você esqueceu de preencher seu Nome. 🫣"); 
+                return; 
+            }
+            if (!dados.whatsapp || dados.whatsapp.trim() === "") { 
+                alert("Preciso do seu WhatsApp para confirmar o agendamento! 📱"); 
+                return; 
+            }
+            if (dados.whatsapp.length < 14) { 
+                alert("O número do WhatsApp parece incompleto. Não esqueça do DDD! 📞"); 
+                return; 
+            }
+            if (!dados.email || dados.email.trim() === "") { 
+                alert("Por favor, preencha seu E-mail. 📧"); 
+                return; 
+            }
+            if (!validarEmail(dados.email)) { 
+                alert("O e-mail digitado não parece válido. Dá uma conferida? 🧐"); 
+                return; 
+            }
+            if (!dados.data) { 
+                alert("Faltou escolher a Data do atendimento! 📅"); 
+                return; 
+            }
+            if (!dados.hora) { 
+                alert("Selecione um Horário disponível logo abaixo da data! ⏰"); 
+                return; 
+            }
+            
             salvarAgendamentoPlanilha(dados);
             setModalSucesso(true);
         };
@@ -570,18 +623,20 @@
                             <div className="mb-4 bg-white border border-gray-100 rounded-xl p-3 shadow-sm"><h3 className="text-xs font-bold text-gray-500 mb-2 uppercase flex items-center gap-1">Antes de vir:</h3><div className="grid grid-cols-2 gap-2 text-[10px] text-gray-600"><div className="flex items-center gap-1"><Icons.Clock /><span className="text-[9px]">Duração: 1h30 a 2h30</span></div><div className="flex items-center gap-1"><Icons.EyeOff /><span className="text-[9px]">Sem Rímel</span></div><div className="flex items-center gap-1"><span className="text-xs">👓</span><span className="text-[9px]">Remover Lentes</span></div><div className="flex items-center gap-1"><span className="text-xs">⏰</span><span className="text-[9px]">Tolerância 15min</span></div></div><div className="mt-2 pt-2 border-t border-gray-100 text-[9px] text-red-400 leading-tight">⚠️ <strong>Contraindicações:</strong> Alergias, doenças oculares ativas (conjuntivite) ou pele extremamente sensível.</div></div>
                             <div className="space-y-3">
                                 <input type="text" className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="Seu Nome *" value={dados.nome} onChange={(e) => setDados({...dados, nome: e.target.value})} />
-                                <input type="tel" className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="WhatsApp *" value={dados.whatsapp} onChange={(e) => setDados({...dados, whatsapp: e.target.value})} />
-                                <div className="flex gap-2"><input type="email" className="flex-1 p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="E-mail" value={dados.email} onChange={(e) => setDados({...dados, email: e.target.value})} /><div className="w-2/5">
-                                    <input 
-                                        type="text" 
-                                        onFocus={(e) => e.target.type = 'date'} 
-                                        onBlur={(e) => { if(!e.target.value) e.target.type = 'text'; }} 
-                                        className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" 
-                                        placeholder="Nascimento" 
-                                        value={dados.nascimento} 
-                                        onChange={(e) => setDados({...dados, nascimento: e.target.value})} 
-                                    />
-                                </div></div>
+                                <input type="tel" className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="WhatsApp *" value={dados.whatsapp} onChange={handlePhoneChange} maxLength="15" />
+                                <div className="flex gap-2">
+                                    <input type="email" className="flex-1 p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="E-mail" value={dados.email} onChange={(e) => setDados({...dados, email: e.target.value})} />
+                                    <div className="w-2/5 relative">
+                                        <label className="absolute -top-2 left-2 bg-white px-1 text-[10px] text-gray-400">Nascimento</label>
+                                        <input 
+                                            type="date" 
+                                            max={hoje}
+                                            className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" 
+                                            value={dados.nascimento} 
+                                            onChange={(e) => setDados({...dados, nascimento: e.target.value})} 
+                                        />
+                                    </div>
+                                </div>
                                 <hr className="border-dashed border-gray-200 my-2"/>
                                 <div className="p-3 bg-gray-50 rounded-xl border border-gray-200"><label className="block text-xs font-bold text-gray-500 mb-2">ONDE SERÁ O ATENDIMENTO?</label><div className="flex gap-2 mb-3"><button onClick={() => setDados({...dados, tipoAtendimento: 'studio'})} className={`flex-1 py-2 text-sm rounded-lg border font-medium flex items-center justify-center gap-2 ${dados.tipoAtendimento === 'studio' ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-500'}`}><Icons.Briefcase /> No Studio</button><button onClick={() => setDados({...dados, tipoAtendimento: 'domicilio'})} className={`flex-1 py-2 text-sm rounded-lg border font-medium flex items-center justify-center gap-2 ${dados.tipoAtendimento === 'domicilio' ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-500'}`}><Icons.Home /> A Domicílio</button></div>{dados.tipoAtendimento === 'domicilio' && (<div className="fade-in"><div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-[10px] text-yellow-800 mb-2">⚠️ Taxa de Uber será cobrada.</div><input type="text" className="w-full p-2 bg-white rounded-lg border text-sm mb-2 text-gray-900 placeholder-gray-400" placeholder="Endereço *" value={dados.endereco} onChange={(e) => setDados({...dados, endereco: e.target.value})} /><input type="text" className="w-full p-2 bg-white rounded-lg border text-sm" placeholder="Complemento" value={dados.complemento} onChange={(e) => setDados({...dados, complemento: e.target.value})} /></div>)}</div>
                                 <div className="pt-2">
@@ -933,6 +988,7 @@
         const sincronizarGoogleAgenda = async () => { 
             setLoadingSync(true); 
             // Usa o .ics público apenas para ver ocupados e montar a lista de "hoje"
+            // Para ter nomes reais aqui, o ideal seria cruzar com a planilha, mas por enquanto usamos o ICS
             const eventos = await fetchRawEvents(CONFIG.icalUrlPrivate, dataLote); 
             const listaFinal = eventos.map(ev => ({ 
                 id: Date.now() + Math.random(), 
