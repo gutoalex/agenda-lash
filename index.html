@@ -75,12 +75,11 @@
         emailProfissional: "lscilios.contato@gmail.com", 
         senhaAdmin: "1234",
         
-        // SUA NOVA URL AQUI
+        // URL DO SCRIPT GOOGLE
         scriptGoogleUrl: "https://script.google.com/macros/s/AKfycbz64IT565CxQvlkOds-gqlnX-gJOIKZuWozhrrxkPmCcRQ8SNLRge_m6QPmGyaC3tF-QQ/exec", 
         
         icalUrlPrivate: "https://calendar.google.com/calendar/ical/lscilios.contato%40gmail.com/private-994f64be13e6b1d832cf279c97c36175/basic.ics",
         icalUrlPublic: "https://calendar.google.com/calendar/ical/lscilios.contato%40gmail.com/public/basic.ics",
-        linkAgendaPublicaGoogle: "https://calendar.google.com/calendar/embed?src=lscilios.contato%40gmail.com&ctz=America%2FSao_Paulo", 
         
         depoimentos: [
             { nome: "Cliente", texto: "Amo sua flexibilidade, paciência e atendimento. Você me dá a liberdade de escolher o estilo e a durabilidade é ótima!" },
@@ -112,7 +111,7 @@
         LogOut: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>,
         Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
         Trash: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
-        Eye: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8-11-8-11-8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>,
+        Eye: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8-11-8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>,
         Mail: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>,
         Cake: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M2 21h20"></path><path d="M7 8v2"></path><path d="M12 8v2"></path><path d="M17 8v2"></path><path d="M7 4h.01"></path><path d="M12 4h.01"></path><path d="M17 4h.01"></path></svg>,
         Alert: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>,
@@ -172,7 +171,7 @@
         if(!dateStr) return [];
         const [y, m, d] = dateStr.split('-').map(Number);
         const date = new Date(y, m - 1, d);
-        const day = date.getDay(); 
+        const day = date.getDay(); // 0=Dom, 1=Seg, ...
 
         const gerar = (inicio, fim) => {
             const lista = [];
@@ -440,7 +439,6 @@
         const [horarioPendente, setHorarioPendente] = useState('');
         const [modalSucesso, setModalSucesso] = useState(false);
         const [showCalendarAlert, setShowCalendarAlert] = useState(false);
-        const [enviouZap, setEnviouZap] = useState(false);
 
         const [servicoExpandido, setServicoExpandido] = useState(null);
         const [modalDetalhes, setModalDetalhes] = useState(null);
@@ -484,7 +482,6 @@
             mensagem += `\n\nGostaria de agendar:\n*${dados.servicoObj.nome}*\nTipo: *${tipoTexto}* (R$ ${dados.precoFinal},00)\n\n🗓 Data: *${dataFormatada}*\n⏰ Horário: *${dados.hora}*`;
             if(dados.tipoAtendimento === 'domicilio') { mensagem += `\n\n📍 *A DOMICÍLIO*\nLocal: ${dados.endereco}\n⚠️ *Ciente da taxa de Uber.*`; } else { mensagem += `\n\n📍 No Studio`; }
             window.open(`https://wa.me/${CONFIG.telefoneProfissional}?text=${encodeURIComponent(mensagem)}`, '_blank');
-            setEnviouZap(true);
         };
 
         const enviarInviteAgenda = () => {
@@ -502,16 +499,20 @@
             setShowCalendarAlert(false);
         };
 
-        const salvarEAvancar = async () => {
+        const salvarEAvancar = () => {
             if (!dados.nome || !dados.whatsapp || !dados.data || !dados.hora) { alert("Por favor, preencha todos os campos obrigatórios!"); return; }
             if (dados.whatsapp.length < 14) { alert("Digite um WhatsApp válido com DDD."); return; }
             if (!validarEmail(dados.email)) { alert("Digite um e-mail válido."); return; }
+            if (!dados.servicoObj || !dados.servicoObj.nome) { alert("Erro: Serviço não selecionado corretamente."); return; }
             
-            setLoadingIA(true); 
-            // Espera uns instantes para dar feedback visual antes de abrir o modal
-            await new Promise(r => setTimeout(r, 1500));
+            if (dados.tipoAtendimento === 'domicilio') {
+                if (!dados.endereco || dados.endereco.trim().length < 5) {
+                    alert("Por favor, digite o endereço completo para o atendimento a domicílio.");
+                    return;
+                }
+            }
+
             salvarAgendamentoPlanilha(dados);
-            setLoadingIA(false);
             setModalSucesso(true);
         };
 
@@ -646,17 +647,7 @@
                                 </div>
                                 <div className="flex justify-center gap-4 text-gray-400 py-2 border-t border-gray-100"><div className="flex flex-col items-center gap-1"><Icons.Smartphone /><span className="text-[8px]">Pix</span></div><div className="flex flex-col items-center gap-1"><Icons.CreditCard /><span className="text-[8px]">Cartão</span></div><div className="flex flex-col items-center gap-1"><Icons.Dollar /><span className="text-[8px]">Dinheiro</span></div></div>
                                 {dados.hora && (<div className="fade-in space-y-3 pt-2">
-                                    <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 text-center mb-2">
-                                        <p className="text-xs text-blue-800 mb-2">Antes de finalizar:</p>
-                                        <button onClick={() => setShowCalendarAlert(true)} className="w-full bg-white text-blue-600 font-bold py-2 rounded-lg border border-blue-200 hover:bg-blue-50 flex items-center justify-center gap-2 text-sm shadow-sm"><Icons.Calendar /> Adicionar ao Google Agenda</button>
-                                    </div>
-                                    <button 
-                                        onClick={salvarEAvancar} 
-                                        disabled={loadingIA}
-                                        className={`w-full bg-gradient-to-r from-purple-600 to-purple-800 text-white font-bold py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 mt-2 flex items-center justify-center gap-2 ${loadingIA ? 'opacity-75 cursor-wait' : ''}`}
-                                    >
-                                        {loadingIA ? 'Confirmando...' : 'AGENDAR E ENVIAR ZAP'} <Icons.Whatsapp />
-                                    </button>
+                                    <button onClick={salvarEAvancar} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transform transition hover:-translate-y-1">Agendar e Enviar Zap <Icons.Whatsapp /></button>
                                 </div>)}
                             </div>
                         </div>
@@ -709,34 +700,19 @@
                                 <div className="text-green-500 scale-150"><Icons.Check /></div>
                             </div>
                             <h2 className="text-2xl font-bold text-gray-800 mb-2">Oba, {dados.nome.split(' ')[0]}! 🎉</h2>
+                            <h3 className="text-lg font-semibold text-pink-600 mb-4">Solicitação Enviada!</h3>
                             
-                            {!enviouZap ? (
-                                <>
-                                    <h3 className="text-lg font-semibold text-pink-600 mb-4">Agendamento Realizado!</h3>
-                                    <div className="bg-green-50 text-green-700 px-4 py-2 rounded-lg mb-6 text-sm font-bold border border-green-200">
-                                        Agenda criada com sucesso! ✅
-                                    </div>
-                                    <p className="text-gray-600 text-sm mb-6">
-                                        Agora é só enviar os detalhes no WhatsApp para confirmar tudo certinho.
-                                    </p>
-                                    <button 
-                                        onClick={enviarWhatsapp} 
-                                        className="w-full bg-[#25D366] hover:bg-[#1ebd59] text-white font-bold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 mb-3 transform transition hover:-translate-y-1"
-                                    >
-                                        <Icons.Whatsapp /> Enviar no Zap Agora
-                                    </button>
-                                </>
-                            ) : (
-                                <div className="fade-in">
-                                    <h3 className="text-lg font-bold text-gray-800 mb-2">Mensagem Enviada!</h3>
-                                    <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-                                        Agora aguarde a Le te responder confirmando o seu horário! 💖
-                                    </p>
-                                </div>
-                            )}
-                            
+                            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                                Agora aguarde a Le te responder confirmando o seu horário! 💖
+                            </p>
                             <button 
-                                onClick={() => { setModalSucesso(false); setStep(1); setDados({ ...dados, hora: '', data: '' }); setEnviouZap(false); }} 
+                                onClick={enviarWhatsapp} 
+                                className="w-full bg-[#25D366] hover:bg-[#1ebd59] text-white font-bold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 mb-3 transform transition hover:-translate-y-1"
+                            >
+                                <Icons.Whatsapp /> Enviar no Zap Agora
+                            </button>
+                            <button 
+                                onClick={() => { setModalSucesso(false); setStep(1); setDados({ ...dados, hora: '', data: '' }); }} 
                                 className="text-gray-400 hover:text-gray-600 text-sm underline"
                             >
                                 Fechar
@@ -864,50 +840,28 @@
 
         const gerarAnaliseFinanceira = async () => {
             setLoadingGeral(true);
-            const receitaEst = listaClientes.reduce((acc, curr) => acc + 120, 0); // Mock
+            const receitaEst = listaClientes.reduce((acc, curr) => acc + 120, 0); 
             const despesaEst = despesas.reduce((acc, curr) => acc + parseFloat(curr.valor), 0);
-            
-            const prompt = `
-                Você é uma consultora financeira especialista em Lash Designers.
-                Analise os dados:
-                - Receita Estimada do dia/período: R$ ${receitaEst}
-                - Despesas Totais cadastradas: R$ ${despesaEst}
-                - Número de atendimentos listados: ${listaClientes.length}
-                
-                Gere um relatório curto e estratégico com:
-                1. Ticket Médio (calculado).
-                2. Sugestão de ação para aumentar lucro (ex: combo, aumento de preço).
-                3. Um elogio ou alerta sobre os números.
-                Use emojis e formatação bonita.
-            `;
-            
-            const resposta = await chamarGemini(prompt, "Aja como uma especialista financeira de beleza.");
-            setAnaliseGeral(resposta || "Não foi possível gerar análise.");
+            const prompt = `Analise os dados: Receita Estimada R$ ${receitaEst}, Despesas R$ ${despesaEst}, Atendimentos ${listaClientes.length}. Gere um relatório curto.`;
+            const resposta = await chamarGemini(prompt, "Especialista financeira.");
+            setAnaliseGeral(resposta || "Erro.");
             setLoadingGeral(false);
         };
 
         const perguntarConselheira = async () => {
             if(!pergunta) return;
             setLoadingChat(true);
-            const prompt = `
-                Contexto: Sou Lash Designer. Tenho ${listaClientes.length} clientes agendadas hoje.
-                Minha pergunta estratégica é: "${pergunta}"
-                Responda de forma curta, direta e motivadora.
-            `;
-            const resposta = await chamarGemini(prompt, "Você é a Conselheira do Studio, uma mentora de negócios de beleza.");
-            setRespostaChat(resposta || "Erro ao conectar.");
+            const prompt = `Sou Lash Designer. Pergunta: "${pergunta}". Responda curto.`;
+            const resposta = await chamarGemini(prompt, "Conselheira de negócios.");
+            setRespostaChat(resposta || "Erro.");
             setLoadingChat(false);
         };
 
         return (
             <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
-                {/* Cabeçalho */}
                 <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 rounded-xl text-white shadow-md">
                     <h3 className="font-bold text-lg flex items-center gap-2"><Icons.Sparkles /> Inteligência Financeira</h3>
-                    <p className="text-xs opacity-90">Sua mente mestra para lucrar mais.</p>
                 </div>
-
-                {/* Botão Gerar Relatório */}
                 <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                     <h4 className="font-bold text-gray-700 text-sm mb-2">📊 Análise de Faturamento</h4>
                     {!analiseGeral ? (
@@ -915,31 +869,19 @@
                             {loadingGeral ? "Analisando..." : "Gerar Relatório Inteligente ✨"}
                         </button>
                     ) : (
-                        <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 animate-in fade-in">
-                            <div dangerouslySetInnerHTML={{ __html: analiseGeral.replace(/\n/g, '<br/>') }} />
+                        <div className="bg-gray-50 p-3 rounded-lg text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
+                            {analiseGeral}
                             <button onClick={() => setAnaliseGeral("")} className="mt-3 text-xs text-purple-500 font-bold underline">Nova Análise</button>
                         </div>
                     )}
                 </div>
-
-                {/* Conselheira Chat */}
                 <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-1 flex flex-col">
                     <h4 className="font-bold text-gray-700 text-sm mb-2 flex items-center gap-2"><Icons.Robot /> Conselheira do Studio</h4>
                     <div className="flex-1 bg-gray-50 rounded-lg p-3 mb-3 text-sm text-gray-600 overflow-y-auto max-h-40">
-                        {respostaChat ? (
-                            <p>{respostaChat}</p>
-                        ) : (
-                            <p className="text-gray-400 italic text-xs">Ex: "Devo fazer promoção hoje?" ou "Qual combo vender?"</p>
-                        )}
+                        {respostaChat ? <p>{respostaChat}</p> : <p className="text-gray-400 italic text-xs">Ex: "Devo fazer promoção?"</p>}
                     </div>
                     <div className="flex gap-2">
-                        <input 
-                            type="text" 
-                            className="flex-1 border rounded-lg px-3 py-2 text-sm" 
-                            placeholder="Pergunte algo..." 
-                            value={pergunta} 
-                            onChange={(e) => setPergunta(e.target.value)}
-                        />
+                        <input type="text" className="flex-1 border rounded-lg px-3 py-2 text-sm" placeholder="Pergunte algo..." value={pergunta} onChange={(e) => setPergunta(e.target.value)}/>
                         <button onClick={perguntarConselheira} disabled={loadingChat} className="bg-pink-500 text-white p-2 rounded-lg">➤</button>
                     </div>
                 </div>
@@ -1039,12 +981,6 @@
         
         const gerarMensagemSaudade = (cliente) => {
             const msg = `Oii ${cliente.nome}, sumida! 👻\nEstamos com saudades de você aqui no LS Cílios!\n\nQue tal agendar uma manutenção ou uma nova aplicação para renovar o olhar? 🥰\n\nMe chama aqui!`;
-            const link = `https://wa.me/55${cliente.zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
-            window.open(link, '_blank');
-        };
-
-        const gerarMensagemParabens = (cliente) => {
-            const msg = `Parabéns ${cliente.nome}! 🎂🥳\nHoje é o seu dia e queremos te desejar muitas felicidades!\n\nComo presente, que tal vir ficar ainda mais linda com a gente? ✨`;
             const link = `https://wa.me/55${cliente.zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
             window.open(link, '_blank');
         };
@@ -1178,15 +1114,12 @@
                                      
                                      <div className="flex gap-2">
                                          <button onClick={() => { setModalAnaliseIA(c); gerarAnaliseCliente(c); }} className="flex-1 bg-purple-100 text-purple-600 py-1 rounded text-[10px] font-bold hover:bg-purple-200 flex items-center justify-center gap-1">✨ Analisar</button>
-                                         
-                                         {/* Botão de Parabéns AGORA ABRE O MODAL */}
                                          {isNiver && (
                                              <button onClick={() => abrirModalNiver(c)} className="flex-1 bg-pink-100 text-pink-600 py-1 rounded text-[10px] font-bold hover:bg-pink-200 flex items-center justify-center gap-1">
                                                  Parabéns <Icons.Gift />
                                              </button>
                                          )}
-                                         
-                                         {isSumida && !isNiver && (<button onClick={() => gerarMensagemSaudade(c)} className="flex-1 bg-gray-100 text-gray-600 py-1 rounded text-[10px] font-bold hover:bg-gray-200">Mandar Oi Sumida 👋</button>)}
+                                         <button onClick={() => { const link = `https://wa.me/55${c.zap.replace(/\D/g, '')}`; window.open(link, '_blank'); }} className="bg-green-100 text-green-600 p-1.5 rounded hover:bg-green-200"><Icons.Whatsapp /></button>
                                      </div>
                                  </div>
                              )
@@ -1318,7 +1251,8 @@
             <div className="min-h-screen bg-pink-50 p-4 md:p-8 font-sans">
                 <div className="max-w-md mx-auto relative">
                     <div className="text-center mb-6 pt-4 flex flex-col items-center">
-                        <img src="img/logo.png" alt="Logo Ls Cílios" className="w-40 h-auto mb-2 object-contain" onError={(e) => { e.target.style.display = 'none'; }} />
+                        <img src="img/logo.png" alt="Logo" className="w-20 h-20 mb-2 object-contain" onError={(e) => { e.target.style.display = 'none'; }} />
+                        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Ls <span className="text-pink-600">Cílios</span></h1>
                         <p className="text-sm text-gray-500 tracking-widest uppercase mt-1">Realce sua beleza</p>
                     </div>
                     <div className="relative">
