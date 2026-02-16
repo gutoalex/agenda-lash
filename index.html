@@ -17,7 +17,6 @@
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Ajustes para iOS */
         input[type="date"] {
             -webkit-appearance: none;
             display: block;
@@ -30,27 +29,14 @@
             font-size: 16px;
         }
         
-        /* Loading Spinner */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #db2777; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .sparkle-icon { animation: sparkle 2s infinite; }
-        @keyframes sparkle { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(0.5); } }
-
+        .toggle-checkbox:checked { right: 0; border-color: #db2777; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #db2777; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        
-        /* Toggle Switch */
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #db2777;
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #db2777;
-        }
-
-        /* Modal Gradiente */
         .modal-gradient { background: linear-gradient(135deg, #fce7f3 0%, #e9d5ff 100%); }
     </style>
 </head>
@@ -68,7 +54,7 @@
 
         const { useState, useEffect, useRef } = React;
 
-        // --- 1. CONFIGURAÇÕES E CHAVES (OFUSCADAS) ---
+        // --- 1. CONFIGURAÇÕES E CHAVES ---
         const k1 = "AIzaSyC6-j5wwV";
         const k2 = "-2UcrtTr7Z5jM7Pp4cy78jmqA";
         const apiKey = k1 + k2; 
@@ -84,8 +70,7 @@
             
             depoimentos: [
                 { nome: "Cliente", texto: "Amo sua flexibilidade, paciência e atendimento. Você me dá a liberdade de escolher o estilo e a durabilidade é ótima!" },
-                { nome: "Cliente", texto: "Seu trabalho é ótimo! O espaço aconchegante. Higiene impecável e cuidado para não arder os olhos." },
-                { nome: "Cliente", texto: "Seu trabalho é sinceramente o melhor que já fiz. Não fico mais sem cílios e sem você!" }
+                { nome: "Cliente", texto: "Seu trabalho é ótimo! O espaço aconchegante. Higiene impecável e cuidado para não arder os olhos." }
             ],
 
             sobrancelha: { id: 999, nome: "Design de Sobrancelhas", preco: 35, duracao: 0.5 },
@@ -104,7 +89,7 @@
             ]
         };
 
-        // --- 2. UTILITÁRIOS E ÍCONES ---
+        // --- 2. ÍCONES ---
         const Icons = {
             Whatsapp: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>,
             Lock: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
@@ -120,7 +105,7 @@
             Chart: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>,
             Robot: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>,
             Gift: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>,
-            Sparkles: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275-1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>,
+            Sparkles: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>,
             Analysis: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h5"></path><path d="M17 12h5"></path><path d="M12 2v5"></path><path d="M12 17v5"></path><circle cx="12" cy="12" r="4"></circle><path d="M10 2 2.5 9.5"></path><path d="M14 2l7.5 7.5"></path><path d="M10 22l-7.5-7.5"></path><path d="M14 22l7.5-7.5"></path></svg>,
             LogOut: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>,
             Refresh: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>,
@@ -136,7 +121,7 @@
             Cake: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M2 21h20"></path><path d="M7 8v2"></path><path d="M12 8v2"></path><path d="M17 8v2"></path><path d="M7 4h.01"></path><path d="M12 4h.01"></path><path d="M17 4h.01"></path></svg>
         };
 
-        // --- 3. FUNÇÕES GLOBAIS ---
+        // --- 3. FUNÇÕES GLOBAIS (DEFINIDAS AQUI PARA EVITAR ERROS) ---
         
         const formatarTelefone = (value) => {
             if(!value) return "";
@@ -149,7 +134,7 @@
         };
 
         const validarEmail = (email) => {
-            if (!email) return true; 
+            if (!email) return true; // Email é opcional
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         };
 
@@ -168,18 +153,72 @@
             return { isAllDay: false, date: date };
         };
 
-        const fetchICSAndParse = async (url, dateStr, horariosDoDia = []) => {
+        const fetchRawEvents = async (url, dateStr) => {
             try {
-                // Proxy CORS mais estável
-                const proxyUrl = 'https://corsproxy.io/?'; 
+                // Usando um proxy CORS alternativo que costuma ser mais estável
+                const proxyUrl = 'https://api.allorigins.win/get?url=';
                 const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
                 const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+                if (!response.ok) return [];
                 
-                if (!response.ok) {
-                    console.warn("Erro ao buscar agenda:", response.status);
-                    return [];
+                const data = await response.json();
+                const icsText = data.contents;
+                
+                const events = [];
+                const lines = icsText.split(/\r\n|\n|\r/);
+                let currentEvent = null;
+                let inEvent = false;
+                
+                lines.forEach(line => {
+                    if (line.startsWith('BEGIN:VEVENT')) { inEvent = true; currentEvent = {}; } 
+                    else if (line.startsWith('END:VEVENT')) { 
+                        if (currentEvent && currentEvent.dtstart) events.push(currentEvent); 
+                        inEvent = false;
+                        currentEvent = null; 
+                    } 
+                    else if (inEvent && currentEvent) {
+                        const colonIndex = line.indexOf(':');
+                        if (colonIndex > -1) {
+                            const keyPart = line.substring(0, colonIndex).split(';')[0];
+                            const value = line.substring(colonIndex + 1);
+                            if (keyPart === 'SUMMARY') currentEvent.summary = value;
+                            if (keyPart === 'LOCATION') currentEvent.location = value;
+                            if (keyPart.startsWith('DTSTART')) currentEvent.dtstart = value;
+                            if (keyPart.startsWith('DTEND')) currentEvent.dtend = value;
+                            if (keyPart === 'DESCRIPTION') currentEvent.description = value;
+                        }
+                    }
+                });
+                
+                if (dateStr) {
+                    const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
+                    return events.filter(ev => {
+                        const startInfo = parseIcsDate(ev.dtstart);
+                        if (!startInfo) return false;
+                        const d = startInfo.date;
+                        return d.getFullYear() === tYear && d.getMonth() === tMonth - 1 && d.getDate() === tDay;
+                    }).map(ev => {
+                        const startInfo = parseIcsDate(ev.dtstart);
+                        ev.localHour = startInfo ? startInfo.date.getHours() : -1;
+                        return ev;
+                    });
                 }
-                const icsText = await response.text();
+                return events;
+            } catch (e) {
+                console.error("Erro ao buscar eventos raw", e);
+                return [];
+            }
+        };
+
+        const fetchICSAndParse = async (url, dateStr, horariosDoDia = []) => {
+            try {
+                // Usando allorigins como proxy (mesma lógica do fetchRawEvents)
+                const proxyUrl = 'https://api.allorigins.win/get?url='; 
+                const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+                const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+                if (!response.ok) return [];
+                const data = await response.json();
+                const icsText = data.contents;
                 
                 const ocupados = [];
                 const lines = icsText.split(/\r\n|\n|\r/);
@@ -220,6 +259,7 @@
                                         horariosDoDia.forEach(slot => {
                                             const [sh, sm] = slot.split(':').map(Number);
                                             const slotDate = new Date(tYear, tMonth - 1, tDay, sh, sm, 0);
+                                            // Se o slot está "dentro" do evento
                                             if (slotDate >= startDate && slotDate < endDate) {
                                                 if (!ocupados.includes(slot)) ocupados.push(slot);
                                             }
@@ -240,75 +280,16 @@
                 return []; 
             }
         };
-        
-        // Função necessária para a TelaProfissional buscar a agenda
-        const fetchRawEvents = async (url, dateStr) => {
-            try {
-                const proxyUrl = 'https://corsproxy.io/?'; 
-                const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-                const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
-                if (!response.ok) return [];
-                const icsText = await response.text();
-                
-                const events = [];
-                const lines = icsText.split(/\r\n|\n|\r/);
-                let currentEvent = null;
-                let inEvent = false;
-                
-                lines.forEach(line => {
-                    if (line.startsWith('BEGIN:VEVENT')) { inEvent = true; currentEvent = {}; } 
-                    else if (line.startsWith('END:VEVENT')) { 
-                        if (currentEvent && currentEvent.dtstart) events.push(currentEvent); 
-                        inEvent = false;
-                        currentEvent = null; 
-                    } 
-                    else if (inEvent && currentEvent) {
-                        const colonIndex = line.indexOf(':');
-                        if (colonIndex > -1) {
-                            const keyPart = line.substring(0, colonIndex).split(';')[0];
-                            const value = line.substring(colonIndex + 1);
-                            if (keyPart === 'SUMMARY') currentEvent.summary = value;
-                            if (keyPart === 'LOCATION') currentEvent.location = value;
-                            if (keyPart.startsWith('DTSTART')) currentEvent.dtstart = value;
-                            if (keyPart.startsWith('DTEND')) currentEvent.dtend = value;
-                            if (keyPart === 'DESCRIPTION') currentEvent.description = value;
-                        }
-                    }
-                });
-                
-                if (dateStr) {
-                    const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
-                    return events.filter(ev => {
-                        if (!ev.dtstart) return false;
-                        const clean = ev.dtstart.replace(/[^0-9TZ]/g, '');
-                        const y = parseInt(clean.substring(0, 4));
-                        const m = parseInt(clean.substring(4, 6)) - 1;
-                        const d = parseInt(clean.substring(6, 8));
-                        return y === tYear && m === tMonth - 1 && d === tDay;
-                    }).map(ev => {
-                        const clean = ev.dtstart.replace(/[^0-9TZ]/g, '');
-                        const time = clean.includes('T') ? clean.split('T')[1] : "0000";
-                        const h = parseInt(time.substring(0, 2));
-                        let localH = h;
-                        if (ev.dtstart.includes('Z')) localH -= 3;
-                        ev.localHour = localH < 0 ? localH + 24 : localH;
-                        return ev;
-                    });
-                }
-                return events;
-            } catch (e) {
-                console.error("Erro ao buscar eventos raw", e);
-                return [];
-            }
-        };
 
         const salvarAgendamentoPlanilha = async (dadosCliente) => {
             if (!CONFIG.scriptGoogleUrl) return; 
             try {
                 let nomeServico = dadosCliente.servicoObj ? dadosCliente.servicoObj.nome : "Serviço Avulso";
+                
                 if (dadosCliente.incluiSobrancelha && dadosCliente.servicoObj && dadosCliente.servicoObj.id !== 999) {
                     nomeServico += " + Design Sobrancelhas";
                 }
+
                 const payload = {
                     nome: dadosCliente.nome || "",
                     whatsapp: dadosCliente.whatsapp || "",
@@ -361,7 +342,9 @@
             const [historico, setHistorico] = useState([{ role: 'bot', text: 'Olá! Sou a assistente virtual da Le. Tem alguma dúvida? 💖' }]);
             const [loading, setLoading] = useState(false);
             const msgEndRef = useRef(null);
+            
             useEffect(() => { msgEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [historico]);
+            
             const enviarMsg = async () => {
                 if (!msg.trim()) return;
                 const novaMsg = { role: 'user', text: msg };
@@ -466,7 +449,7 @@
             );
         }
 
-        function TelaCliente({ aoFinalizar, verificarDisponibilidade, horariosOcupados, carregandoHorarios, horariosDoDia }) {
+        function TelaCliente({ aoFinalizar }) {
             const [step, setStep] = useState(0); 
             const [dados, setDados] = useState({ 
                 nome: '', whatsapp: '', email: '', nascimento: '', 
@@ -484,11 +467,41 @@
             const [modalConfirmacao, setModalConfirmacao] = useState(false);
             const [horarioPendente, setHorarioPendente] = useState('');
             const [loadingSalvar, setLoadingSalvar] = useState(false);
+            const [horariosDoDia, setHorariosDoDia] = useState([]);
+            const [horariosOcupados, setHorariosOcupados] = useState([]);
+            const [carregandoHorarios, setCarregandoHorarios] = useState(false);
 
             const hoje = new Date().toISOString().split('T')[0];
 
             useEffect(() => { const interval = setInterval(() => { setDepoimentoIndex((prev) => (prev + 1) % CONFIG.depoimentos.length); }, 5000); return () => clearInterval(interval); }, []);
-            useEffect(() => { if (dados.data) { verificarDisponibilidade(dados.data); } }, [dados.data]);
+            
+            // Função para gerar horários
+            const gerarHorarios = (dateStr) => {
+                if (!dateStr) return [];
+                const dia = new Date(dateStr + 'T12:00:00').getDay();
+                if (dia === 0 || dia === 1) return []; // Dom/Seg fechado
+                const lista = [];
+                const inicio = dia === 2 || dia === 4 ? 9 : 10;
+                const fim = dia === 6 ? 14 : 18;
+                for (let h = inicio; h <= fim; h++) lista.push((h < 10 ? '0'+h : h) + ":00");
+                return lista;
+            };
+
+            const verificarAgenda = async (data) => {
+                setCarregandoHorarios(true);
+                const slots = gerarHorarios(data);
+                setHorariosDoDia(slots);
+                if (slots.length > 0) {
+                    // Passa os slots para verificar colisão de eventos maiores que 1h
+                    const ocupados = await fetchICSAndParse(CONFIG.icalUrlPublic, data, slots);
+                    setHorariosOcupados(ocupados);
+                } else {
+                    setHorariosOcupados([]);
+                }
+                setCarregandoHorarios(false);
+            };
+
+            useEffect(() => { if (dados.data) { verificarAgenda(dados.data); } }, [dados.data]);
 
             const selecionarCategoria = (tipo) => {
                 if (tipo === 'cilios') { setDados({...dados, incluiSobrancelha: false}); setStep(1); } 
@@ -633,14 +646,14 @@
                                 </div>
                                 <div className="pt-2">
                                     <label className="block text-xs font-bold text-gray-500 mb-1">ESCOLHA DATA E HORA</label>
-                                    <input type="date" min={hoje} className="w-full p-3 bg-white rounded-xl border border-gray-200 mb-3 font-bold text-gray-700" value={dados.data} onChange={(e) => { setDados({...dados, data: e.target.value, hora: ''}); verificarDisponibilidade(e.target.value); }} />
+                                    <input type="date" min={hoje} className="w-full p-3 bg-white rounded-xl border border-gray-200 mb-3 font-bold text-gray-700" value={dados.data} onChange={(e) => { setDados({...dados, data: e.target.value, hora: ''}); verificarAgenda(e.target.value); }} />
                                     {dados.data && (
                                         <div className="grid grid-cols-4 gap-2 pb-2 mt-2">
                                             {carregandoHorarios ? <p className="col-span-4 text-center text-xs text-gray-400">Verificando agenda...</p> : 
-                                            horariosDoDia.map((h) => {
+                                            horariosDisponiveis.length > 0 ? horariosDisponiveis.map((h) => {
                                                 const isOcupado = horariosOcupados.includes(h);
                                                 return (<button key={h} disabled={isOcupado} onClick={() => selecionarHorario(h)} className={`p-2 rounded text-xs font-bold border transition-all ${isOcupado ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed opacity-50' : dados.hora === h ? 'bg-pink-500 text-white border-pink-500 shadow-md transform scale-105' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'}`}>{h}</button>)
-                                            })}
+                                            }) : <p className="col-span-4 text-center text-xs text-red-400">Sem horários para este dia.</p>}
                                         </div>
                                     )}
                                 </div>
@@ -658,7 +671,7 @@
                             </div>
                         )}
                     </div>
-                    {/* MODAIS (Detalhes, Confirmação, IA) */}
+                    {/* MODAIS */}
                     {modalDetalhes && (
                         <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 fade-in" onClick={() => setModalDetalhes(null)}>
                             <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
@@ -784,8 +797,8 @@
             };
             
             const confirmarAgendamentoProfissional = (cliente) => {
-                // Tenta achar o telefone na lista de clientes se não vier da agenda
                 let zap = cliente.whatsapp;
+                // Busca automática
                 if (!zap) {
                     const clienteEncontrado = bancoClientes.find(c => c.nome.toLowerCase().includes(cliente.nome.toLowerCase()));
                     if (clienteEncontrado) zap = clienteEncontrado.zap;
@@ -795,13 +808,16 @@
                     const msg = `Olá ${cliente.nome}! Passando para confirmar seu horário de Cílios amanhã às ${cliente.hora}. Tudo certo? 🥰`;
                     window.open(`https://wa.me/55${zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
                 } else {
-                    alert("Telefone não encontrado. Copie o nome e busque no WhatsApp.");
+                    const manualZap = prompt(`Não encontrei o WhatsApp de ${cliente.nome}. Digite o número:`);
+                    if(manualZap) {
+                         const msg = `Olá ${cliente.nome}! Passando para confirmar seu horário de Cílios amanhã às ${cliente.hora}. Tudo certo? 🥰`;
+                         window.open(`https://wa.me/55${manualZap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+                    }
                 }
             };
             
             const isAniversariante = (dataNasc) => {
                 if (!dataNasc) return false;
-                // Formato YYYY-MM-DD
                 const parts = dataNasc.split('-');
                 if(parts.length !== 3) return false;
                 const hoje = new Date();
@@ -858,7 +874,7 @@
                     {modalNiver && (
                         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 fade-in">
                             <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden relative transform scale-100 transition-all shadow-2xl">
-                                <div className="modal-gradient p-8 text-center flex flex-col items-center justify-center relative h-96">
+                                <div className="modal-gradient p-8 text-center flex flex-col items-center justify-center relative">
                                     <button onClick={()=>setModalNiver(null)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/50 rounded-full p-1"><Icons.Close /></button>
                                     <div className="text-7xl mb-4 animate-bounce filter drop-shadow-md">🎂</div>
                                     <h3 className="font-bold text-3xl text-purple-800 mb-2">Parabéns, {modalNiver.nome.split(' ')[0]}!</h3>
@@ -949,7 +965,7 @@
 
                     {tela === 'cliente' && (
                         <div className="w-full max-w-md">
-                            <TelaCliente aoFinalizar={handleSucesso} verificarDisponibilidade={async ()=>{}} horariosOcupados={[]} carregandoHorarios={false} horariosDoDia={[]} />
+                            <TelaCliente aoFinalizar={handleSucesso} />
                         </div>
                     )}
                     
