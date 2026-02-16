@@ -56,7 +56,7 @@
 
         const { useState, useEffect, useRef } = React;
 
-        // --- 1. CONFIGURAÇÕES E CHAVES (PROTEGIDAS) ---
+        // --- 1. CONFIGURAÇÕES E CHAVES ---
         const k1 = "AIzaSyC6-j5wwV";
         const k2 = "-2UcrtTr7Z5jM7Pp4cy78jmqA";
         const apiKey = k1 + k2; 
@@ -144,8 +144,10 @@
         const salvarAgendamentoPlanilha = async (dadosCliente) => {
             if (!CONFIG.scriptGoogleUrl) return; 
             try {
+                // Monta o nome completo se for combo
                 let nomeServico = dadosCliente.servicoObj ? dadosCliente.servicoObj.nome : "Serviço Avulso";
                 
+                // Se é combo e não é apenas sobrancelha avulsa
                 if (dadosCliente.incluiSobrancelha && dadosCliente.servicoObj && dadosCliente.servicoObj.id !== 999) {
                     nomeServico += " + Design Sobrancelhas";
                 }
@@ -193,10 +195,9 @@
             return { isAllDay: false, date: date };
         };
 
-        // Função fetchRawEvents corrigida e global
         const fetchRawEvents = async (url, dateStr) => {
             try {
-                // Usando o mesmo proxy estável da verificação
+                // Usando proxy do allorigins para evitar bloqueio
                 const proxyUrl = 'https://api.allorigins.win/get?url=';
                 const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
                 const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
@@ -234,19 +235,13 @@
                 if (dateStr) {
                     const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
                     return events.filter(ev => {
-                        if (!ev.dtstart) return false;
-                        const clean = ev.dtstart.replace(/[^0-9TZ]/g, '');
-                        const y = parseInt(clean.substring(0, 4));
-                        const m = parseInt(clean.substring(4, 6)) - 1;
-                        const d = parseInt(clean.substring(6, 8));
-                        return y === tYear && m === tMonth - 1 && d === tDay;
+                        const startInfo = parseIcsDate(ev.dtstart);
+                        if (!startInfo) return false;
+                        const d = startInfo.date;
+                        return d.getFullYear() === tYear && d.getMonth() === tMonth - 1 && d.getDate() === tDay;
                     }).map(ev => {
-                        const clean = ev.dtstart.replace(/[^0-9TZ]/g, '');
-                        const time = clean.includes('T') ? clean.split('T')[1] : "0000";
-                        const h = parseInt(time.substring(0, 2));
-                        let localH = h;
-                        if (ev.dtstart.includes('Z')) localH -= 3;
-                        ev.localHour = localH < 0 ? localH + 24 : localH;
+                        const startInfo = parseIcsDate(ev.dtstart);
+                        ev.localHour = startInfo ? startInfo.date.getHours() : -1;
                         return ev;
                     });
                 }
@@ -257,9 +252,9 @@
             }
         };
 
+        // Função de busca e parse de horários para o Cliente
         const fetchICSAndParse = async (url, dateStr, horariosDoDia) => {
             try {
-                // Usando proxy mais robusto e estável
                 const proxyUrl = 'https://api.allorigins.win/get?url='; 
                 const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
                 const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
@@ -321,10 +316,7 @@
                     }
                 });
                 return ocupados;
-            } catch (e) { 
-                console.error("Erro no processamento do ICS:", e);
-                return []; 
-            }
+            } catch (e) { return []; }
         };
 
         async function chamarGemini(prompt, systemInstruction = "") {
@@ -464,9 +456,6 @@
                 incluiSobrancelha: false, duracaoTotal: 0,
                 data: '', hora: '', tipoAtendimento: 'studio', endereco: '', complemento: '' 
             });
-            const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
-            const [horariosOcupados, setHorariosOcupados] = useState([]);
-            const [carregandoHorarios, setCarregandoHorarios] = useState(false);
             const [servicoExpandido, setServicoExpandido] = useState(null);
             const [modalDetalhes, setModalDetalhes] = useState(null); 
             const [showModalIA, setShowModalIA] = useState(false);
@@ -478,6 +467,8 @@
             const [horarioPendente, setHorarioPendente] = useState('');
             const [loadingSalvar, setLoadingSalvar] = useState(false);
             const [horariosDoDia, setHorariosDoDia] = useState([]);
+            const [horariosOcupados, setHorariosOcupados] = useState([]);
+            const [carregandoHorarios, setCarregandoHorarios] = useState(false);
 
             const hoje = new Date().toISOString().split('T')[0];
 
@@ -494,7 +485,6 @@
                 return lista;
             };
 
-            // Função definida dentro do escopo do componente
             const verificarAgenda = async (data) => {
                 setCarregandoHorarios(true);
                 const slots = gerarHorarios(data);
@@ -503,15 +493,11 @@
                 if (slots.length > 0) {
                     const ocupados = await fetchICSAndParse(CONFIG.icalUrlPublic, data, slots);
                     setHorariosOcupados(ocupados);
-                    setHorariosDisponiveis(slots);
                 } else {
                     setHorariosOcupados([]);
-                    setHorariosDisponiveis([]);
                 }
                 setCarregandoHorarios(false);
             };
-
-            useEffect(() => { if (dados.data) { verificarAgenda(dados.data); } }, [dados.data]);
 
             const selecionarCategoria = (tipo) => {
                 if (tipo === 'cilios') { setDados({...dados, incluiSobrancelha: false}); setStep(1); } 
@@ -775,7 +761,7 @@
                 setTemDesconto(false);
                 setSugestaoIA("");
                 setLoadingIA(true);
-                chamarGemini(`Dê uma sugestão curta de desconto de aniversário para a cliente ${cliente.nome}.`, "Especialista em Marketing").then(r => { setSugestaoIA(r); setLoadingIA(false); });
+                chamarGemini(`Dê uma sugestão amigável de desconto para ${cliente.nome} que é aniversariante.`).then(r => { setSugestaoIA(r); setLoadingIA(false); });
             };
 
             const enviarMensagemNiver = () => {
@@ -808,9 +794,9 @@
             
             const confirmarAgendamentoProfissional = (cliente) => {
                 let zap = cliente.whatsapp;
-                // Busca automática
+                // Busca automática na lista de clientes se não vier da agenda
                 if (!zap) {
-                    const clienteEncontrado = bancoClientes.find(c => c.nome.toLowerCase().includes(cliente.nome.toLowerCase()));
+                    const clienteEncontrado = bancoClientes.find(c => c.nome.toLowerCase().includes(cliente.nome.toLowerCase()) || cliente.nome.toLowerCase().includes(c.nome.toLowerCase()));
                     if (clienteEncontrado) zap = clienteEncontrado.zap;
                 }
                 
@@ -818,7 +804,8 @@
                     const msg = `Olá ${cliente.nome}! Passando para confirmar seu horário de Cílios amanhã às ${cliente.hora}. Tudo certo? 🥰`;
                     window.open(`https://wa.me/55${zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
                 } else {
-                    const manualZap = prompt(`Não encontrei o WhatsApp de ${cliente.nome}. Digite o número:`);
+                    // Fallback manual se não achar
+                    const manualZap = prompt(`Não encontrei o WhatsApp de ${cliente.nome} automaticamente. Digite o número (com DDD) para abrir a conversa:`);
                     if(manualZap) {
                          const msg = `Olá ${cliente.nome}! Passando para confirmar seu horário de Cílios amanhã às ${cliente.hora}. Tudo certo? 🥰`;
                          window.open(`https://wa.me/55${manualZap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -884,7 +871,7 @@
                     {modalNiver && (
                         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 fade-in">
                             <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden relative transform scale-100 transition-all shadow-2xl">
-                                <div className="modal-gradient p-8 text-center flex flex-col items-center justify-center relative">
+                                <div className="modal-gradient p-8 text-center flex flex-col items-center justify-center relative h-96">
                                     <button onClick={()=>setModalNiver(null)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/50 rounded-full p-1"><Icons.Close /></button>
                                     <div className="text-7xl mb-4 animate-bounce filter drop-shadow-md">🎂</div>
                                     <h3 className="font-bold text-3xl text-purple-800 mb-2">Parabéns, {modalNiver.nome.split(' ')[0]}!</h3>
@@ -975,7 +962,7 @@
 
                     {tela === 'cliente' && (
                         <div className="w-full max-w-md">
-                            <TelaCliente aoFinalizar={handleSucesso} verificarDisponibilidade={async ()=>{}} horariosOcupados={[]} carregandoHorarios={false} horariosDoDia={[]} />
+                            <TelaCliente aoFinalizar={handleSucesso} />
                         </div>
                     )}
                     
