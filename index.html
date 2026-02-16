@@ -193,9 +193,10 @@
             return { isAllDay: false, date: date };
         };
 
+        // Função fetchRawEvents corrigida e global
         const fetchRawEvents = async (url, dateStr) => {
             try {
-                // Usando proxy mais robusto e estável
+                // Usando o mesmo proxy estável da verificação
                 const proxyUrl = 'https://api.allorigins.win/get?url=';
                 const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
                 const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
@@ -233,13 +234,19 @@
                 if (dateStr) {
                     const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
                     return events.filter(ev => {
-                        const startInfo = parseIcsDate(ev.dtstart);
-                        if (!startInfo) return false;
-                        const d = startInfo.date;
-                        return d.getFullYear() === tYear && d.getMonth() === tMonth - 1 && d.getDate() === tDay;
+                        if (!ev.dtstart) return false;
+                        const clean = ev.dtstart.replace(/[^0-9TZ]/g, '');
+                        const y = parseInt(clean.substring(0, 4));
+                        const m = parseInt(clean.substring(4, 6)) - 1;
+                        const d = parseInt(clean.substring(6, 8));
+                        return y === tYear && m === tMonth - 1 && d === tDay;
                     }).map(ev => {
-                        const startInfo = parseIcsDate(ev.dtstart);
-                        ev.localHour = startInfo ? startInfo.date.getHours() : -1;
+                        const clean = ev.dtstart.replace(/[^0-9TZ]/g, '');
+                        const time = clean.includes('T') ? clean.split('T')[1] : "0000";
+                        const h = parseInt(time.substring(0, 2));
+                        let localH = h;
+                        if (ev.dtstart.includes('Z')) localH -= 3;
+                        ev.localHour = localH < 0 ? localH + 24 : localH;
                         return ev;
                     });
                 }
@@ -250,9 +257,9 @@
             }
         };
 
-        const fetchICSAndParse = async (url, dateStr, horariosDoDia = []) => {
+        const fetchICSAndParse = async (url, dateStr, horariosDoDia) => {
             try {
-                // Usando o mesmo proxy estável
+                // Usando proxy mais robusto e estável
                 const proxyUrl = 'https://api.allorigins.win/get?url='; 
                 const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
                 const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
@@ -479,7 +486,7 @@
             const gerarHorarios = (dateStr) => {
                 if (!dateStr) return [];
                 const dia = new Date(dateStr + 'T12:00:00').getDay();
-                if (dia === 0 || dia === 1) return []; 
+                if (dia === 0 || dia === 1) return []; // Dom/Seg fechado
                 const lista = [];
                 const inicio = dia === 2 || dia === 4 ? 9 : 10;
                 const fim = dia === 6 ? 14 : 18;
@@ -504,12 +511,7 @@
                 setCarregandoHorarios(false);
             };
 
-            // Hook para chamar a verificação quando a data mudar
-            useEffect(() => { 
-                if (dados.data) { 
-                    verificarAgenda(dados.data); 
-                } 
-            }, [dados.data]);
+            useEffect(() => { if (dados.data) { verificarAgenda(dados.data); } }, [dados.data]);
 
             const selecionarCategoria = (tipo) => {
                 if (tipo === 'cilios') { setDados({...dados, incluiSobrancelha: false}); setStep(1); } 
@@ -826,7 +828,6 @@
             
             const isAniversariante = (dataNasc) => {
                 if (!dataNasc) return false;
-                // Formato YYYY-MM-DD
                 const parts = dataNasc.split('-');
                 if(parts.length !== 3) return false;
                 const hoje = new Date();
