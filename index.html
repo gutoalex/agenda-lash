@@ -17,6 +17,7 @@
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
+        /* Ajustes para iOS */
         input[type="date"] {
             -webkit-appearance: none;
             display: block;
@@ -29,16 +30,27 @@
             font-size: 16px;
         }
         
+        /* Loading Spinner */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #db2777; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .toggle-checkbox:checked { right: 0; border-color: #db2777; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #db2777; }
-        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .sparkle-icon { animation: sparkle 2s infinite; }
+        @keyframes sparkle { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(0.5); } }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         
-        /* Fundo especial para o aniversário */
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #db2777;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #db2777;
+        }
+
+        /* Modal Gradiente */
         .modal-gradient { background: linear-gradient(135deg, #fce7f3 0%, #e9d5ff 100%); }
     </style>
 </head>
@@ -56,7 +68,7 @@
 
         const { useState, useEffect, useRef } = React;
 
-        // --- 1. CONFIGURAÇÕES E CHAVES ---
+        // --- 1. CONFIGURAÇÕES E CHAVES (OFUSCADAS) ---
         const k1 = "AIzaSyC6-j5wwV";
         const k2 = "-2UcrtTr7Z5jM7Pp4cy78jmqA";
         const apiKey = k1 + k2; 
@@ -71,9 +83,9 @@
             icalUrlPublic: "https://calendar.google.com/calendar/ical/lscilios.contato%40gmail.com/public/basic.ics",
             
             depoimentos: [
-                { nome: "Cliente", texto: "Amo sua flexibilidade e paciência!" },
-                { nome: "Cliente", texto: "Seu trabalho é ótimo e o espaço aconchegante." },
-                { nome: "Cliente", texto: "Melhor lash da região, recomendo demais!" }
+                { nome: "Cliente", texto: "Amo sua flexibilidade, paciência e atendimento. Você me dá a liberdade de escolher o estilo e a durabilidade é ótima!" },
+                { nome: "Cliente", texto: "Seu trabalho é ótimo! O espaço aconchegante. Higiene impecável e cuidado para não arder os olhos." },
+                { nome: "Cliente", texto: "Seu trabalho é sinceramente o melhor que já fiz. Não fico mais sem cílios e sem você!" }
             ],
 
             sobrancelha: { id: 999, nome: "Design de Sobrancelhas", preco: 35, duracao: 0.5 },
@@ -92,7 +104,7 @@
             ]
         };
 
-        // --- 2. ÍCONES ---
+        // --- 2. UTILITÁRIOS E ÍCONES ---
         const Icons = {
             Whatsapp: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>,
             Lock: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
@@ -125,7 +137,7 @@
         };
 
         // --- 3. FUNÇÕES GLOBAIS ---
-
+        
         const formatarTelefone = (value) => {
             if(!value) return "";
             const numero = value.replace(/\D/g, "");
@@ -137,49 +149,99 @@
         };
 
         const validarEmail = (email) => {
-            if (!email) return true; // Email é opcional
+            if (!email) return true; 
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         };
 
-        const salvarAgendamentoPlanilha = async (dadosCliente) => {
-            if (!CONFIG.scriptGoogleUrl) return; 
-            try {
-                // Monta o nome completo se for combo
-                let nomeServico = dadosCliente.servicoObj ? dadosCliente.servicoObj.nome : "Serviço Avulso";
-                
-                // Se é combo e não é apenas sobrancelha avulsa
-                if (dadosCliente.incluiSobrancelha && dadosCliente.servicoObj && dadosCliente.servicoObj.id !== 999) {
-                    nomeServico += " + Design Sobrancelhas";
-                }
-
-                const payload = {
-                    nome: dadosCliente.nome || "",
-                    whatsapp: dadosCliente.whatsapp || "",
-                    email: dadosCliente.email || "",
-                    nascimento: dadosCliente.nascimento || "",
-                    servico: nomeServico,
-                    duracao: dadosCliente.duracaoTotal || 2,
-                    tipoServico: dadosCliente.tipoServico || "Aplicação",
-                    precoFinal: dadosCliente.precoFinal || 0,
-                    data: dadosCliente.data || "",
-                    hora: dadosCliente.hora || "",
-                    tipoAtendimento: dadosCliente.tipoAtendimento || "studio",
-                    endereco: dadosCliente.endereco || ""
-                };
-
-                await fetch(CONFIG.scriptGoogleUrl, {
-                    method: 'POST',
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(payload)
-                });
-                return true;
-            } catch (e) { 
-                console.error("Erro ao salvar:", e);
-                return false;
-            }
+        const parseIcsDate = (val) => {
+            if (!val) return null;
+            const clean = val.replace(/[^0-9TZ]/g, '');
+            const y = parseInt(clean.substring(0, 4));
+            const m = parseInt(clean.substring(4, 6)) - 1;
+            const d = parseInt(clean.substring(6, 8));
+            if (!clean.includes('T')) return { isAllDay: true, date: new Date(y, m, d, 0, 0, 0) };
+            const time = clean.split('T')[1];
+            const h = parseInt(time.substring(0, 2));
+            const min = parseInt(time.substring(2, 4));
+            let date = new Date(y, m, d, h, min, 0);
+            if (val.includes('Z')) date.setHours(date.getHours() - 3);
+            return { isAllDay: false, date: date };
         };
 
+        const fetchICSAndParse = async (url, dateStr, horariosDoDia = []) => {
+            try {
+                // Proxy CORS mais estável
+                const proxyUrl = 'https://corsproxy.io/?'; 
+                const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+                const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+                
+                if (!response.ok) {
+                    console.warn("Erro ao buscar agenda:", response.status);
+                    return [];
+                }
+                const icsText = await response.text();
+                
+                const ocupados = [];
+                const lines = icsText.split(/\r\n|\n|\r/);
+                let inEvent = false;
+                let dtStart = "";
+                let dtEnd = "";
+                
+                const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
+                const targetDateStart = new Date(tYear, tMonth - 1, tDay, 0, 0, 0);
+                const targetDateEnd = new Date(tYear, tMonth - 1, tDay, 23, 59, 59);
+
+                lines.forEach(line => {
+                    if (line.startsWith('BEGIN:VEVENT')) { inEvent = true; dtStart = ""; dtEnd = ""; }
+                    if (line.startsWith('END:VEVENT')) { 
+                        inEvent = false;
+                        if (dtStart) {
+                            const startInfo = parseIcsDate(dtStart);
+                            if (startInfo) {
+                                let startDate = startInfo.date;
+                                let endDate = null;
+
+                                if (dtEnd) {
+                                    const endInfo = parseIcsDate(dtEnd);
+                                    if (endInfo) endDate = endInfo.date;
+                                }
+
+                                if (!endDate) {
+                                    endDate = new Date(startDate);
+                                    endDate.setHours(endDate.getHours() + 1);
+                                }
+
+                                if (startInfo.isAllDay) {
+                                     if (startDate.getFullYear() === tYear && startDate.getMonth() === tMonth - 1 && startDate.getDate() === tDay) {
+                                        horariosDoDia.forEach(h => { if(!ocupados.includes(h)) ocupados.push(h); });
+                                     }
+                                } else {
+                                    if (endDate > targetDateStart && startDate < targetDateEnd) {
+                                        horariosDoDia.forEach(slot => {
+                                            const [sh, sm] = slot.split(':').map(Number);
+                                            const slotDate = new Date(tYear, tMonth - 1, tDay, sh, sm, 0);
+                                            if (slotDate >= startDate && slotDate < endDate) {
+                                                if (!ocupados.includes(slot)) ocupados.push(slot);
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (inEvent) {
+                        if (line.startsWith('DTSTART')) dtStart = line.split(':')[1];
+                        if (line.startsWith('DTEND')) dtEnd = line.split(':')[1];
+                    }
+                });
+                return ocupados;
+            } catch (e) { 
+                console.error("Erro no processamento do ICS:", e);
+                return []; 
+            }
+        };
+        
+        // Função necessária para a TelaProfissional buscar a agenda
         const fetchRawEvents = async (url, dateStr) => {
             try {
                 const proxyUrl = 'https://corsproxy.io/?'; 
@@ -240,87 +302,39 @@
             }
         };
 
-        const fetchICSAndParse = async (url, dateStr, horariosDoDia = []) => {
+        const salvarAgendamentoPlanilha = async (dadosCliente) => {
+            if (!CONFIG.scriptGoogleUrl) return; 
             try {
-                const proxyUrl = 'https://corsproxy.io/?'; 
-                const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-                const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
-                if (!response.ok) return [];
-                const icsText = await response.text();
-                
-                const ocupados = [];
-                const lines = icsText.split(/\r\n|\n|\r/);
-                let inEvent = false;
-                let dtStart = "";
-                let dtEnd = "";
-                
-                const parseIcsTime = (val) => {
-                    if (!val) return null;
-                    const clean = val.replace(/[^0-9TZ]/g, '');
-                    const y = parseInt(clean.substring(0, 4));
-                    const m = parseInt(clean.substring(4, 6)) - 1;
-                    const d = parseInt(clean.substring(6, 8));
-                    
-                    if (!clean.includes('T')) return { isAllDay: true, date: new Date(y, m, d) };
-                    
-                    const time = clean.split('T')[1];
-                    const h = parseInt(time.substring(0, 2));
-                    const min = parseInt(time.substring(2, 4));
-                    
-                    let date = new Date(y, m, d, h, min);
-                    if (val.includes('Z')) date.setHours(date.getHours() - 3);
-                    return { isAllDay: false, date: date };
+                let nomeServico = dadosCliente.servicoObj ? dadosCliente.servicoObj.nome : "Serviço Avulso";
+                if (dadosCliente.incluiSobrancelha && dadosCliente.servicoObj && dadosCliente.servicoObj.id !== 999) {
+                    nomeServico += " + Design Sobrancelhas";
+                }
+                const payload = {
+                    nome: dadosCliente.nome || "",
+                    whatsapp: dadosCliente.whatsapp || "",
+                    email: dadosCliente.email || "",
+                    nascimento: dadosCliente.nascimento || "",
+                    servico: nomeServico,
+                    duracao: dadosCliente.duracaoTotal || 2,
+                    tipoServico: dadosCliente.tipoServico || "Aplicação",
+                    precoFinal: dadosCliente.precoFinal || 0,
+                    data: dadosCliente.data || "",
+                    hora: dadosCliente.hora || "",
+                    tipoAtendimento: dadosCliente.tipoAtendimento || "studio",
+                    endereco: dadosCliente.endereco || ""
                 };
 
-                const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
-                const targetDateStart = new Date(tYear, tMonth - 1, tDay, 0, 0, 0);
-                const targetDateEnd = new Date(tYear, tMonth - 1, tDay, 23, 59, 59);
-
-                lines.forEach(line => {
-                    if (line.startsWith('BEGIN:VEVENT')) { inEvent = true; dtStart = ""; dtEnd = ""; }
-                    if (line.startsWith('END:VEVENT')) { 
-                        inEvent = false;
-                        if (dtStart) {
-                            const startInfo = parseIcsTime(dtStart);
-                            if (startInfo) {
-                                let startDate = startInfo.date;
-                                let endDate = null;
-
-                                if (dtEnd) {
-                                    const endInfo = parseIcsTime(dtEnd);
-                                    if (endInfo) endDate = endInfo.date;
-                                }
-
-                                if (!endDate) {
-                                    endDate = new Date(startDate);
-                                    endDate.setHours(endDate.getHours() + 1);
-                                }
-
-                                if (startInfo.isAllDay) {
-                                     if (startDate.getFullYear() === tYear && startDate.getMonth() === tMonth - 1 && startDate.getDate() === tDay) {
-                                        horariosDoDia.forEach(h => { if(!ocupados.includes(h)) ocupados.push(h); });
-                                     }
-                                } else {
-                                    if (endDate > targetDateStart && startDate < targetDateEnd) {
-                                        horariosDoDia.forEach(slot => {
-                                            const [sh, sm] = slot.split(':').map(Number);
-                                            const slotDate = new Date(tYear, tMonth - 1, tDay, sh, sm, 0);
-                                            if (slotDate >= startDate && slotDate < endDate) {
-                                                if (!ocupados.includes(slot)) ocupados.push(slot);
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (inEvent) {
-                        if (line.startsWith('DTSTART')) dtStart = line.split(':')[1];
-                        if (line.startsWith('DTEND')) dtEnd = line.split(':')[1];
-                    }
+                await fetch(CONFIG.scriptGoogleUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
                 });
-                return ocupados;
-            } catch (e) { return []; }
+                return true;
+            } catch (e) { 
+                console.error("Erro ao salvar:", e);
+                return false;
+            }
         };
 
         async function chamarGemini(prompt, systemInstruction = "") {
@@ -440,10 +454,7 @@
                         {!analiseGeral ? (
                             <button onClick={gerarAnaliseFinanceira} disabled={loadingGeral} className="w-full bg-purple-100 text-purple-700 font-bold py-3 rounded-xl hover:bg-purple-200 transition-all flex items-center justify-center gap-2">Gerar Relatório ✨</button>
                         ) : (
-                            <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 animate-in fade-in">
-                                <div dangerouslySetInnerHTML={{ __html: analiseGeral.replace(/\n/g, '<br/>') }} />
-                                <button onClick={() => setAnaliseGeral("")} className="mt-3 text-xs text-purple-500 font-bold underline">Nova Análise</button>
-                            </div>
+                            <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 whitespace-pre-wrap">{analiseGeral}<button onClick={() => setAnaliseGeral("")} className="block mt-2 text-xs text-purple-500 font-bold underline">Nova Análise</button></div>
                         )}
                     </div>
                     <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-1 flex flex-col">
@@ -626,7 +637,7 @@
                                     {dados.data && (
                                         <div className="grid grid-cols-4 gap-2 pb-2 mt-2">
                                             {carregandoHorarios ? <p className="col-span-4 text-center text-xs text-gray-400">Verificando agenda...</p> : 
-                                            horariosDisponiveis.map((h) => {
+                                            horariosDoDia.map((h) => {
                                                 const isOcupado = horariosOcupados.includes(h);
                                                 return (<button key={h} disabled={isOcupado} onClick={() => selecionarHorario(h)} className={`p-2 rounded text-xs font-bold border transition-all ${isOcupado ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed opacity-50' : dados.hora === h ? 'bg-pink-500 text-white border-pink-500 shadow-md transform scale-105' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'}`}>{h}</button>)
                                             })}
@@ -754,14 +765,7 @@
             const gerarAnaliseCliente = async (cliente) => {
                 setLoadingMsgIA(true);
                 setAnaliseIA(null);
-                const prompt = `
-                    Crie uma mensagem curta e carinhosa de 'sumida' para a cliente ${cliente.nome} do estúdio de cílios.
-                    Objetivo: Fazer ela agendar um retorno.
-                    Tom: Amigável, próximo e profissional.
-                    IMPORTANTE: Finalize a mensagem EXATAMENTE com a assinatura: "Com carinho, Leticia Souza".
-                    Não use [Nome da Empresa] ou [Sua Equipe].
-                `;
-                const resp = await chamarGemini(prompt, "Especialista em Recuperação de Clientes");
+                const resp = await chamarGemini(`Crie uma mensagem curta e profissional de fidelização para a cliente ${cliente.nome} que não vem há alguns dias. Ofereça um incentivo para retorno. Tom: Carinhoso e exclusivo.`, "Especialista em CRM");
                 setAnaliseIA({ status: "Analisado", mensagem: resp, dica: "Ofereça um mimo!" });
                 setLoadingMsgIA(false);
             };
@@ -791,12 +795,7 @@
                     const msg = `Olá ${cliente.nome}! Passando para confirmar seu horário de Cílios amanhã às ${cliente.hora}. Tudo certo? 🥰`;
                     window.open(`https://wa.me/55${zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
                 } else {
-                    // Fallback manual se não achar
-                    const manualZap = prompt(`Não encontrei o WhatsApp de ${cliente.nome} automaticamente. Digite o número (com DDD) para abrir a conversa:`);
-                    if(manualZap) {
-                         const msg = `Olá ${cliente.nome}! Passando para confirmar seu horário de Cílios amanhã às ${cliente.hora}. Tudo certo? 🥰`;
-                         window.open(`https://wa.me/55${manualZap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
-                    }
+                    alert("Telefone não encontrado. Copie o nome e busque no WhatsApp.");
                 }
             };
             
