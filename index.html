@@ -18,18 +18,11 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         input[type="date"] {
-            -webkit-appearance: none;
-            display: block;
-            width: 100%;
-            height: 50px;
-            padding: 10px;
-            background: white !important;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
-            font-size: 16px;
+            -webkit-appearance: none; display: block; width: 100%; height: 50px; padding: 10px;
+            background: white !important; border: 1px solid #e5e7eb; border-radius: 0.75rem; font-size: 16px;
         }
         
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #db2777; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #db2777; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .toggle-checkbox:checked { right: 0; border-color: #db2777; }
@@ -43,9 +36,8 @@
 <body>
 
     <div id="root">
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #db2777; background-color: #fdf2f8;">
-            <img src="img/logo.png" style="width: 150px; margin-bottom: 20px;" alt="Logo Ls Cílios" onerror="this.style.display='none'"/>
-            <h2 style="font-family: sans-serif;">Carregando App...</h2>
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #db2777;">
+            <h2 style="font-family: sans-serif;">Carregando Agenda...</h2>
             <div class="loader" style="margin-top: 15px;"></div>
         </div>
     </div>
@@ -69,9 +61,8 @@
             icalUrlPublic: "https://calendar.google.com/calendar/ical/lscilios.contato%40gmail.com/public/basic.ics",
             
             depoimentos: [
-                { nome: "Cliente", texto: "Amo sua flexibilidade, paciência e atendimento. Você me dá a liberdade de escolher o estilo e a durabilidade é ótima!" },
-                { nome: "Cliente", texto: "Seu trabalho é ótimo! O espaço aconchegante. Higiene impecável e cuidado para não arder os olhos." },
-                { nome: "Cliente", texto: "Seu trabalho é sinceramente o melhor que já fiz. Não fico mais sem cílios e sem você!" }
+                { nome: "Cliente", texto: "Amo sua flexibilidade, paciência e atendimento." },
+                { nome: "Cliente", texto: "Seu trabalho é ótimo! O espaço aconchegante." }
             ],
 
             sobrancelha: { id: 999, nome: "Design de Sobrancelhas", preco: 35, duracao: 0.5 },
@@ -119,24 +110,61 @@
             Dollar: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>,
             User: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
             CloudDownload: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>,
-            Cake: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M2 21h20"></path><path d="M7 8v2"></path><path d="M12 8v2"></path><path d="M17 8v2"></path><path d="M7 4h.01"></path><path d="M12 4h.01"></path><path d="M17 4h.01"></path></svg>
+            Cake: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M2 21h20"></path><path d="M7 8v2"></path><path d="M12 8v2"></path><path d="M17 8v2"></path><path d="M7 4h.01"></path><path d="M12 4h.01"></path><path d="M17 4h.01"></path></svg>,
+            Search: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
+            Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         };
 
         // --- 3. FUNÇÕES GLOBAIS ---
-
+        
         const formatarTelefone = (value) => {
             if(!value) return "";
             const numero = value.replace(/\D/g, "");
-            if (numero.length <= 10) {
-                return numero.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+            if (numero.length <= 11) {
+                return numero.replace(/^(\d{2})(\d{0,5})(\d{0,4}).*/, "($1) $2-$3").replace(/-$/, ''); 
             } else {
-                return numero.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, "($1) $2-$3");
+                return numero.substring(0, 11).replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
             }
         };
 
         const validarEmail = (email) => {
-            if (!email) return true;
+            if (!email) return true; 
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        };
+
+        const salvarAgendamentoPlanilha = async (dadosCliente) => {
+            if (!CONFIG.scriptGoogleUrl) return true; 
+            try {
+                let nomeServico = dadosCliente.servicoObj ? dadosCliente.servicoObj.nome : "Serviço Avulso";
+                if (dadosCliente.incluiSobrancelha && dadosCliente.servicoObj && dadosCliente.servicoObj.id !== 999) {
+                    nomeServico += " + Design Sobrancelhas";
+                }
+                const payload = {
+                    nome: dadosCliente.nome || "",
+                    whatsapp: dadosCliente.whatsapp || "",
+                    email: dadosCliente.email || "",
+                    nascimento: dadosCliente.nascimento || "",
+                    servico: nomeServico,
+                    duracao: dadosCliente.duracaoTotal || 2,
+                    tipoServico: dadosCliente.tipoServico || "Aplicação",
+                    precoFinal: dadosCliente.precoFinal || 0,
+                    data: dadosCliente.data || "",
+                    hora: dadosCliente.hora || "",
+                    tipoAtendimento: dadosCliente.tipoAtendimento || "studio",
+                    endereco: dadosCliente.endereco || ""
+                };
+                
+                await fetch(CONFIG.scriptGoogleUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+                return true;
+            } catch (e) { 
+                console.error("Erro ao salvar:", e);
+                return true; 
+            }
         };
 
         const parseIcsDate = (val) => {
@@ -154,29 +182,34 @@
             return { isAllDay: false, date: date };
         };
 
-        const fetchRawEvents = async (url, dateStr) => {
+        // Função de busca inteligente com múltiplos proxies
+        const fetchAndParseEvents = async (url, dateStr, forClient = false, slots = []) => {
             try {
-                // Tenta buscar diretamente, se falhar usa proxy corsproxy.io, se falhar usa allorigins
-                let icsText = '';
-                const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+                const proxies = [
+                    'https://corsproxy.io/?',
+                    'https://api.allorigins.win/raw?url='
+                ];
                 
-                try {
-                     const response = await fetch('https://corsproxy.io/?' + encodeURIComponent(targetUrl));
-                     if (response.ok) icsText = await response.text();
-                } catch (e) {
-                     console.warn("Proxy 1 falhou, tentando proxy 2");
-                }
+                const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+                let icsText = null;
 
-                if (!icsText) {
-                     const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl));
-                     if (response.ok) {
-                        const data = await response.json();
-                        icsText = data.contents;
-                     }
+                for (const proxy of proxies) {
+                    try {
+                        const response = await fetch(proxy + encodeURIComponent(targetUrl));
+                        if (response.ok) {
+                            if (proxy.includes('allorigins') && !proxy.includes('raw')) {
+                                const data = await response.json();
+                                icsText = data.contents;
+                            } else {
+                                icsText = await response.text();
+                            }
+                            if (icsText && icsText.includes("BEGIN:VCALENDAR")) break;
+                        }
+                    } catch (e) { console.warn(`Proxy ${proxy} falhou`); }
                 }
 
                 if (!icsText) return [];
-                
+
                 const events = [];
                 const lines = icsText.split(/\r\n|\n|\r/);
                 let currentEvent = null;
@@ -202,9 +235,39 @@
                         }
                     }
                 });
-                
-                if (dateStr) {
-                    const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
+
+                const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
+                const targetDateStart = new Date(tYear, tMonth - 1, tDay, 0, 0, 0);
+                const targetDateEnd = new Date(tYear, tMonth - 1, tDay, 23, 59, 59);
+
+                if (forClient) {
+                    const ocupados = [];
+                    events.forEach(ev => {
+                         const startInfo = parseIcsDate(ev.dtstart);
+                         if (startInfo) {
+                            let startDate = startInfo.date;
+                            let endDate = ev.dtend ? parseIcsDate(ev.dtend).date : new Date(startDate.getTime() + 60*60*1000);
+                            
+                            if (startInfo.isAllDay) {
+                                if (startDate.getFullYear() === tYear && startDate.getMonth() === tMonth - 1 && startDate.getDate() === tDay) {
+                                    slots.forEach(h => { if(!ocupados.includes(h)) ocupados.push(h); });
+                                }
+                            } else {
+                                if (endDate > targetDateStart && startDate < targetDateEnd) {
+                                    slots.forEach(slot => {
+                                        const [sh, sm] = slot.split(':').map(Number);
+                                        const slotDate = new Date(tYear, tMonth - 1, tDay, sh, sm, 0);
+                                        if (slotDate >= startDate && slotDate < endDate) {
+                                            if (!ocupados.includes(slot)) ocupados.push(slot);
+                                        }
+                                    });
+                                }
+                            }
+                         }
+                    });
+                    return ocupados;
+
+                } else {
                     return events.filter(ev => {
                         const startInfo = parseIcsDate(ev.dtstart);
                         if (!startInfo) return false;
@@ -213,121 +276,25 @@
                     }).map(ev => {
                         const startInfo = parseIcsDate(ev.dtstart);
                         ev.localHour = startInfo ? startInfo.date.getHours() : -1;
+                        
+                        const loc = ev.location ? ev.location.toLowerCase() : "";
+                        let tipoLocal = 'domicilio';
+                        if (!loc || loc.length < 5 || loc.includes('studio') || loc.includes('prestes')) {
+                            tipoLocal = 'studio';
+                        }
+                        
+                        ev.tipo = tipoLocal;
                         return ev;
                     });
                 }
-                return events;
-            } catch (e) {
-                console.error("Erro ao buscar eventos raw", e);
-                return [];
+            } catch (e) { 
+                console.error("Erro geral no ICS:", e);
+                return []; 
             }
         };
 
-        const fetchICSAndParse = async (url, dateStr, horariosDoDia) => {
-            try {
-                let icsText = '';
-                const targetUrl = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-                
-                try {
-                     const response = await fetch('https://corsproxy.io/?' + encodeURIComponent(targetUrl));
-                     if (response.ok) icsText = await response.text();
-                } catch (e) {
-                     console.warn("Proxy 1 falhou na verificação, tentando proxy 2");
-                }
-
-                if (!icsText) {
-                     const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl));
-                     if (response.ok) {
-                        const data = await response.json();
-                        icsText = data.contents;
-                     }
-                }
-
-                if (!icsText) return [];
-                
-                const ocupados = [];
-                const lines = icsText.split(/\r\n|\n|\r/);
-                let inEvent = false;
-                let dtStart = "";
-                let dtEnd = "";
-                
-                const [tYear, tMonth, tDay] = dateStr.split('-').map(Number);
-                const targetDateStart = new Date(tYear, tMonth - 1, tDay, 0, 0, 0);
-                const targetDateEnd = new Date(tYear, tMonth - 1, tDay, 23, 59, 59);
-
-                lines.forEach(line => {
-                    if (line.startsWith('BEGIN:VEVENT')) { inEvent = true; dtStart = ""; dtEnd = ""; }
-                    if (line.startsWith('END:VEVENT')) { 
-                        inEvent = false;
-                        if (dtStart) {
-                            const startInfo = parseIcsDate(dtStart);
-                            if (startInfo) {
-                                let startDate = startInfo.date;
-                                let endDate = null;
-                                if (dtEnd) {
-                                    const endInfo = parseIcsDate(dtEnd);
-                                    if (endInfo) endDate = endInfo.date;
-                                }
-                                if (!endDate) {
-                                    endDate = new Date(startDate);
-                                    endDate.setHours(endDate.getHours() + 1);
-                                }
-                                if (startInfo.isAllDay) {
-                                     if (startDate.getFullYear() === tYear && startDate.getMonth() === tMonth - 1 && startDate.getDate() === tDay) {
-                                        horariosDoDia.forEach(h => { if(!ocupados.includes(h)) ocupados.push(h); });
-                                     }
-                                } else {
-                                    if (endDate > targetDateStart && startDate < targetDateEnd) {
-                                        horariosDoDia.forEach(slot => {
-                                            const [sh, sm] = slot.split(':').map(Number);
-                                            const slotDate = new Date(tYear, tMonth - 1, tDay, sh, sm, 0);
-                                            if (slotDate >= startDate && slotDate < endDate) {
-                                                if (!ocupados.includes(slot)) ocupados.push(slot);
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (inEvent) {
-                        if (line.startsWith('DTSTART')) dtStart = line.split(':')[1];
-                        if (line.startsWith('DTEND')) dtEnd = line.split(':')[1];
-                    }
-                });
-                return ocupados;
-            } catch (e) { return []; }
-        };
-
-        const salvarAgendamentoPlanilha = async (dadosCliente) => {
-            if (!CONFIG.scriptGoogleUrl) return; 
-            try {
-                let nomeServico = dadosCliente.servicoObj ? dadosCliente.servicoObj.nome : "Serviço Avulso";
-                if (dadosCliente.incluiSobrancelha && dadosCliente.servicoObj && dadosCliente.servicoObj.id !== 999) {
-                    nomeServico += " + Design Sobrancelhas";
-                }
-                const payload = {
-                    nome: dadosCliente.nome || "",
-                    whatsapp: dadosCliente.whatsapp || "",
-                    email: dadosCliente.email || "",
-                    nascimento: dadosCliente.nascimento || "",
-                    servico: nomeServico,
-                    duracao: dadosCliente.duracaoTotal || 2,
-                    tipoServico: dadosCliente.tipoServico || "Aplicação",
-                    precoFinal: dadosCliente.precoFinal || 0,
-                    data: dadosCliente.data || "",
-                    hora: dadosCliente.hora || "",
-                    tipoAtendimento: dadosCliente.tipoAtendimento || "studio",
-                    endereco: dadosCliente.endereco || ""
-                };
-                await fetch(CONFIG.scriptGoogleUrl, {
-                    method: 'POST',
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(payload)
-                });
-                return true;
-            } catch (e) { console.error("Erro ao salvar:", e); return false; }
+        const fetchRawEvents = async (url, dateStr) => {
+           return fetchAndParseEvents(url, dateStr, false);
         };
 
         async function chamarGemini(prompt, systemInstruction = "") {
@@ -361,9 +328,12 @@
                 setHistorico(prev => [...prev, novaMsg]);
                 setMsg('');
                 setLoading(true);
-                const resposta = await chamarGemini(msg, "Você é a assistente virtual da Ls Cílios. Responda curto e simpática.");
+                const resposta = await chamarGemini(msg, "Você é a assistente virtual da Ls Cílios. Responda curto e simpática. Se não souber, peça para falar com a Le.");
                 setHistorico(prev => [...prev, { role: 'bot', text: resposta || "Desculpe, não entendi." }]);
                 setLoading(false);
+            };
+            const irParaWhatsApp = () => {
+                window.open(`https://wa.me/${CONFIG.telefoneProfissional}?text=Olá Le, tenho uma dúvida.`, '_blank');
             };
             return (
                 <React.Fragment>
@@ -375,6 +345,7 @@
                                 {historico.map((m, i) => (<div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[85%] p-2 rounded-xl ${m.role === 'user' ? 'bg-purple-100 text-purple-800 rounded-tr-none' : 'bg-white border border-gray-200 text-gray-600 rounded-tl-none'}`}>{m.text}</div></div>))}
                                 <div ref={msgEndRef} />
                             </div>
+                            <div className="p-2 bg-gray-50 border-t border-gray-100 text-center"><button onClick={irParaWhatsApp} className="text-xs text-green-600 font-bold hover:underline flex items-center justify-center gap-1 w-full"><Icons.Whatsapp /> Falar com a Le no Zap</button></div>
                             <div className="p-2 bg-white border-t border-gray-100 flex gap-2">
                                 <input type="text" className="flex-1 border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-500" placeholder="Digite..." value={msg} onChange={(e) => setMsg(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && enviarMsg()} />
                                 <button onClick={enviarMsg} disabled={loading} className="bg-purple-600 text-white p-2 rounded-lg">➤</button>
@@ -417,49 +388,424 @@
             );
         }
 
-        function TelaEstrategiaIA({ listaClientes, despesas }) {
-            const [analiseGeral, setAnaliseGeral] = useState("");
-            const [loadingGeral, setLoadingGeral] = useState(false);
-            const [pergunta, setPergunta] = useState("");
-            const [respostaChat, setRespostaChat] = useState("");
-            const [loadingChat, setLoadingChat] = useState(false);
-            const gerarAnaliseFinanceira = async () => {
-                setLoadingGeral(true);
-                const resp = await chamarGemini(`Analise: Receita R$${listaClientes.length * 120}, Despesas R$${despesas.reduce((a,b)=>a+parseFloat(b.valor),0)}. Dê 2 dicas de lucro.`);
-                setAnaliseGeral(resp);
-                setLoadingGeral(false);
+        // Modal para Adicionar Novo Cliente
+        function ModalNovoCliente({ isOpen, onClose, onSalvar, loading }) {
+            const [nome, setNome] = useState('');
+            const [whatsapp, setWhatsapp] = useState('');
+            const [nascimento, setNascimento] = useState('');
+            const [email, setEmail] = useState('');
+
+            if (!isOpen) return null;
+
+            const handleSave = () => {
+                if (!nome || !whatsapp) {
+                    alert("Nome e WhatsApp são obrigatórios!");
+                    return;
+                }
+                onSalvar({ nome, whatsapp, nascimento, email });
             };
-            const perguntarConselheira = async () => {
-                if(!pergunta) return;
-                setLoadingChat(true);
-                const prompt = `Sou Lash Designer. Pergunta: "${pergunta}". Responda curto.`;
-                const resposta = await chamarGemini(prompt, "Conselheira de negócios.");
-                setRespostaChat(resposta || "Erro.");
-                setLoadingChat(false);
-            };
+
             return (
-                <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
-                    <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 rounded-xl text-white shadow-md">
-                        <h3 className="font-bold text-lg flex items-center gap-2"><Icons.Sparkles /> Inteligência Financeira</h3>
-                    </div>
-                    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                        <h4 className="font-bold text-gray-700 text-sm mb-2">📊 Análise de Faturamento</h4>
-                        {!analiseGeral ? (
-                            <button onClick={gerarAnaliseFinanceira} disabled={loadingGeral} className="w-full bg-purple-100 text-purple-700 font-bold py-3 rounded-xl hover:bg-purple-200 transition-all flex items-center justify-center gap-2">Gerar Relatório ✨</button>
-                        ) : (
-                            <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 whitespace-pre-wrap">{analiseGeral}<button onClick={() => setAnaliseGeral("")} className="block mt-2 text-xs text-purple-500 font-bold underline">Nova Análise</button></div>
-                        )}
-                    </div>
-                    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-1 flex flex-col">
-                        <h4 className="font-bold text-gray-700 text-sm mb-2 flex items-center gap-2"><Icons.Robot /> Conselheira do Studio</h4>
-                        <div className="flex-1 bg-gray-50 p-2 rounded mb-2 text-xs overflow-y-auto max-h-40">{respostaChat || "Pergunte algo..."}</div>
-                        <div className="flex gap-2"><input type="text" className="flex-1 border rounded px-2 py-1 text-sm" value={pergunta} onChange={e=>setPergunta(e.target.value)}/><button onClick={perguntarConselheira} disabled={loadingChat} className="bg-pink-500 text-white p-2 rounded">➤</button></div>
+                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" onClick={onClose}>
+                    <div className="bg-white rounded-xl w-full max-w-sm p-6 relative" onClick={e => e.stopPropagation()}>
+                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400"><Icons.Close /></button>
+                        <h3 className="font-bold text-lg mb-4 text-gray-800">Novo Cliente</h3>
+                        <div className="space-y-3">
+                            <input type="text" placeholder="Nome Completo *" className="w-full p-3 border rounded-lg text-sm" value={nome} onChange={e => setNome(e.target.value)} />
+                            <input type="tel" placeholder="WhatsApp (DDD) *" className="w-full p-3 border rounded-lg text-sm" value={whatsapp} onChange={e => setWhatsapp(formatarTelefone(e.target.value))} maxLength="15" />
+                            <input type="date" className="w-full p-3 border rounded-lg text-sm" value={nascimento} onChange={e => setNascimento(e.target.value)} />
+                            <input type="email" placeholder="E-mail (Opcional)" className="w-full p-3 border rounded-lg text-sm" value={email} onChange={e => setEmail(e.target.value)} />
+                            <button onClick={handleSave} disabled={loading} className="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition-all flex justify-center items-center gap-2">
+                                {loading ? 'Salvando...' : <><Icons.Check /> Salvar Cliente</>}
+                            </button>
+                        </div>
                     </div>
                 </div>
             );
         }
 
-        function TelaCliente({ aoFinalizar }) {
+        // Modal Auxiliar para Seleção de Contato (Mensagens)
+        function ModalSelecionarContato({ isOpen, onClose, clientes, onSelect }) {
+            const [termoBusca, setTermoBusca] = useState('');
+            if (!isOpen) return null;
+
+            const clientesFiltrados = clientes.filter(c => 
+                c.nome.toLowerCase().includes(termoBusca.toLowerCase()) || 
+                c.zap.includes(termoBusca)
+            );
+            
+            const enviarSemNumero = () => {
+                const url = `https://api.whatsapp.com/send?text=`;
+                window.open(url, '_blank');
+                onClose();
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" onClick={onClose}>
+                    <div className="bg-white rounded-xl w-full max-w-sm max-h-[80vh] flex flex-col overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+                        <div className="bg-purple-600 p-4 text-white flex justify-between items-center">
+                            <h3 className="font-bold">Selecione o Contato</h3>
+                            <button onClick={onClose}><Icons.Close /></button>
+                        </div>
+                        <div className="p-2 border-b bg-gray-50">
+                            <div className="flex items-center bg-white border border-gray-200 rounded-lg px-2 shadow-sm">
+                                <Icons.Search className="text-gray-400 w-4 h-4" />
+                                <input 
+                                    type="text" 
+                                    className="w-full p-2 bg-transparent text-sm focus:outline-none"
+                                    placeholder="Buscar por nome..." 
+                                    value={termoBusca}
+                                    onChange={(e) => setTermoBusca(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                            {clientesFiltrados.length > 0 ? (
+                                clientesFiltrados.map((c, i) => (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => onSelect(c)}
+                                        className="w-full text-left p-3 hover:bg-purple-50 rounded-lg border border-transparent hover:border-purple-100 flex justify-between items-center transition-all"
+                                    >
+                                        <div>
+                                            <span className="font-bold text-gray-700 text-sm block">{c.nome}</span>
+                                            <span className="text-xs text-gray-400">Última visita: {c.ultima_visita ? c.ultima_visita.split('T')[0] : '-'}</span>
+                                        </div>
+                                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">{c.zap}</span>
+                                    </button>
+                                ))
+                            ) : (
+                                <p className="text-center text-gray-500 text-sm py-8 flex flex-col items-center gap-2">
+                                    <Icons.EyeOff className="w-8 h-8 text-gray-300"/>
+                                    Nenhum cliente encontrado.
+                                </p>
+                            )}
+                        </div>
+                        <div className="p-3 border-t bg-gray-50">
+                            <button 
+                                onClick={enviarSemNumero}
+                                className="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-md transition-all"
+                            >
+                                <Icons.Whatsapp /> Abrir WhatsApp (Escolher Contato)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function TelaProfissional({ onSair }) {
+            const [aba, setAba] = useState('confirma'); 
+            const [dataLote, setDataLote] = useState(new Date().toISOString().split('T')[0]);
+            const [listaClientes, setListaClientes] = useState([]);
+            const [bancoClientes, setBancoClientes] = useState([]);
+            const [loadingSync, setLoadingSync] = useState(false);
+            const [loadingPlanilha, setLoadingPlanilha] = useState(false);
+            const [despesas, setDespesas] = useState([]); 
+            const [modalAnaliseIA, setModalAnaliseIA] = useState(null);
+            const [analiseIA, setAnaliseIA] = useState(null);
+            const [loadingMsgIA, setLoadingMsgIA] = useState(false);
+            const [modalNiver, setModalNiver] = useState(null);
+            const [temDesconto, setTemDesconto] = useState(false);
+            const [valorDesconto, setValorDesconto] = useState(10);
+            const [sugestaoIA, setSugestaoIA] = useState("");
+            const [loadingIA, setLoadingIA] = useState(false);
+            const [postIA, setPostIA] = useState({ servico: '', tom: 'Divertido', legenda: '' });
+            
+            // Estados para modais
+            const [modalSelecionarContato, setModalSelecionarContato] = useState(false);
+            const [clienteParaConfirmar, setClienteParaConfirmar] = useState(null);
+            const [modalNovoCliente, setModalNovoCliente] = useState(false);
+            const [loadingSalvarCliente, setLoadingSalvarCliente] = useState(false);
+
+            useEffect(() => {
+                const saved = localStorage.getItem('ls_despesas');
+                if(saved) setDespesas(JSON.parse(saved));
+                baixarClientesPlanilha();
+            }, []);
+
+            const sincronizarGoogleAgenda = async () => { 
+                setLoadingSync(true); 
+                const eventos = await fetchAndParseEvents(CONFIG.icalUrlPrivate, dataLote); 
+                const listaFinal = eventos.map(ev => ({ 
+                    id: Math.random(), 
+                    nome: ev.summary || 'Cliente', 
+                    hora: (ev.localHour < 10 ? '0'+ev.localHour : ev.localHour) + ":00", 
+                    tipo: ev.tipo, 
+                    whatsapp: ev.description ? ev.description.match(/Whats: ([\d() -]+)/)?.[1] : null,
+                    location: ev.location
+                }));
+                setListaClientes(listaFinal);
+                setLoadingSync(false); 
+            };
+
+            const baixarClientesPlanilha = async () => {
+                setLoadingPlanilha(true);
+                try {
+                    const res = await fetch(`${CONFIG.scriptGoogleUrl}?action=readClients`);
+                    const data = await res.json();
+                    if (Array.isArray(data)) setBancoClientes(data);
+                } catch (e) { console.error(e); }
+                setLoadingPlanilha(false);
+            };
+
+            const handleSalvarNovoCliente = async (novoCliente) => {
+                setLoadingSalvarCliente(true);
+                // Usa a função de salvar agendamento "falso" para registrar o cliente
+                // O script do Google Sheets detecta o telefone e adiciona na aba Clientes se não existir
+                const payload = {
+                    nome: novoCliente.nome,
+                    whatsapp: novoCliente.whatsapp,
+                    email: novoCliente.email || "",
+                    nascimento: novoCliente.nascimento || "",
+                    servico: "Cadastro Manual",
+                    tipoServico: "Cadastro",
+                    data: new Date().toISOString().split('T')[0], // Data de hoje para registro
+                    hora: "00:00",
+                    tipoAtendimento: "studio",
+                    endereco: ""
+                };
+
+                await salvarAgendamentoPlanilha(payload);
+                await baixarClientesPlanilha(); // Atualiza a lista local
+                setLoadingSalvarCliente(false);
+                setModalNovoCliente(false);
+                alert("Cliente cadastrada com sucesso!");
+            };
+            
+            // Lógica de confirmação (inicia o processo)
+            const iniciarConfirmacao = (cliente) => {
+                let zap = cliente.whatsapp;
+                
+                if (!zap) {
+                    const clienteEncontrado = bancoClientes.find(c => c.nome.toLowerCase().includes(cliente.nome.toLowerCase()) || cliente.nome.toLowerCase().includes(c.nome.toLowerCase()));
+                    if (clienteEncontrado) {
+                         zap = clienteEncontrado.zap;
+                         enviarMensagemConfirmacao({ ...cliente, whatsapp: zap });
+                         return;
+                    }
+                }
+
+                if (zap) {
+                    enviarMensagemConfirmacao(cliente);
+                } else {
+                    setClienteParaConfirmar(cliente);
+                    setModalSelecionarContato(true);
+                }
+            };
+            
+            const selecionarContatoEConfirmar = (contatoSelecionado) => {
+                if (clienteParaConfirmar) {
+                    const clienteAtualizado = { ...clienteParaConfirmar, whatsapp: contatoSelecionado.zap };
+                    enviarMensagemConfirmacao(clienteAtualizado);
+                    setModalSelecionarContato(false);
+                    setClienteParaConfirmar(null);
+                }
+            };
+
+            const enviarMensagemConfirmacao = (cliente) => {
+                let msg = "";
+                if (cliente.tipo === 'studio') {
+                    msg = `Oiiiii, *${cliente.nome}* !!!\nSó pra confirmar seu horário amanhã às ${cliente.hora} no Studio 💜\n\n📍endereço:\nAv. Prestes Maia, 221 - Jardim D’abril, Osasco\n\n⏰ Só para lembrar que temos uma tolerância de 15 minutos de atraso.\n\nTe espero 💜`;
+                } else {
+                    const loc = cliente.location ? cliente.location.toLowerCase() : "";
+                    const semEndereco = !cliente.location || loc === 'domicilio' || loc.length < 5;
+                    
+                    if (semEndereco) {
+                         msg = `Oiiiii, *${cliente.nome}* !!!\nPassando pra confirmar nosso atendimento a domicílio amanhã às ${cliente.hora} 💜\n\n📍 *Poderia me confirmar seu endereço certinho, por favor?* 🥰\n\nQualquer imprevisto me avise!`;
+                    } else {
+                         msg = `Oiiiii, *${cliente.nome}* !!!\nPassando pra confirmar nosso atendimento a domicílio amanhã às ${cliente.hora} 💜\n\n📍No endereço: ${cliente.location}\n\nQualquer imprevisto me avise! 🥰`;
+                    }
+                }
+                
+                const zapLimpo = String(cliente.whatsapp).replace(/\D/g, '');
+                window.open(`https://wa.me/55${zapLimpo}?text=${encodeURIComponent(msg)}`, '_blank');
+            };
+
+            const abrirModalNiver = (cliente) => {
+                setModalNiver(cliente);
+                setTemDesconto(false);
+                setSugestaoIA("");
+                setLoadingIA(true);
+                chamarGemini(`Dê uma sugestão curta de desconto de aniversário para a cliente ${cliente.nome}.`, "Especialista em Marketing").then(r => { setSugestaoIA(r); setLoadingIA(false); });
+            };
+
+            const enviarMensagemNiver = () => {
+                if (!modalNiver) return;
+                const msg = `Parabéns ${modalNiver.nome}! 🎂🥳 Estamos enviando um presente especial de ${temDesconto ? valorDesconto + '% OFF' : 'uma surpresa'} para você realçar seu olhar! 🥰`;
+                window.open(`https://wa.me/55${modalNiver.zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+                setModalNiver(null);
+            };
+
+            const gerarAnaliseCliente = async (cliente) => {
+                setLoadingMsgIA(true);
+                setAnaliseIA(null);
+                const resp = await chamarGemini(`Crie uma mensagem curta e profissional de fidelização para a cliente ${cliente.nome} que não vem há alguns dias. Ofereça um incentivo para retorno. Tom: Carinhoso e exclusivo.`, "Especialista em CRM");
+                setAnaliseIA({ status: "Analisado", mensagem: resp, dica: "Ofereça um mimo!" });
+                setLoadingMsgIA(false);
+            };
+
+            const enviarMensagemAnalise = (zap, msg) => {
+                const link = `https://wa.me/55${zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
+                window.open(link, '_blank');
+            };
+
+            const gerarLegendaInstagram = async () => {
+                setLoadingMsgIA(true);
+                const prompt = `Crie uma legenda de Instagram para Lash Designers sobre ${postIA.servico} com tom ${postIA.tom}. Inclua emojis e hashtags.`;
+                const resposta = await chamarGemini(prompt, "Copywriter de Redes Sociais");
+                setPostIA({...postIA, legenda: resposta});
+                setLoadingMsgIA(false);
+            };
+            
+            const isAniversariante = (dataNasc) => {
+                if (!dataNasc) return false;
+                const parts = dataNasc.split('-');
+                if(parts.length !== 3) return false;
+                const hoje = new Date();
+                return parseInt(parts[2]) === hoje.getDate() && parseInt(parts[1]) === (hoje.getMonth() + 1);
+            };
+
+            return (
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 fade-in relative min-h-[600px] flex flex-col">
+                    <button onClick={onSair} className="absolute top-4 right-4 text-white z-10"><Icons.LogOut /></button>
+                    <div className="bg-purple-600 p-6 text-white">
+                        <h2 className="text-xl font-bold">Painel da Le</h2>
+                        <div className="flex gap-4 mt-4 text-[10px] font-bold overflow-x-auto no-scrollbar whitespace-nowrap">
+                            {['confirma', 'financeiro', 'clientes', 'marketing'].map(t => (
+                                <button key={t} onClick={() => setAba(t)} className={`pb-1 border-b-2 uppercase ${aba === t ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>{t}</button>
+                            ))}
+                        </div>
+                    </div>
+                    {aba === 'confirma' && (
+                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
+                            <div className="bg-gray-50 p-4 rounded-xl border flex gap-2"><input type="date" className="flex-1 p-2 rounded-lg border text-sm" value={dataLote} onChange={e => setDataLote(e.target.value)} /><button onClick={sincronizarGoogleAgenda} className="bg-blue-600 text-white px-3 rounded-lg text-xs font-bold">{loadingSync ? '...' : <Icons.Refresh />}</button></div>
+                            <div className="flex-1 overflow-y-auto space-y-2">
+                                {listaClientes.map((c) => (
+                                    <div key={c.id} className="p-3 rounded-xl border flex flex-col gap-2 bg-white">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <p className="font-bold text-sm text-gray-800">{c.nome}</p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="bg-gray-100 text-xs px-1.5 rounded text-gray-600 font-bold">{c.hora}</span>
+                                                    <span className={`text-[10px] px-2 py-0.5 rounded ${c.tipo === 'domicilio' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                                                        {c.tipo === 'domicilio' ? '🏠 Casa' : '🏢 Studio'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => iniciarConfirmacao(c)} className="w-full py-2 rounded-lg text-xs bg-green-500 text-white font-bold flex justify-center items-center gap-1 shadow-sm hover:bg-green-600 transition-all"><Icons.Whatsapp /> Confirmar</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {aba === 'financeiro' && <TelaFinanceiro listaClientes={listaClientes} despesas={despesas} setDespesas={setDespesas} />}
+                    {aba === 'clientes' && (
+                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
+                            <div className="flex gap-2 mb-2">
+                                <button onClick={() => setModalNovoCliente(true)} className="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl text-sm flex justify-center items-center gap-2 shadow-lg hover:bg-purple-700 transition-all"><Icons.Plus /> Novo Cliente</button>
+                                <button onClick={baixarClientesPlanilha} className="bg-green-100 text-green-700 font-bold px-4 rounded-xl text-xs flex justify-center items-center gap-1"><Icons.Refresh /></button>
+                            </div>
+                            
+                            {bancoClientes.map((c, i) => (
+                                <div key={i} className="p-3 rounded-xl border mb-2 bg-white flex justify-between items-center">
+                                    <div className="flex flex-col"><p className="font-bold text-sm text-gray-700">{c.nome}</p><p className="text-[10px] text-gray-400">{c.zap}</p></div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => { setModalAnaliseIA(c); gerarAnaliseCliente(c); }} className="bg-purple-100 text-purple-600 py-1 px-2 rounded text-[10px] font-bold">Analisar</button>
+                                        {isAniversariante(c.nascimento) && <button onClick={() => abrirModalNiver(c)} className="bg-pink-100 text-pink-600 py-1 px-2 rounded text-[10px] font-bold flex items-center gap-1"><Icons.Cake /> Parabéns</button>}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {aba === 'marketing' && (
+                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
+                            <div className="bg-pink-50 p-4 rounded-xl border border-pink-200">
+                                <h3 className="font-bold text-pink-700 text-sm mb-3 flex items-center gap-2"><Icons.Gemini /> Gerador de Legenda</h3>
+                                <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.servico} onChange={(e) => setPostIA({...postIA, servico: e.target.value})}><option value="">Serviço...</option>{CONFIG.servicos.map(s => <option key={s.id} value={s.nome}>{s.nome}</option>)}</select>
+                                <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.tom} onChange={(e) => setPostIA({...postIA, tom: e.target.value})}><option value="Divertido">Divertido</option><option value="Profissional">Profissional</option></select>
+                                <button onClick={gerarLegendaInstagram} disabled={loadingMsgIA || !postIA.servico} className="w-full bg-pink-500 text-white font-bold py-2 rounded-lg text-sm hover:bg-pink-600 disabled:opacity-50">{loadingMsgIA ? '...' : '✨ Criar'}</button>
+                            </div>
+                            {postIA.legenda && <textarea className="w-full h-32 p-2 bg-gray-50 rounded border text-sm" value={postIA.legenda} readOnly></textarea>}
+                        </div>
+                    )}
+                    
+                    {/* Modal Selecionar Contato */}
+                    <ModalSelecionarContato 
+                        isOpen={modalSelecionarContato} 
+                        onClose={() => setModalSelecionarContato(false)}
+                        clientes={bancoClientes}
+                        onSelect={selecionarContatoEConfirmar}
+                    />
+                    
+                    {/* Modal Novo Cliente */}
+                    <ModalNovoCliente
+                        isOpen={modalNovoCliente}
+                        onClose={() => setModalNovoCliente(false)}
+                        onSalvar={handleSalvarNovoCliente}
+                        loading={loadingSalvarCliente}
+                    />
+
+                    {modalNiver && (
+                        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 fade-in">
+                            <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden relative transform scale-100 transition-all shadow-2xl">
+                                <div className="modal-gradient p-8 text-center flex flex-col items-center justify-center relative h-96">
+                                    <button onClick={()=>setModalNiver(null)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/50 rounded-full p-1"><Icons.Close /></button>
+                                    <div className="text-7xl mb-4 animate-bounce filter drop-shadow-md">🎂</div>
+                                    <h3 className="font-bold text-3xl text-purple-800 mb-2">Parabéns, {modalNiver.nome.split(' ')[0]}!</h3>
+                                    <p className="text-purple-600 text-base mb-8 font-medium">Vamos mimar essa cliente especial?</p>
+                                    
+                                    <div className="w-full space-y-4">
+                                        <div className="flex gap-3 justify-center">
+                                            <button onClick={()=>setTemDesconto(true)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${temDesconto?'bg-pink-50 text-pink-600 border-pink-400':'bg-white text-gray-500 border-gray-200'}`}>Sim, Desconto 🎁</button>
+                                            <button onClick={()=>setTemDesconto(false)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${!temDesconto?'bg-white text-gray-600 border-gray-300':'bg-white text-gray-400 border-gray-100'}`}>Só Mensagem 💌</button>
+                                        </div>
+                                        
+                                        {temDesconto && (
+                                            <div className="fade-in flex items-center justify-center gap-3 bg-white/80 p-3 rounded-2xl border border-pink-200 shadow-inner">
+                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Desconto:</span>
+                                                <input type="number" className="w-24 p-2 border-b-2 border-pink-300 text-center font-bold text-pink-600 text-2xl focus:outline-none bg-transparent" value={valorDesconto} onChange={e=>setValorDesconto(e.target.value)} />
+                                                <span className="text-2xl font-bold text-pink-400">%</span>
+                                            </div>
+                                        )}
+                                        
+                                        <button onClick={enviarMensagemNiver} className="w-full py-4 bg-[#25D366] hover:bg-[#1ebd59] text-white rounded-2xl font-bold shadow-lg flex justify-center items-center gap-3 transition-all transform hover:scale-105 active:scale-95 text-lg mt-4">
+                                            <Icons.Whatsapp /> Enviar Mensagem Agora
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modal Analise IA */}
+                    {modalAnaliseIA && (
+                        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setModalAnaliseIA(null)}>
+                            <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
+                                <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 text-white font-bold flex justify-between items-center">
+                                    <h3 className="flex gap-2 items-center"><Icons.Analysis /> Análise de {modalAnaliseIA.nome}</h3>
+                                    <button onClick={()=>setModalAnaliseIA(null)}><Icons.Close /></button>
+                                </div>
+                                <div className="p-5 space-y-4">
+                                    {loadingMsgIA ? <div className="text-center text-purple-600 py-4"><div className="loader mx-auto"></div></div> : analiseIA ? (
+                                        <>
+                                            <div className="bg-purple-50 p-3 rounded-lg border border-purple-100"><p className="text-sm font-bold text-purple-700">{analiseIA.status}</p></div>
+                                            <p className="text-xs font-bold text-gray-400 uppercase">Mensagem Sugerida:</p>
+                                            <textarea className="w-full h-32 p-3 border rounded-lg text-sm bg-gray-50" value={analiseIA.mensagem} readOnly></textarea>
+                                            <button onClick={() => enviarMensagemAnalise(modalAnaliseIA.zap, analiseIA.mensagem)} className="w-full mt-2 bg-green-500 text-white py-3 rounded-xl text-xs font-bold hover:bg-green-600 flex justify-center gap-2 shadow-md">Enviar Agora <Icons.Whatsapp /></button>
+                                        </>
+                                    ) : <p className="text-center text-gray-500 text-sm">Erro na análise.</p>}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function TelaCliente({ aoFinalizar, verificarDisponibilidade, horariosOcupados, carregandoHorarios, horariosDoDia }) {
             const [step, setStep] = useState(0); 
             const [dados, setDados] = useState({ 
                 nome: '', whatsapp: '', email: '', nascimento: '', 
@@ -478,9 +824,8 @@
             const [horarioPendente, setHorarioPendente] = useState('');
             const [loadingSalvar, setLoadingSalvar] = useState(false);
             const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
-            const [horariosOcupados, setHorariosOcupados] = useState([]);
-            const [carregandoHorarios, setCarregandoHorarios] = useState(false);
-            const [horariosDoDia, setHorariosDoDia] = useState([]);
+            const [horariosOcupadosLocal, setHorariosOcupadosLocal] = useState([]);
+            const [carregandoHorariosLocal, setCarregandoHorariosLocal] = useState(false);
 
             const hoje = new Date().toISOString().split('T')[0];
 
@@ -489,7 +834,7 @@
             const gerarHorarios = (dateStr) => {
                 if (!dateStr) return [];
                 const dia = new Date(dateStr + 'T12:00:00').getDay();
-                if (dia === 0 || dia === 1) return []; // Dom/Seg fechado
+                if (dia === 0 || dia === 1) return []; 
                 const lista = [];
                 const inicio = dia === 2 || dia === 4 ? 9 : 10;
                 const fim = dia === 6 ? 14 : 18;
@@ -498,19 +843,17 @@
             };
 
             const verificarAgenda = async (data) => {
-                setCarregandoHorarios(true);
+                setCarregandoHorariosLocal(true);
                 const slots = gerarHorarios(data);
-                setHorariosDoDia(slots);
+                setHorariosDisponiveis(slots);
                 
                 if (slots.length > 0) {
-                    const ocupados = await fetchICSAndParse(CONFIG.icalUrlPublic, data, slots);
-                    setHorariosOcupados(ocupados);
-                    setHorariosDisponiveis(slots);
+                    const ocupados = await fetchAndParseEvents(CONFIG.icalUrlPublic, data, true, slots);
+                    setHorariosOcupadosLocal(ocupados);
                 } else {
-                    setHorariosOcupados([]);
-                    setHorariosDisponiveis([]);
+                    setHorariosOcupadosLocal([]);
                 }
-                setCarregandoHorarios(false);
+                setCarregandoHorariosLocal(false);
             };
 
             useEffect(() => { if (dados.data) { verificarAgenda(dados.data); } }, [dados.data]);
@@ -661,9 +1004,9 @@
                                     <input type="date" min={hoje} className="w-full p-3 bg-white rounded-xl border border-gray-200 mb-3 font-bold text-gray-700" value={dados.data} onChange={(e) => { setDados({...dados, data: e.target.value, hora: ''}); verificarAgenda(e.target.value); }} />
                                     {dados.data && (
                                         <div className="grid grid-cols-4 gap-2 pb-2 mt-2">
-                                            {carregandoHorarios ? <p className="col-span-4 text-center text-xs text-gray-400">Verificando agenda...</p> : 
-                                            horariosDoDia.map((h) => {
-                                                const isOcupado = horariosOcupados.includes(h);
+                                            {carregandoHorariosLocal ? <p className="col-span-4 text-center text-xs text-gray-400">Verificando agenda...</p> : 
+                                            horariosDisponiveis.map((h) => {
+                                                const isOcupado = horariosOcupadosLocal.includes(h);
                                                 return (<button key={h} disabled={isOcupado} onClick={() => selecionarHorario(h)} className={`p-2 rounded text-xs font-bold border transition-all ${isOcupado ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed opacity-50' : dados.hora === h ? 'bg-pink-500 text-white border-pink-500 shadow-md transform scale-105' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'}`}>{h}</button>)
                                             })}
                                         </div>
@@ -724,223 +1067,6 @@
             );
         }
 
-        function TelaProfissional({ onSair }) {
-            const [aba, setAba] = useState('confirma'); 
-            const [dataLote, setDataLote] = useState(new Date().toISOString().split('T')[0]);
-            const [listaClientes, setListaClientes] = useState([]);
-            const [bancoClientes, setBancoClientes] = useState([]);
-            const [loadingSync, setLoadingSync] = useState(false);
-            const [loadingPlanilha, setLoadingPlanilha] = useState(false);
-            const [despesas, setDespesas] = useState([]); 
-            const [modalAnaliseIA, setModalAnaliseIA] = useState(null);
-            const [analiseIA, setAnaliseIA] = useState(null);
-            const [loadingMsgIA, setLoadingMsgIA] = useState(false);
-            const [modalNiver, setModalNiver] = useState(null);
-            const [temDesconto, setTemDesconto] = useState(false);
-            const [valorDesconto, setValorDesconto] = useState(10);
-            const [sugestaoIA, setSugestaoIA] = useState("");
-            const [loadingIA, setLoadingIA] = useState(false);
-            const [postIA, setPostIA] = useState({ servico: '', tom: 'Divertido', legenda: '' });
-
-            useEffect(() => {
-                const saved = localStorage.getItem('ls_despesas');
-                if(saved) setDespesas(JSON.parse(saved));
-                baixarClientesPlanilha();
-            }, []);
-
-            const sincronizarGoogleAgenda = async () => { 
-                setLoadingSync(true); 
-                const eventos = await fetchRawEvents(CONFIG.icalUrlPrivate, dataLote); 
-                const listaFinal = eventos.map(ev => ({ 
-                    id: Math.random(), 
-                    nome: ev.summary || 'Cliente', 
-                    hora: (ev.localHour < 10 ? '0'+ev.localHour : ev.localHour) + ":00", 
-                    tipo: ev.location && ev.location.length > 5 ? 'domicilio' : 'studio',
-                    whatsapp: ev.description ? ev.description.match(/Whats: ([\d() -]+)/)?.[1] : null
-                }));
-                setListaClientes(listaFinal);
-                setLoadingSync(false); 
-            };
-
-            const baixarClientesPlanilha = async () => {
-                setLoadingPlanilha(true);
-                try {
-                    const res = await fetch(`${CONFIG.scriptGoogleUrl}?action=readClients`);
-                    const data = await res.json();
-                    if (Array.isArray(data)) setBancoClientes(data);
-                } catch (e) { console.error(e); }
-                setLoadingPlanilha(false);
-            };
-
-            const abrirModalNiver = (cliente) => {
-                setModalNiver(cliente);
-                setTemDesconto(false);
-                setSugestaoIA("");
-                setLoadingIA(true);
-                chamarGemini(`Dê uma sugestão curta de desconto de aniversário para a cliente ${cliente.nome}.`, "Especialista em Marketing").then(r => { setSugestaoIA(r); setLoadingIA(false); });
-            };
-
-            const enviarMensagemNiver = () => {
-                if (!modalNiver) return;
-                const msg = `Parabéns ${modalNiver.nome}! 🎂🥳 Estamos enviando um presente especial de ${temDesconto ? valorDesconto + '% OFF' : 'uma surpresa'} para você realçar seu olhar! 🥰`;
-                window.open(`https://wa.me/55${modalNiver.zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
-                setModalNiver(null);
-            };
-
-            const gerarAnaliseCliente = async (cliente) => {
-                setLoadingMsgIA(true);
-                setAnaliseIA(null);
-                const resp = await chamarGemini(`Crie uma mensagem curta e profissional de fidelização para a cliente ${cliente.nome} que não vem há alguns dias. Ofereça um incentivo para retorno. Tom: Carinhoso e exclusivo.`, "Especialista em CRM");
-                setAnaliseIA({ status: "Analisado", mensagem: resp, dica: "Ofereça um mimo!" });
-                setLoadingMsgIA(false);
-            };
-
-            const enviarMensagemAnalise = (zap, msg) => {
-                const link = `https://wa.me/55${zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
-                window.open(link, '_blank');
-            };
-
-            const gerarLegendaInstagram = async () => {
-                setLoadingMsgIA(true);
-                const prompt = `Crie uma legenda de Instagram para Lash Designers sobre ${postIA.servico} com tom ${postIA.tom}. Inclua emojis e hashtags.`;
-                const resposta = await chamarGemini(prompt, "Copywriter de Redes Sociais");
-                setPostIA({...postIA, legenda: resposta});
-                setLoadingMsgIA(false);
-            };
-            
-            const confirmarAgendamentoProfissional = (cliente) => {
-                let zap = cliente.whatsapp;
-                // Busca automática na lista de clientes se não vier da agenda
-                if (!zap) {
-                    const clienteEncontrado = bancoClientes.find(c => c.nome.toLowerCase().includes(cliente.nome.toLowerCase()) || cliente.nome.toLowerCase().includes(c.nome.toLowerCase()));
-                    if (clienteEncontrado) zap = clienteEncontrado.zap;
-                }
-                
-                if (zap) {
-                    const msg = `Olá ${cliente.nome}! Passando para confirmar seu horário de Cílios amanhã às ${cliente.hora}. Tudo certo? 🥰`;
-                    window.open(`https://wa.me/55${zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
-                } else {
-                    // Fallback manual se não achar
-                    const manualZap = prompt(`Não encontrei o WhatsApp de ${cliente.nome} automaticamente. Digite o número (com DDD) para abrir a conversa:`);
-                    if(manualZap) {
-                         const msg = `Olá ${cliente.nome}! Passando para confirmar seu horário de Cílios amanhã às ${cliente.hora}. Tudo certo? 🥰`;
-                         window.open(`https://wa.me/55${manualZap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
-                    }
-                }
-            };
-            
-            const isAniversariante = (dataNasc) => {
-                if (!dataNasc) return false;
-                const parts = dataNasc.split('-');
-                if(parts.length !== 3) return false;
-                const hoje = new Date();
-                return parseInt(parts[2]) === hoje.getDate() && parseInt(parts[1]) === (hoje.getMonth() + 1);
-            };
-
-            return (
-                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 fade-in relative min-h-[600px] flex flex-col">
-                    <button onClick={onSair} className="absolute top-4 right-4 text-white z-10"><Icons.LogOut /></button>
-                    <div className="bg-purple-600 p-6 text-white">
-                        <h2 className="text-xl font-bold">Painel da Le</h2>
-                        <div className="flex gap-4 mt-4 text-[10px] font-bold overflow-x-auto no-scrollbar whitespace-nowrap">
-                            {['confirma', 'financeiro', 'estrategia', 'clientes', 'marketing'].map(t => (
-                                <button key={t} onClick={() => setAba(t)} className={`pb-1 border-b-2 uppercase ${aba === t ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>{t}</button>
-                            ))}
-                        </div>
-                    </div>
-                    {aba === 'confirma' && (
-                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
-                            <div className="bg-gray-50 p-4 rounded-xl border flex gap-2"><input type="date" className="flex-1 p-2 rounded-lg border text-sm" value={dataLote} onChange={e => setDataLote(e.target.value)} /><button onClick={sincronizarGoogleAgenda} className="bg-blue-600 text-white px-3 rounded-lg text-xs font-bold">{loadingSync ? '...' : <Icons.Refresh />}</button></div>
-                            <div className="flex-1 overflow-y-auto space-y-2">
-                                {listaClientes.map((c) => (<div key={c.id} className="p-3 rounded-xl border flex flex-col gap-2 bg-white"><div className="flex justify-between items-start"><div><p className="font-bold text-sm text-gray-800">{c.nome}</p><span className="bg-gray-100 text-xs px-1.5 rounded">{c.hora}</span></div></div><button onClick={() => confirmarAgendamentoProfissional(c)} className="w-full py-1 rounded-lg text-xs bg-green-500 text-white font-bold flex justify-center items-center gap-1"><Icons.Whatsapp /> Confirmar</button></div>))}
-                            </div>
-                        </div>
-                    )}
-                    {aba === 'financeiro' && <TelaFinanceiro listaClientes={listaClientes} despesas={despesas} setDespesas={setDespesas} />}
-                    {aba === 'estrategia' && <TelaEstrategiaIA listaClientes={listaClientes} despesas={despesas} />}
-                    {aba === 'clientes' && (
-                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
-                            <button onClick={baixarClientesPlanilha} className="w-full bg-green-100 text-green-700 font-bold py-2 rounded-lg text-xs flex justify-center items-center gap-1"><Icons.Refresh /> Atualizar Lista</button>
-                            {bancoClientes.map((c, i) => (
-                                <div key={i} className="p-3 rounded-xl border mb-2 bg-white flex justify-between items-center">
-                                    <div className="flex flex-col"><p className="font-bold text-sm text-gray-700">{c.nome}</p><p className="text-[10px] text-gray-400">{c.zap}</p></div>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => { setModalAnaliseIA(c); gerarAnaliseCliente(c); }} className="bg-purple-100 text-purple-600 py-1 px-2 rounded text-[10px] font-bold">Analisar</button>
-                                        {isAniversariante(c.nascimento) && <button onClick={() => abrirModalNiver(c)} className="bg-pink-100 text-pink-600 py-1 px-2 rounded text-[10px] font-bold flex items-center gap-1"><Icons.Cake /> Parabéns</button>}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                    {aba === 'marketing' && (
-                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
-                            <div className="bg-pink-50 p-4 rounded-xl border border-pink-200">
-                                <h3 className="font-bold text-pink-700 text-sm mb-3 flex items-center gap-2"><Icons.Gemini /> Gerador de Legenda</h3>
-                                <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.servico} onChange={(e) => setPostIA({...postIA, servico: e.target.value})}><option value="">Serviço...</option>{CONFIG.servicos.map(s => <option key={s.id} value={s.nome}>{s.nome}</option>)}</select>
-                                <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.tom} onChange={(e) => setPostIA({...postIA, tom: e.target.value})}><option value="Divertido">Divertido</option><option value="Profissional">Profissional</option></select>
-                                <button onClick={gerarLegendaInstagram} disabled={loadingMsgIA || !postIA.servico} className="w-full bg-pink-500 text-white font-bold py-2 rounded-lg text-sm hover:bg-pink-600 disabled:opacity-50">{loadingMsgIA ? '...' : '✨ Criar'}</button>
-                            </div>
-                            {postIA.legenda && <textarea className="w-full h-32 p-2 bg-gray-50 rounded border text-sm" value={postIA.legenda} readOnly></textarea>}
-                        </div>
-                    )}
-                    
-                    {modalNiver && (
-                        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 fade-in">
-                            <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden relative transform scale-100 transition-all shadow-2xl">
-                                <div className="modal-gradient p-8 text-center flex flex-col items-center justify-center relative h-96">
-                                    <button onClick={()=>setModalNiver(null)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/50 rounded-full p-1"><Icons.Close /></button>
-                                    <div className="text-7xl mb-4 animate-bounce filter drop-shadow-md">🎂</div>
-                                    <h3 className="font-bold text-3xl text-purple-800 mb-2">Parabéns, {modalNiver.nome.split(' ')[0]}!</h3>
-                                    <p className="text-purple-600 text-base mb-8 font-medium">Vamos mimar essa cliente especial?</p>
-                                    
-                                    <div className="w-full space-y-4">
-                                        <div className="flex gap-3 justify-center">
-                                            <button onClick={()=>setTemDesconto(true)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${temDesconto?'bg-pink-50 text-pink-600 border-pink-400':'bg-white text-gray-500 border-gray-200'}`}>Sim, Desconto 🎁</button>
-                                            <button onClick={()=>setTemDesconto(false)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${!temDesconto?'bg-white text-gray-600 border-gray-300':'bg-white text-gray-400 border-gray-100'}`}>Só Mensagem 💌</button>
-                                        </div>
-                                        
-                                        {temDesconto && (
-                                            <div className="fade-in flex items-center justify-center gap-3 bg-white/80 p-3 rounded-2xl border border-pink-200 shadow-inner">
-                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Desconto:</span>
-                                                <input type="number" className="w-24 p-2 border-b-2 border-pink-300 text-center font-bold text-pink-600 text-2xl focus:outline-none bg-transparent" value={valorDesconto} onChange={e=>setValorDesconto(e.target.value)} />
-                                                <span className="text-2xl font-bold text-pink-400">%</span>
-                                            </div>
-                                        )}
-                                        
-                                        <button onClick={enviarMensagemNiver} className="w-full py-4 bg-[#25D366] hover:bg-[#1ebd59] text-white rounded-2xl font-bold shadow-lg flex justify-center items-center gap-3 transition-all transform hover:scale-105 active:scale-95 text-lg mt-4">
-                                            <Icons.Whatsapp /> Enviar Mensagem Agora
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Modal Analise IA */}
-                    {modalAnaliseIA && (
-                        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setModalAnaliseIA(null)}>
-                            <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
-                                <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 text-white font-bold flex justify-between items-center">
-                                    <h3 className="flex gap-2 items-center"><Icons.Analysis /> Análise de {modalAnaliseIA.nome}</h3>
-                                    <button onClick={()=>setModalAnaliseIA(null)}><Icons.Close /></button>
-                                </div>
-                                <div className="p-5 space-y-4">
-                                    {loadingMsgIA ? <div className="text-center text-purple-600 py-4"><div className="loader mx-auto"></div></div> : analiseIA ? (
-                                        <>
-                                            <div className="bg-purple-50 p-3 rounded-lg border border-purple-100"><p className="text-sm font-bold text-purple-700">{analiseIA.status}</p></div>
-                                            <p className="text-xs font-bold text-gray-400 uppercase">Mensagem Sugerida:</p>
-                                            <textarea className="w-full h-32 p-3 border rounded-lg text-sm bg-gray-50" value={analiseIA.mensagem} readOnly></textarea>
-                                            <button onClick={() => enviarMensagemAnalise(modalAnaliseIA.zap, analiseIA.mensagem)} className="w-full mt-2 bg-green-500 text-white py-3 rounded-xl text-xs font-bold hover:bg-green-600 flex justify-center gap-2 shadow-md">Enviar Agora <Icons.Whatsapp /></button>
-                                        </>
-                                    ) : <p className="text-center text-gray-500 text-sm">Erro na análise.</p>}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        }
-
         // --- COMPONENTE PRINCIPAL (APP) ---
         function App() {
             const [tela, setTela] = useState('cliente');
@@ -969,7 +1095,12 @@
                             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-4xl text-green-500 mb-4 animate-bounce">✓</div>
                             <h2 className="text-2xl font-bold text-gray-800 mb-2">Agendado! 🎉</h2>
                             <p className="text-center text-gray-600 text-sm mb-8">Seu horário está pré-reservado. Envie a mensagem para confirmar.</p>
-                            <button onClick={irWhatsapp} className="w-full max-w-xs bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-green-600 transition-all">
+                            <div className="bg-pink-50 p-4 rounded-xl w-full max-w-xs mb-8 text-left border border-pink-100">
+                                <p className="text-xs text-gray-500 uppercase font-bold mb-1">DETALHES:</p>
+                                <p className="text-gray-800 font-bold">{dadosFinal?.servicoObj?.nome}</p>
+                                <p className="text-gray-600 text-sm">{dadosFinal?.data.split('-').reverse().join('/')} às {dadosFinal?.hora}</p>
+                            </div>
+                            <button onClick={irWhatsapp} className="w-full max-w-xs bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-green-600 transition-all animate-pulse">
                                 <Icons.Whatsapp /> Enviar no WhatsApp
                             </button>
                             <button onClick={() => window.location.reload()} className="mt-6 text-gray-400 text-xs underline">Voltar ao início</button>
@@ -978,7 +1109,7 @@
 
                     {tela === 'cliente' && (
                         <div className="w-full max-w-md">
-                            <TelaCliente aoFinalizar={handleSucesso} />
+                            <TelaCliente aoFinalizar={handleSucesso} verificarDisponibilidade={async ()=>{}} horariosOcupados={[]} carregandoHorarios={false} horariosDoDia={[]} />
                         </div>
                     )}
                     
