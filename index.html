@@ -182,7 +182,6 @@
             return { isAllDay: false, date: date };
         };
 
-        // Função de busca inteligente com múltiplos proxies
         const fetchAndParseEvents = async (url, dateStr, forClient = false, slots = []) => {
             try {
                 const proxies = [
@@ -328,7 +327,7 @@
                 setHistorico(prev => [...prev, novaMsg]);
                 setMsg('');
                 setLoading(true);
-                const resposta = await chamarGemini(msg, "Você é a assistente virtual da Ls Cílios. Responda curto e simpática. Se não souber, peça para falar com a Le.");
+                const resposta = await chamarGemini(msg, "Você é a assistente virtual da Ls Cílios. Responda curto e simpática.");
                 setHistorico(prev => [...prev, { role: 'bot', text: resposta || "Desculpe, não entendi." }]);
                 setLoading(false);
             };
@@ -388,424 +387,8 @@
             );
         }
 
-        // Modal para Adicionar Novo Cliente
-        function ModalNovoCliente({ isOpen, onClose, onSalvar, loading }) {
-            const [nome, setNome] = useState('');
-            const [whatsapp, setWhatsapp] = useState('');
-            const [nascimento, setNascimento] = useState('');
-            const [email, setEmail] = useState('');
-
-            if (!isOpen) return null;
-
-            const handleSave = () => {
-                if (!nome || !whatsapp) {
-                    alert("Nome e WhatsApp são obrigatórios!");
-                    return;
-                }
-                onSalvar({ nome, whatsapp, nascimento, email });
-            };
-
-            return (
-                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" onClick={onClose}>
-                    <div className="bg-white rounded-xl w-full max-w-sm p-6 relative" onClick={e => e.stopPropagation()}>
-                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400"><Icons.Close /></button>
-                        <h3 className="font-bold text-lg mb-4 text-gray-800">Novo Cliente</h3>
-                        <div className="space-y-3">
-                            <input type="text" placeholder="Nome Completo *" className="w-full p-3 border rounded-lg text-sm" value={nome} onChange={e => setNome(e.target.value)} />
-                            <input type="tel" placeholder="WhatsApp (DDD) *" className="w-full p-3 border rounded-lg text-sm" value={whatsapp} onChange={e => setWhatsapp(formatarTelefone(e.target.value))} maxLength="15" />
-                            <input type="date" className="w-full p-3 border rounded-lg text-sm" value={nascimento} onChange={e => setNascimento(e.target.value)} />
-                            <input type="email" placeholder="E-mail (Opcional)" className="w-full p-3 border rounded-lg text-sm" value={email} onChange={e => setEmail(e.target.value)} />
-                            <button onClick={handleSave} disabled={loading} className="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition-all flex justify-center items-center gap-2">
-                                {loading ? 'Salvando...' : <><Icons.Check /> Salvar Cliente</>}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // Modal Auxiliar para Seleção de Contato (Mensagens)
-        function ModalSelecionarContato({ isOpen, onClose, clientes, onSelect }) {
-            const [termoBusca, setTermoBusca] = useState('');
-            if (!isOpen) return null;
-
-            const clientesFiltrados = clientes.filter(c => 
-                c.nome.toLowerCase().includes(termoBusca.toLowerCase()) || 
-                c.zap.includes(termoBusca)
-            );
-            
-            const enviarSemNumero = () => {
-                const url = `https://api.whatsapp.com/send?text=`;
-                window.open(url, '_blank');
-                onClose();
-            };
-
-            return (
-                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" onClick={onClose}>
-                    <div className="bg-white rounded-xl w-full max-w-sm max-h-[80vh] flex flex-col overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
-                        <div className="bg-purple-600 p-4 text-white flex justify-between items-center">
-                            <h3 className="font-bold">Selecione o Contato</h3>
-                            <button onClick={onClose}><Icons.Close /></button>
-                        </div>
-                        <div className="p-2 border-b bg-gray-50">
-                            <div className="flex items-center bg-white border border-gray-200 rounded-lg px-2 shadow-sm">
-                                <Icons.Search className="text-gray-400 w-4 h-4" />
-                                <input 
-                                    type="text" 
-                                    className="w-full p-2 bg-transparent text-sm focus:outline-none"
-                                    placeholder="Buscar por nome..." 
-                                    value={termoBusca}
-                                    onChange={(e) => setTermoBusca(e.target.value)}
-                                    autoFocus
-                                />
-                            </div>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                            {clientesFiltrados.length > 0 ? (
-                                clientesFiltrados.map((c, i) => (
-                                    <button 
-                                        key={i} 
-                                        onClick={() => onSelect(c)}
-                                        className="w-full text-left p-3 hover:bg-purple-50 rounded-lg border border-transparent hover:border-purple-100 flex justify-between items-center transition-all"
-                                    >
-                                        <div>
-                                            <span className="font-bold text-gray-700 text-sm block">{c.nome}</span>
-                                            <span className="text-xs text-gray-400">Última visita: {c.ultima_visita ? c.ultima_visita.split('T')[0] : '-'}</span>
-                                        </div>
-                                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">{c.zap}</span>
-                                    </button>
-                                ))
-                            ) : (
-                                <p className="text-center text-gray-500 text-sm py-8 flex flex-col items-center gap-2">
-                                    <Icons.EyeOff className="w-8 h-8 text-gray-300"/>
-                                    Nenhum cliente encontrado.
-                                </p>
-                            )}
-                        </div>
-                        <div className="p-3 border-t bg-gray-50">
-                            <button 
-                                onClick={enviarSemNumero}
-                                className="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-md transition-all"
-                            >
-                                <Icons.Whatsapp /> Abrir WhatsApp (Escolher Contato)
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        function TelaProfissional({ onSair }) {
-            const [aba, setAba] = useState('confirma'); 
-            const [dataLote, setDataLote] = useState(new Date().toISOString().split('T')[0]);
-            const [listaClientes, setListaClientes] = useState([]);
-            const [bancoClientes, setBancoClientes] = useState([]);
-            const [loadingSync, setLoadingSync] = useState(false);
-            const [loadingPlanilha, setLoadingPlanilha] = useState(false);
-            const [despesas, setDespesas] = useState([]); 
-            const [modalAnaliseIA, setModalAnaliseIA] = useState(null);
-            const [analiseIA, setAnaliseIA] = useState(null);
-            const [loadingMsgIA, setLoadingMsgIA] = useState(false);
-            const [modalNiver, setModalNiver] = useState(null);
-            const [temDesconto, setTemDesconto] = useState(false);
-            const [valorDesconto, setValorDesconto] = useState(10);
-            const [sugestaoIA, setSugestaoIA] = useState("");
-            const [loadingIA, setLoadingIA] = useState(false);
-            const [postIA, setPostIA] = useState({ servico: '', tom: 'Divertido', legenda: '' });
-            
-            // Estados para modais
-            const [modalSelecionarContato, setModalSelecionarContato] = useState(false);
-            const [clienteParaConfirmar, setClienteParaConfirmar] = useState(null);
-            const [modalNovoCliente, setModalNovoCliente] = useState(false);
-            const [loadingSalvarCliente, setLoadingSalvarCliente] = useState(false);
-
-            useEffect(() => {
-                const saved = localStorage.getItem('ls_despesas');
-                if(saved) setDespesas(JSON.parse(saved));
-                baixarClientesPlanilha();
-            }, []);
-
-            const sincronizarGoogleAgenda = async () => { 
-                setLoadingSync(true); 
-                const eventos = await fetchAndParseEvents(CONFIG.icalUrlPrivate, dataLote); 
-                const listaFinal = eventos.map(ev => ({ 
-                    id: Math.random(), 
-                    nome: ev.summary || 'Cliente', 
-                    hora: (ev.localHour < 10 ? '0'+ev.localHour : ev.localHour) + ":00", 
-                    tipo: ev.tipo, 
-                    whatsapp: ev.description ? ev.description.match(/Whats: ([\d() -]+)/)?.[1] : null,
-                    location: ev.location
-                }));
-                setListaClientes(listaFinal);
-                setLoadingSync(false); 
-            };
-
-            const baixarClientesPlanilha = async () => {
-                setLoadingPlanilha(true);
-                try {
-                    const res = await fetch(`${CONFIG.scriptGoogleUrl}?action=readClients`);
-                    const data = await res.json();
-                    if (Array.isArray(data)) setBancoClientes(data);
-                } catch (e) { console.error(e); }
-                setLoadingPlanilha(false);
-            };
-
-            const handleSalvarNovoCliente = async (novoCliente) => {
-                setLoadingSalvarCliente(true);
-                // Usa a função de salvar agendamento "falso" para registrar o cliente
-                // O script do Google Sheets detecta o telefone e adiciona na aba Clientes se não existir
-                const payload = {
-                    nome: novoCliente.nome,
-                    whatsapp: novoCliente.whatsapp,
-                    email: novoCliente.email || "",
-                    nascimento: novoCliente.nascimento || "",
-                    servico: "Cadastro Manual",
-                    tipoServico: "Cadastro",
-                    data: new Date().toISOString().split('T')[0], // Data de hoje para registro
-                    hora: "00:00",
-                    tipoAtendimento: "studio",
-                    endereco: ""
-                };
-
-                await salvarAgendamentoPlanilha(payload);
-                await baixarClientesPlanilha(); // Atualiza a lista local
-                setLoadingSalvarCliente(false);
-                setModalNovoCliente(false);
-                alert("Cliente cadastrada com sucesso!");
-            };
-            
-            // Lógica de confirmação (inicia o processo)
-            const iniciarConfirmacao = (cliente) => {
-                let zap = cliente.whatsapp;
-                
-                if (!zap) {
-                    const clienteEncontrado = bancoClientes.find(c => c.nome.toLowerCase().includes(cliente.nome.toLowerCase()) || cliente.nome.toLowerCase().includes(c.nome.toLowerCase()));
-                    if (clienteEncontrado) {
-                         zap = clienteEncontrado.zap;
-                         enviarMensagemConfirmacao({ ...cliente, whatsapp: zap });
-                         return;
-                    }
-                }
-
-                if (zap) {
-                    enviarMensagemConfirmacao(cliente);
-                } else {
-                    setClienteParaConfirmar(cliente);
-                    setModalSelecionarContato(true);
-                }
-            };
-            
-            const selecionarContatoEConfirmar = (contatoSelecionado) => {
-                if (clienteParaConfirmar) {
-                    const clienteAtualizado = { ...clienteParaConfirmar, whatsapp: contatoSelecionado.zap };
-                    enviarMensagemConfirmacao(clienteAtualizado);
-                    setModalSelecionarContato(false);
-                    setClienteParaConfirmar(null);
-                }
-            };
-
-            const enviarMensagemConfirmacao = (cliente) => {
-                let msg = "";
-                if (cliente.tipo === 'studio') {
-                    msg = `Oiiiii, *${cliente.nome}* !!!\nSó pra confirmar seu horário amanhã às ${cliente.hora} no Studio 💜\n\n📍endereço:\nAv. Prestes Maia, 221 - Jardim D’abril, Osasco\n\n⏰ Só para lembrar que temos uma tolerância de 15 minutos de atraso.\n\nTe espero 💜`;
-                } else {
-                    const loc = cliente.location ? cliente.location.toLowerCase() : "";
-                    const semEndereco = !cliente.location || loc === 'domicilio' || loc.length < 5;
-                    
-                    if (semEndereco) {
-                         msg = `Oiiiii, *${cliente.nome}* !!!\nPassando pra confirmar nosso atendimento a domicílio amanhã às ${cliente.hora} 💜\n\n📍 *Poderia me confirmar seu endereço certinho, por favor?* 🥰\n\nQualquer imprevisto me avise!`;
-                    } else {
-                         msg = `Oiiiii, *${cliente.nome}* !!!\nPassando pra confirmar nosso atendimento a domicílio amanhã às ${cliente.hora} 💜\n\n📍No endereço: ${cliente.location}\n\nQualquer imprevisto me avise! 🥰`;
-                    }
-                }
-                
-                const zapLimpo = String(cliente.whatsapp).replace(/\D/g, '');
-                window.open(`https://wa.me/55${zapLimpo}?text=${encodeURIComponent(msg)}`, '_blank');
-            };
-
-            const abrirModalNiver = (cliente) => {
-                setModalNiver(cliente);
-                setTemDesconto(false);
-                setSugestaoIA("");
-                setLoadingIA(true);
-                chamarGemini(`Dê uma sugestão curta de desconto de aniversário para a cliente ${cliente.nome}.`, "Especialista em Marketing").then(r => { setSugestaoIA(r); setLoadingIA(false); });
-            };
-
-            const enviarMensagemNiver = () => {
-                if (!modalNiver) return;
-                const msg = `Parabéns ${modalNiver.nome}! 🎂🥳 Estamos enviando um presente especial de ${temDesconto ? valorDesconto + '% OFF' : 'uma surpresa'} para você realçar seu olhar! 🥰`;
-                window.open(`https://wa.me/55${modalNiver.zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
-                setModalNiver(null);
-            };
-
-            const gerarAnaliseCliente = async (cliente) => {
-                setLoadingMsgIA(true);
-                setAnaliseIA(null);
-                const resp = await chamarGemini(`Crie uma mensagem curta e profissional de fidelização para a cliente ${cliente.nome} que não vem há alguns dias. Ofereça um incentivo para retorno. Tom: Carinhoso e exclusivo.`, "Especialista em CRM");
-                setAnaliseIA({ status: "Analisado", mensagem: resp, dica: "Ofereça um mimo!" });
-                setLoadingMsgIA(false);
-            };
-
-            const enviarMensagemAnalise = (zap, msg) => {
-                const link = `https://wa.me/55${zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
-                window.open(link, '_blank');
-            };
-
-            const gerarLegendaInstagram = async () => {
-                setLoadingMsgIA(true);
-                const prompt = `Crie uma legenda de Instagram para Lash Designers sobre ${postIA.servico} com tom ${postIA.tom}. Inclua emojis e hashtags.`;
-                const resposta = await chamarGemini(prompt, "Copywriter de Redes Sociais");
-                setPostIA({...postIA, legenda: resposta});
-                setLoadingMsgIA(false);
-            };
-            
-            const isAniversariante = (dataNasc) => {
-                if (!dataNasc) return false;
-                const parts = dataNasc.split('-');
-                if(parts.length !== 3) return false;
-                const hoje = new Date();
-                return parseInt(parts[2]) === hoje.getDate() && parseInt(parts[1]) === (hoje.getMonth() + 1);
-            };
-
-            return (
-                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 fade-in relative min-h-[600px] flex flex-col">
-                    <button onClick={onSair} className="absolute top-4 right-4 text-white z-10"><Icons.LogOut /></button>
-                    <div className="bg-purple-600 p-6 text-white">
-                        <h2 className="text-xl font-bold">Painel da Le</h2>
-                        <div className="flex gap-4 mt-4 text-[10px] font-bold overflow-x-auto no-scrollbar whitespace-nowrap">
-                            {['confirma', 'financeiro', 'clientes', 'marketing'].map(t => (
-                                <button key={t} onClick={() => setAba(t)} className={`pb-1 border-b-2 uppercase ${aba === t ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>{t}</button>
-                            ))}
-                        </div>
-                    </div>
-                    {aba === 'confirma' && (
-                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
-                            <div className="bg-gray-50 p-4 rounded-xl border flex gap-2"><input type="date" className="flex-1 p-2 rounded-lg border text-sm" value={dataLote} onChange={e => setDataLote(e.target.value)} /><button onClick={sincronizarGoogleAgenda} className="bg-blue-600 text-white px-3 rounded-lg text-xs font-bold">{loadingSync ? '...' : <Icons.Refresh />}</button></div>
-                            <div className="flex-1 overflow-y-auto space-y-2">
-                                {listaClientes.map((c) => (
-                                    <div key={c.id} className="p-3 rounded-xl border flex flex-col gap-2 bg-white">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <p className="font-bold text-sm text-gray-800">{c.nome}</p>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="bg-gray-100 text-xs px-1.5 rounded text-gray-600 font-bold">{c.hora}</span>
-                                                    <span className={`text-[10px] px-2 py-0.5 rounded ${c.tipo === 'domicilio' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                                                        {c.tipo === 'domicilio' ? '🏠 Casa' : '🏢 Studio'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button onClick={() => iniciarConfirmacao(c)} className="w-full py-2 rounded-lg text-xs bg-green-500 text-white font-bold flex justify-center items-center gap-1 shadow-sm hover:bg-green-600 transition-all"><Icons.Whatsapp /> Confirmar</button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                    {aba === 'financeiro' && <TelaFinanceiro listaClientes={listaClientes} despesas={despesas} setDespesas={setDespesas} />}
-                    {aba === 'clientes' && (
-                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
-                            <div className="flex gap-2 mb-2">
-                                <button onClick={() => setModalNovoCliente(true)} className="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl text-sm flex justify-center items-center gap-2 shadow-lg hover:bg-purple-700 transition-all"><Icons.Plus /> Novo Cliente</button>
-                                <button onClick={baixarClientesPlanilha} className="bg-green-100 text-green-700 font-bold px-4 rounded-xl text-xs flex justify-center items-center gap-1"><Icons.Refresh /></button>
-                            </div>
-                            
-                            {bancoClientes.map((c, i) => (
-                                <div key={i} className="p-3 rounded-xl border mb-2 bg-white flex justify-between items-center">
-                                    <div className="flex flex-col"><p className="font-bold text-sm text-gray-700">{c.nome}</p><p className="text-[10px] text-gray-400">{c.zap}</p></div>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => { setModalAnaliseIA(c); gerarAnaliseCliente(c); }} className="bg-purple-100 text-purple-600 py-1 px-2 rounded text-[10px] font-bold">Analisar</button>
-                                        {isAniversariante(c.nascimento) && <button onClick={() => abrirModalNiver(c)} className="bg-pink-100 text-pink-600 py-1 px-2 rounded text-[10px] font-bold flex items-center gap-1"><Icons.Cake /> Parabéns</button>}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                    {aba === 'marketing' && (
-                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
-                            <div className="bg-pink-50 p-4 rounded-xl border border-pink-200">
-                                <h3 className="font-bold text-pink-700 text-sm mb-3 flex items-center gap-2"><Icons.Gemini /> Gerador de Legenda</h3>
-                                <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.servico} onChange={(e) => setPostIA({...postIA, servico: e.target.value})}><option value="">Serviço...</option>{CONFIG.servicos.map(s => <option key={s.id} value={s.nome}>{s.nome}</option>)}</select>
-                                <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.tom} onChange={(e) => setPostIA({...postIA, tom: e.target.value})}><option value="Divertido">Divertido</option><option value="Profissional">Profissional</option></select>
-                                <button onClick={gerarLegendaInstagram} disabled={loadingMsgIA || !postIA.servico} className="w-full bg-pink-500 text-white font-bold py-2 rounded-lg text-sm hover:bg-pink-600 disabled:opacity-50">{loadingMsgIA ? '...' : '✨ Criar'}</button>
-                            </div>
-                            {postIA.legenda && <textarea className="w-full h-32 p-2 bg-gray-50 rounded border text-sm" value={postIA.legenda} readOnly></textarea>}
-                        </div>
-                    )}
-                    
-                    {/* Modal Selecionar Contato */}
-                    <ModalSelecionarContato 
-                        isOpen={modalSelecionarContato} 
-                        onClose={() => setModalSelecionarContato(false)}
-                        clientes={bancoClientes}
-                        onSelect={selecionarContatoEConfirmar}
-                    />
-                    
-                    {/* Modal Novo Cliente */}
-                    <ModalNovoCliente
-                        isOpen={modalNovoCliente}
-                        onClose={() => setModalNovoCliente(false)}
-                        onSalvar={handleSalvarNovoCliente}
-                        loading={loadingSalvarCliente}
-                    />
-
-                    {modalNiver && (
-                        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 fade-in">
-                            <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden relative transform scale-100 transition-all shadow-2xl">
-                                <div className="modal-gradient p-8 text-center flex flex-col items-center justify-center relative h-96">
-                                    <button onClick={()=>setModalNiver(null)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/50 rounded-full p-1"><Icons.Close /></button>
-                                    <div className="text-7xl mb-4 animate-bounce filter drop-shadow-md">🎂</div>
-                                    <h3 className="font-bold text-3xl text-purple-800 mb-2">Parabéns, {modalNiver.nome.split(' ')[0]}!</h3>
-                                    <p className="text-purple-600 text-base mb-8 font-medium">Vamos mimar essa cliente especial?</p>
-                                    
-                                    <div className="w-full space-y-4">
-                                        <div className="flex gap-3 justify-center">
-                                            <button onClick={()=>setTemDesconto(true)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${temDesconto?'bg-pink-50 text-pink-600 border-pink-400':'bg-white text-gray-500 border-gray-200'}`}>Sim, Desconto 🎁</button>
-                                            <button onClick={()=>setTemDesconto(false)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${!temDesconto?'bg-white text-gray-600 border-gray-300':'bg-white text-gray-400 border-gray-100'}`}>Só Mensagem 💌</button>
-                                        </div>
-                                        
-                                        {temDesconto && (
-                                            <div className="fade-in flex items-center justify-center gap-3 bg-white/80 p-3 rounded-2xl border border-pink-200 shadow-inner">
-                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Desconto:</span>
-                                                <input type="number" className="w-24 p-2 border-b-2 border-pink-300 text-center font-bold text-pink-600 text-2xl focus:outline-none bg-transparent" value={valorDesconto} onChange={e=>setValorDesconto(e.target.value)} />
-                                                <span className="text-2xl font-bold text-pink-400">%</span>
-                                            </div>
-                                        )}
-                                        
-                                        <button onClick={enviarMensagemNiver} className="w-full py-4 bg-[#25D366] hover:bg-[#1ebd59] text-white rounded-2xl font-bold shadow-lg flex justify-center items-center gap-3 transition-all transform hover:scale-105 active:scale-95 text-lg mt-4">
-                                            <Icons.Whatsapp /> Enviar Mensagem Agora
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Modal Analise IA */}
-                    {modalAnaliseIA && (
-                        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setModalAnaliseIA(null)}>
-                            <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
-                                <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 text-white font-bold flex justify-between items-center">
-                                    <h3 className="flex gap-2 items-center"><Icons.Analysis /> Análise de {modalAnaliseIA.nome}</h3>
-                                    <button onClick={()=>setModalAnaliseIA(null)}><Icons.Close /></button>
-                                </div>
-                                <div className="p-5 space-y-4">
-                                    {loadingMsgIA ? <div className="text-center text-purple-600 py-4"><div className="loader mx-auto"></div></div> : analiseIA ? (
-                                        <>
-                                            <div className="bg-purple-50 p-3 rounded-lg border border-purple-100"><p className="text-sm font-bold text-purple-700">{analiseIA.status}</p></div>
-                                            <p className="text-xs font-bold text-gray-400 uppercase">Mensagem Sugerida:</p>
-                                            <textarea className="w-full h-32 p-3 border rounded-lg text-sm bg-gray-50" value={analiseIA.mensagem} readOnly></textarea>
-                                            <button onClick={() => enviarMensagemAnalise(modalAnaliseIA.zap, analiseIA.mensagem)} className="w-full mt-2 bg-green-500 text-white py-3 rounded-xl text-xs font-bold hover:bg-green-600 flex justify-center gap-2 shadow-md">Enviar Agora <Icons.Whatsapp /></button>
-                                        </>
-                                    ) : <p className="text-center text-gray-500 text-sm">Erro na análise.</p>}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        }
-
-        function TelaCliente({ aoFinalizar, verificarDisponibilidade, horariosOcupados, carregandoHorarios, horariosDoDia }) {
+        // --- TELA CLIENTE (AGORA DEFINIDA) ---
+        function TelaCliente({ aoFinalizar }) {
             const [step, setStep] = useState(0); 
             const [dados, setDados] = useState({ 
                 nome: '', whatsapp: '', email: '', nascimento: '', 
@@ -813,6 +396,9 @@
                 incluiSobrancelha: false, duracaoTotal: 0,
                 data: '', hora: '', tipoAtendimento: 'studio', endereco: '', complemento: '' 
             });
+            const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
+            const [horariosOcupadosLocal, setHorariosOcupadosLocal] = useState([]);
+            const [carregandoHorariosLocal, setCarregandoHorariosLocal] = useState(false);
             const [servicoExpandido, setServicoExpandido] = useState(null);
             const [modalDetalhes, setModalDetalhes] = useState(null); 
             const [showModalIA, setShowModalIA] = useState(false);
@@ -823,9 +409,7 @@
             const [modalConfirmacao, setModalConfirmacao] = useState(false);
             const [horarioPendente, setHorarioPendente] = useState('');
             const [loadingSalvar, setLoadingSalvar] = useState(false);
-            const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
-            const [horariosOcupadosLocal, setHorariosOcupadosLocal] = useState([]);
-            const [carregandoHorariosLocal, setCarregandoHorariosLocal] = useState(false);
+            const [horariosDoDia, setHorariosDoDia] = useState([]);
 
             const hoje = new Date().toISOString().split('T')[0];
 
@@ -874,10 +458,24 @@
 
             const selecionarServico = (servico, tipo) => {
                 let preco = servico.precos[tipo];
-                let duracao = servico.duracao;
                 let isCombo = dados.incluiSobrancelha;
-                if (servico.id === 999) { isCombo = false; }
-                else if (isCombo) { preco += CONFIG.sobrancelha.preco; duracao += CONFIG.sobrancelha.duracao; }
+                let duracao = 2; // Base padrão
+                
+                if (servico.id === 999) { 
+                    isCombo = false; 
+                    duracao = CONFIG.sobrancelha.duracao; // Se for só sobrancelha avulsa
+                } else {
+                    // Regra de horários
+                    if (isCombo) {
+                        duracao = 3; // Combo = 3 horas
+                        preco += CONFIG.sobrancelha.preco;
+                    } else if (tipo === 'remocao') {
+                        duracao = 1; // Remoção = 1 hora
+                    } else {
+                        duracao = 2; // Aplicação e Manutenção = 2 horas
+                    }
+                }
+                
                 setDados({ ...dados, servicoObj: servico, tipoServico: tipo, precoFinal: preco, duracaoTotal: duracao, incluiSobrancelha: isCombo });
                 setModalDetalhes(null);
                 setStep(2);
@@ -1067,6 +665,419 @@
             );
         }
 
+        // Modal Auxiliar para Seleção de Contato
+        function ModalSelecionarContato({ isOpen, onClose, clientes, onSelect }) {
+            const [termoBusca, setTermoBusca] = useState('');
+            if (!isOpen) return null;
+
+            const clientesFiltrados = clientes.filter(c => 
+                c.nome.toLowerCase().includes(termoBusca.toLowerCase()) || 
+                c.zap.includes(termoBusca)
+            );
+            
+            const enviarSemNumero = () => {
+                const url = `https://api.whatsapp.com/send?text=`;
+                window.open(url, '_blank');
+                onClose();
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" onClick={onClose}>
+                    <div className="bg-white rounded-xl w-full max-w-sm max-h-[80vh] flex flex-col overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+                        <div className="bg-purple-600 p-4 text-white flex justify-between items-center">
+                            <h3 className="font-bold">Selecione o Contato</h3>
+                            <button onClick={onClose}><Icons.Close /></button>
+                        </div>
+                        <div className="p-2 border-b bg-gray-50">
+                            <div className="flex items-center bg-white border border-gray-200 rounded-lg px-2 shadow-sm">
+                                <Icons.Search className="text-gray-400 w-4 h-4" />
+                                <input 
+                                    type="text" 
+                                    className="w-full p-2 bg-transparent text-sm focus:outline-none"
+                                    placeholder="Buscar por nome..." 
+                                    value={termoBusca}
+                                    onChange={(e) => setTermoBusca(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                            {clientesFiltrados.length > 0 ? (
+                                clientesFiltrados.map((c, i) => (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => onSelect(c)}
+                                        className="w-full text-left p-3 hover:bg-purple-50 rounded-lg border border-transparent hover:border-purple-100 flex justify-between items-center transition-all"
+                                    >
+                                        <div>
+                                            <span className="font-bold text-gray-700 text-sm block">{c.nome}</span>
+                                            <span className="text-xs text-gray-400">Última visita: {c.ultima_visita ? c.ultima_visita.split('T')[0] : '-'}</span>
+                                        </div>
+                                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">{c.zap}</span>
+                                    </button>
+                                ))
+                            ) : (
+                                <p className="text-center text-gray-500 text-sm py-8 flex flex-col items-center gap-2">
+                                    <Icons.EyeOff className="w-8 h-8 text-gray-300"/>
+                                    Nenhum cliente encontrado.
+                                </p>
+                            )}
+                        </div>
+                        <div className="p-3 border-t bg-gray-50">
+                            <button 
+                                onClick={enviarSemNumero}
+                                className="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-md transition-all"
+                            >
+                                <Icons.Whatsapp /> Abrir WhatsApp (Escolher Contato)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Modal para Adicionar Novo Cliente
+        function ModalNovoCliente({ isOpen, onClose, onSalvar, loading }) {
+            const [nome, setNome] = useState('');
+            const [whatsapp, setWhatsapp] = useState('');
+            const [nascimento, setNascimento] = useState('');
+            const [email, setEmail] = useState('');
+
+            if (!isOpen) return null;
+
+            const handleSave = () => {
+                if (!nome || !whatsapp) {
+                    alert("Nome e WhatsApp são obrigatórios!");
+                    return;
+                }
+                onSalvar({ nome, whatsapp, nascimento, email });
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" onClick={onClose}>
+                    <div className="bg-white rounded-xl w-full max-w-sm p-6 relative" onClick={e => e.stopPropagation()}>
+                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400"><Icons.Close /></button>
+                        <h3 className="font-bold text-lg mb-4 text-gray-800">Novo Cliente</h3>
+                        <div className="space-y-3">
+                            <input type="text" placeholder="Nome Completo *" className="w-full p-3 border rounded-lg text-sm" value={nome} onChange={e => setNome(e.target.value)} />
+                            <input type="tel" placeholder="WhatsApp (DDD) *" className="w-full p-3 border rounded-lg text-sm" value={whatsapp} onChange={e => setWhatsapp(formatarTelefone(e.target.value))} maxLength="15" />
+                            <input type="date" className="w-full p-3 border rounded-lg text-sm" value={nascimento} onChange={e => setNascimento(e.target.value)} />
+                            <input type="email" placeholder="E-mail (Opcional)" className="w-full p-3 border rounded-lg text-sm" value={email} onChange={e => setEmail(e.target.value)} />
+                            <button onClick={handleSave} disabled={loading} className="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition-all flex justify-center items-center gap-2">
+                                {loading ? 'Salvando...' : <><Icons.Check /> Salvar Cliente</>}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- TELA PROFISSIONAL (ÚNICA E COMPLETA) ---
+        function TelaProfissional({ onSair }) {
+            const [aba, setAba] = useState('confirma'); 
+            const [dataLote, setDataLote] = useState(new Date().toISOString().split('T')[0]);
+            const [listaClientes, setListaClientes] = useState([]);
+            const [bancoClientes, setBancoClientes] = useState([]);
+            const [loadingSync, setLoadingSync] = useState(false);
+            const [loadingPlanilha, setLoadingPlanilha] = useState(false);
+            const [despesas, setDespesas] = useState([]); 
+            const [modalAnaliseIA, setModalAnaliseIA] = useState(null);
+            const [analiseIA, setAnaliseIA] = useState(null);
+            const [loadingMsgIA, setLoadingMsgIA] = useState(false);
+            const [modalNiver, setModalNiver] = useState(null);
+            const [temDesconto, setTemDesconto] = useState(false);
+            const [valorDesconto, setValorDesconto] = useState(10);
+            const [sugestaoIA, setSugestaoIA] = useState("");
+            const [loadingIA, setLoadingIA] = useState(false);
+            const [postIA, setPostIA] = useState({ servico: '', tom: 'Divertido', legenda: '' });
+            
+            // Novos estados para o modal de seleção e novo cliente
+            const [modalSelecionarContato, setModalSelecionarContato] = useState(false);
+            const [clienteParaConfirmar, setClienteParaConfirmar] = useState(null);
+            const [modalNovoCliente, setModalNovoCliente] = useState(false);
+            const [loadingSalvarCliente, setLoadingSalvarCliente] = useState(false);
+
+            useEffect(() => {
+                const saved = localStorage.getItem('ls_despesas');
+                if(saved) setDespesas(JSON.parse(saved));
+                baixarClientesPlanilha();
+            }, []);
+
+            const sincronizarGoogleAgenda = async () => { 
+                setLoadingSync(true); 
+                const eventos = await fetchAndParseEvents(CONFIG.icalUrlPrivate, dataLote); 
+                const listaFinal = eventos.map(ev => ({ 
+                    id: Math.random(), 
+                    nome: ev.summary || 'Cliente', 
+                    hora: (ev.localHour < 10 ? '0'+ev.localHour : ev.localHour) + ":00", 
+                    tipo: ev.tipo, 
+                    whatsapp: ev.description ? ev.description.match(/Whats: ([\d() -]+)/)?.[1] : null,
+                    location: ev.location
+                }));
+                setListaClientes(listaFinal);
+                setLoadingSync(false); 
+            };
+
+            const baixarClientesPlanilha = async () => {
+                setLoadingPlanilha(true);
+                try {
+                    const res = await fetch(`${CONFIG.scriptGoogleUrl}?action=readClients`);
+                    const data = await res.json();
+                    if (Array.isArray(data)) setBancoClientes(data);
+                } catch (e) { console.error(e); }
+                setLoadingPlanilha(false);
+            };
+
+            const handleSalvarNovoCliente = async (novoCliente) => {
+                setLoadingSalvarCliente(true);
+                const payload = {
+                    nome: novoCliente.nome,
+                    whatsapp: novoCliente.whatsapp,
+                    email: novoCliente.email || "",
+                    nascimento: novoCliente.nascimento || "",
+                    servico: "Cadastro Manual",
+                    tipoServico: "Cadastro",
+                    data: new Date().toISOString().split('T')[0],
+                    hora: "00:00",
+                    tipoAtendimento: "studio",
+                    endereco: ""
+                };
+                await salvarAgendamentoPlanilha(payload);
+                await baixarClientesPlanilha();
+                setLoadingSalvarCliente(false);
+                setModalNovoCliente(false);
+                alert("Cliente cadastrada com sucesso!");
+            };
+            
+            const iniciarConfirmacao = (cliente) => {
+                let zap = cliente.whatsapp;
+                
+                if (!zap) {
+                    const clienteEncontrado = bancoClientes.find(c => c.nome.toLowerCase().includes(cliente.nome.toLowerCase()) || cliente.nome.toLowerCase().includes(c.nome.toLowerCase()));
+                    if (clienteEncontrado) {
+                         zap = clienteEncontrado.zap;
+                         enviarMensagemConfirmacao({ ...cliente, whatsapp: zap });
+                         return;
+                    }
+                }
+
+                if (zap) {
+                    enviarMensagemConfirmacao(cliente);
+                } else {
+                    setClienteParaConfirmar(cliente);
+                    setModalSelecionarContato(true);
+                }
+            };
+            
+            const selecionarContatoEConfirmar = (contatoSelecionado) => {
+                if (clienteParaConfirmar) {
+                    const clienteAtualizado = { ...clienteParaConfirmar, whatsapp: contatoSelecionado.zap };
+                    enviarMensagemConfirmacao(clienteAtualizado);
+                    setModalSelecionarContato(false);
+                    setClienteParaConfirmar(null);
+                }
+            };
+
+            const enviarMensagemConfirmacao = (cliente) => {
+                let msg = "";
+                if (cliente.tipo === 'studio') {
+                    msg = `Oiiiii, *${cliente.nome}* !!!\nSó pra confirmar seu horário amanhã às ${cliente.hora} no Studio 💜\n\n📍endereço:\nAv. Prestes Maia, 221 - Jardim D’abril, Osasco\n\n⏰ Só para lembrar que temos uma tolerância de 15 minutos de atraso.\n\nTe espero 💜`;
+                } else {
+                    const loc = cliente.location ? cliente.location.toLowerCase() : "";
+                    const semEndereco = !cliente.location || loc === 'domicilio' || loc.length < 5;
+                    
+                    if (semEndereco) {
+                         msg = `Oiiiii, *${cliente.nome}* !!!\nPassando pra confirmar nosso atendimento a domicílio amanhã às ${cliente.hora} 💜\n\n📍 *Poderia me confirmar seu endereço certinho, por favor?* 🥰\n\nQualquer imprevisto me avise!`;
+                    } else {
+                         msg = `Oiiiii, *${cliente.nome}* !!!\nPassando pra confirmar nosso atendimento a domicílio amanhã às ${cliente.hora} 💜\n\n📍No endereço: ${cliente.location}\n\nQualquer imprevisto me avise! 🥰`;
+                    }
+                }
+                
+                const zapLimpo = String(cliente.whatsapp).replace(/\D/g, '');
+                window.open(`https://wa.me/55${zapLimpo}?text=${encodeURIComponent(msg)}`, '_blank');
+            };
+
+            const abrirModalNiver = (cliente) => {
+                setModalNiver(cliente);
+                setTemDesconto(false);
+                setSugestaoIA("");
+                setLoadingIA(true);
+                chamarGemini(`Dê uma sugestão curta de desconto de aniversário para a cliente ${cliente.nome}.`, "Especialista em Marketing").then(r => { setSugestaoIA(r); setLoadingIA(false); });
+            };
+
+            const enviarMensagemNiver = () => {
+                if (!modalNiver) return;
+                const msg = `Parabéns ${modalNiver.nome}! 🎂🥳 Estamos enviando um presente especial de ${temDesconto ? valorDesconto + '% OFF' : 'uma surpresa'} para você realçar seu olhar! 🥰`;
+                window.open(`https://wa.me/55${modalNiver.zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+                setModalNiver(null);
+            };
+
+            const gerarAnaliseCliente = async (cliente) => {
+                setLoadingMsgIA(true);
+                setAnaliseIA(null);
+                const resp = await chamarGemini(`Crie uma mensagem curta e profissional de fidelização para a cliente ${cliente.nome} que não vem há alguns dias. Ofereça um incentivo para retorno. Tom: Carinhoso e exclusivo.`, "Especialista em CRM");
+                setAnaliseIA({ status: "Analisado", mensagem: resp, dica: "Ofereça um mimo!" });
+                setLoadingMsgIA(false);
+            };
+
+            const enviarMensagemAnalise = (zap, msg) => {
+                const link = `https://wa.me/55${zap.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
+                window.open(link, '_blank');
+            };
+
+            const gerarLegendaInstagram = async () => {
+                setLoadingMsgIA(true);
+                const prompt = `Crie uma legenda de Instagram para Lash Designers sobre ${postIA.servico} com tom ${postIA.tom}. Inclua emojis e hashtags.`;
+                const resposta = await chamarGemini(prompt, "Copywriter de Redes Sociais");
+                setPostIA({...postIA, legenda: resposta});
+                setLoadingMsgIA(false);
+            };
+            
+            const isAniversariante = (dataNasc) => {
+                if (!dataNasc) return false;
+                const parts = dataNasc.split('-');
+                if(parts.length !== 3) return false;
+                const hoje = new Date();
+                return parseInt(parts[2]) === hoje.getDate() && parseInt(parts[1]) === (hoje.getMonth() + 1);
+            };
+
+            return (
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 fade-in relative min-h-[600px] flex flex-col">
+                    <button onClick={onSair} className="absolute top-4 right-4 text-white z-10"><Icons.LogOut /></button>
+                    <div className="bg-purple-600 p-6 text-white">
+                        <h2 className="text-xl font-bold">Painel da Le</h2>
+                        <div className="flex gap-4 mt-4 text-[10px] font-bold overflow-x-auto no-scrollbar whitespace-nowrap">
+                            {['confirma', 'financeiro', 'clientes', 'marketing'].map(t => (
+                                <button key={t} onClick={() => setAba(t)} className={`pb-1 border-b-2 uppercase ${aba === t ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>{t}</button>
+                            ))}
+                        </div>
+                    </div>
+                    {aba === 'confirma' && (
+                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
+                            <div className="bg-gray-50 p-4 rounded-xl border flex gap-2"><input type="date" className="flex-1 p-2 rounded-lg border text-sm" value={dataLote} onChange={e => setDataLote(e.target.value)} /><button onClick={sincronizarGoogleAgenda} className="bg-blue-600 text-white px-3 rounded-lg text-xs font-bold">{loadingSync ? '...' : <Icons.Refresh />}</button></div>
+                            <div className="flex-1 overflow-y-auto space-y-2">
+                                {listaClientes.map((c) => (
+                                    <div key={c.id} className="p-3 rounded-xl border flex flex-col gap-2 bg-white">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <p className="font-bold text-sm text-gray-800">{c.nome}</p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="bg-gray-100 text-xs px-1.5 rounded text-gray-600 font-bold">{c.hora}</span>
+                                                    <span className={`text-[10px] px-2 py-0.5 rounded ${c.tipo === 'domicilio' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                                                        {c.tipo === 'domicilio' ? '🏠 Casa' : '🏢 Studio'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => iniciarConfirmacao(c)} className="w-full py-2 rounded-lg text-xs bg-green-500 text-white font-bold flex justify-center items-center gap-1 shadow-sm hover:bg-green-600 transition-all"><Icons.Whatsapp /> Confirmar</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {aba === 'financeiro' && <TelaFinanceiro listaClientes={listaClientes} despesas={despesas} setDespesas={setDespesas} />}
+                    {aba === 'clientes' && (
+                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
+                            <div className="flex gap-2 mb-2">
+                                <button onClick={() => setModalNovoCliente(true)} className="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl text-sm flex justify-center items-center gap-2 shadow-lg hover:bg-purple-700 transition-all"><Icons.Plus /> Novo Cliente</button>
+                                <button onClick={baixarClientesPlanilha} className="bg-green-100 text-green-700 font-bold px-4 rounded-xl text-xs flex justify-center items-center gap-1"><Icons.Refresh /></button>
+                            </div>
+                            {bancoClientes.map((c, i) => (
+                                <div key={i} className="p-3 rounded-xl border mb-2 bg-white flex justify-between items-center">
+                                    <div className="flex flex-col"><p className="font-bold text-sm text-gray-700">{c.nome}</p><p className="text-[10px] text-gray-400">{c.zap}</p></div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => { setModalAnaliseIA(c); gerarAnaliseCliente(c); }} className="bg-purple-100 text-purple-600 py-1 px-2 rounded text-[10px] font-bold">Analisar</button>
+                                        {isAniversariante(c.nascimento) && <button onClick={() => abrirModalNiver(c)} className="bg-pink-100 text-pink-600 py-1 px-2 rounded text-[10px] font-bold flex items-center gap-1"><Icons.Cake /> Parabéns</button>}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {aba === 'marketing' && (
+                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
+                            <div className="bg-pink-50 p-4 rounded-xl border border-pink-200">
+                                <h3 className="font-bold text-pink-700 text-sm mb-3 flex items-center gap-2"><Icons.Gemini /> Gerador de Legenda</h3>
+                                <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.servico} onChange={(e) => setPostIA({...postIA, servico: e.target.value})}><option value="">Serviço...</option>{CONFIG.servicos.map(s => <option key={s.id} value={s.nome}>{s.nome}</option>)}</select>
+                                <select className="w-full p-2 mb-3 rounded border text-sm bg-white" value={postIA.tom} onChange={(e) => setPostIA({...postIA, tom: e.target.value})}><option value="Divertido">Divertido</option><option value="Profissional">Profissional</option></select>
+                                <button onClick={gerarLegendaInstagram} disabled={loadingMsgIA || !postIA.servico} className="w-full bg-pink-500 text-white font-bold py-2 rounded-lg text-sm hover:bg-pink-600 disabled:opacity-50">{loadingMsgIA ? '...' : '✨ Criar'}</button>
+                            </div>
+                            {postIA.legenda && <textarea className="w-full h-32 p-2 bg-gray-50 rounded border text-sm" value={postIA.legenda} readOnly></textarea>}
+                        </div>
+                    )}
+                    
+                    {/* Modal Selecionar Contato */}
+                    <ModalSelecionarContato 
+                        isOpen={modalSelecionarContato} 
+                        onClose={() => setModalSelecionarContato(false)}
+                        clientes={bancoClientes}
+                        onSelect={selecionarContatoEConfirmar}
+                    />
+
+                    {/* Modal Novo Cliente */}
+                    <ModalNovoCliente
+                        isOpen={modalNovoCliente}
+                        onClose={() => setModalNovoCliente(false)}
+                        onSalvar={handleSalvarNovoCliente}
+                        loading={loadingSalvarCliente}
+                    />
+
+                    {modalNiver && (
+                        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 fade-in">
+                            <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden relative transform scale-100 transition-all shadow-2xl">
+                                <div className="modal-gradient p-8 text-center flex flex-col items-center justify-center relative h-96">
+                                    <button onClick={()=>setModalNiver(null)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/50 rounded-full p-1"><Icons.Close /></button>
+                                    <div className="text-7xl mb-4 animate-bounce filter drop-shadow-md">🎂</div>
+                                    <h3 className="font-bold text-3xl text-purple-800 mb-2">Parabéns, {modalNiver.nome.split(' ')[0]}!</h3>
+                                    <p className="text-purple-600 text-base mb-8 font-medium">Vamos mimar essa cliente especial?</p>
+                                    
+                                    <div className="w-full space-y-4">
+                                        <div className="flex gap-3 justify-center">
+                                            <button onClick={()=>setTemDesconto(true)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${temDesconto?'bg-pink-50 text-pink-600 border-pink-400':'bg-white text-gray-500 border-gray-200'}`}>Sim, Desconto 🎁</button>
+                                            <button onClick={()=>setTemDesconto(false)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${!temDesconto?'bg-white text-gray-600 border-gray-300':'bg-white text-gray-400 border-gray-100'}`}>Só Mensagem 💌</button>
+                                        </div>
+                                        
+                                        {temDesconto && (
+                                            <div className="fade-in flex items-center justify-center gap-3 bg-white/80 p-3 rounded-2xl border border-pink-200 shadow-inner">
+                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Desconto:</span>
+                                                <input type="number" className="w-24 p-2 border-b-2 border-pink-300 text-center font-bold text-pink-600 text-2xl focus:outline-none bg-transparent" value={valorDesconto} onChange={e=>setValorDesconto(e.target.value)} />
+                                                <span className="text-2xl font-bold text-pink-400">%</span>
+                                            </div>
+                                        )}
+                                        
+                                        <button onClick={enviarMensagemNiver} className="w-full py-4 bg-[#25D366] hover:bg-[#1ebd59] text-white rounded-2xl font-bold shadow-lg flex justify-center items-center gap-3 transition-all transform hover:scale-105 active:scale-95 text-lg mt-4">
+                                            <Icons.Whatsapp /> Enviar Mensagem Agora
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modal Analise IA */}
+                    {modalAnaliseIA && (
+                        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setModalAnaliseIA(null)}>
+                            <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
+                                <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 text-white font-bold flex justify-between items-center">
+                                    <h3 className="flex gap-2 items-center"><Icons.Analysis /> Análise de {modalAnaliseIA.nome}</h3>
+                                    <button onClick={()=>setModalAnaliseIA(null)}><Icons.Close /></button>
+                                </div>
+                                <div className="p-5 space-y-4">
+                                    {loadingMsgIA ? <div className="text-center text-purple-600 py-4"><div className="loader mx-auto"></div></div> : analiseIA ? (
+                                        <>
+                                            <div className="bg-purple-50 p-3 rounded-lg border border-purple-100"><p className="text-sm font-bold text-purple-700">{analiseIA.status}</p></div>
+                                            <p className="text-xs font-bold text-gray-400 uppercase">Mensagem Sugerida:</p>
+                                            <textarea className="w-full h-32 p-3 border rounded-lg text-sm bg-gray-50" value={analiseIA.mensagem} readOnly></textarea>
+                                            <button onClick={() => enviarMensagemAnalise(modalAnaliseIA.zap, analiseIA.mensagem)} className="w-full mt-2 bg-green-500 text-white py-3 rounded-xl text-xs font-bold hover:bg-green-600 flex justify-center gap-2 shadow-md">Enviar Agora <Icons.Whatsapp /></button>
+                                        </>
+                                    ) : <p className="text-center text-gray-500 text-sm">Erro na análise.</p>}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
         // --- COMPONENTE PRINCIPAL (APP) ---
         function App() {
             const [tela, setTela] = useState('cliente');
@@ -1109,7 +1120,7 @@
 
                     {tela === 'cliente' && (
                         <div className="w-full max-w-md">
-                            <TelaCliente aoFinalizar={handleSucesso} verificarDisponibilidade={async ()=>{}} horariosOcupados={[]} carregandoHorarios={false} horariosDoDia={[]} />
+                            <TelaCliente aoFinalizar={handleSucesso} />
                         </div>
                     )}
                     
