@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Agenda da Le - Ls Cílios</title>
     
+    <!-- Ícone da aba do navegador (Favicon) -->
+    <link rel="icon" type="image/png" href="img/LOGO SECUNDÁRIA BRANCO.png">
+    
     <!-- Dependências -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -55,7 +58,7 @@
             emailProfissional: "lscilios.contato@gmail.com", 
             senhaAdmin: "1234",
             
-            // O SEU NOVO LINK ATUALIZADO AQUI (A CHAVE MESTRA)
+            // O SEU LINK ATUALIZADO DA PLANILHA/AGENDA
             scriptGoogleUrl: "https://script.google.com/macros/s/AKfycbwZ4F0MuUlrFDufyaECtkfsevLZ_EtZRWVhOR3gRrJ089XP_3cSgN5tt51C9fUcEHlWZA/exec", 
             
             depoimentos: [
@@ -398,7 +401,6 @@
                             }
                         });
                     } else {
-                        // Se não for um array (ex: erro ou outra resposta do script), tratamos silenciosamente
                         console.error("Resposta inesperada da agenda:", eventos);
                     }
                     setHorariosOcupadosLocal(ocupados);
@@ -498,7 +500,7 @@
                                     <label className="block text-xs font-bold text-gray-500 mb-1">Horário Livre *</label>
                                     {carregandoHorariosLocal ? (
                                         <p className="text-xs text-purple-500 font-bold animate-pulse">Verificando agenda da Le...</p>
-                                    ) : horariosDisponiveis.length === 0 ? (
+                                    ) : horariosDisponivelength === 0 ? (
                                         <p className="text-xs text-red-500 font-bold bg-red-50 p-2 rounded">Sem horários para este dia (Fechado).</p>
                                     ) : (
                                         <div className="grid grid-cols-4 gap-2 max-h-[120px] overflow-y-auto pr-1">
@@ -752,7 +754,7 @@
                                 <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
                                     <div className="flex items-center gap-2 mb-2">
                                         <input type="checkbox" id="checkNiver" checked={sabeNascimento} onChange={e => setSabeNascimento(e.target.checked)} className="w-4 h-4 text-pink-500 rounded cursor-pointer" />
-                                        <label htmlFor="checkNiver" className="text-xs font-bold text-gray-600 cursor-pointer">Gostaria de informar sua data de aniversário? 🎂</label>
+                                        <label htmlFor="checkNiver" className="text-xs font-bold text-gray-600 cursor-pointer">Sabe o dia de aniversário da cliente?</label>
                                     </div>
                                     {sabeNascimento && (
                                         <div className="fade-in mt-2">
