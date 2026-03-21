@@ -5,1385 +5,1293 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Agenda da Le - Ls Cílios</title>
     
+    <!-- Dependências -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --rose: #e11d48;
-            --rose-light: #fff1f4;
-            --rose-mid: #fda4af;
-            --plum: #6d28d9;
-            --plum-light: #f5f3ff;
-            --ink: #1e1b2e;
-            --ink-mid: #6b6880;
-            --surface: #fdfcff;
-            --border: #ede9f6;
-        }
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'DM Sans', sans-serif; 
-            background: var(--surface); 
-            margin: 0; padding: 0;
-            color: var(--ink);
-        }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; }
-
-        /* Animações */
-        @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes scaleIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
-        @keyframes slideUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
-        @keyframes checkmark { 0%{stroke-dashoffset:50} 100%{stroke-dashoffset:0} }
-
-        .fade-up { animation: fadeUp 0.4s ease both; }
-        .scale-in { animation: scaleIn 0.3s ease both; }
-        .slide-up { animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
-
-        /* Progress bar */
-        .progress-track { height:3px; background:var(--border); border-radius:99px; overflow:hidden; }
-        .progress-fill { height:100%; background:linear-gradient(90deg, var(--rose), var(--plum)); border-radius:99px; transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1); }
-
-        /* Inputs */
-        .input {
-            width:100%; padding:12px 16px; border:1.5px solid var(--border);
-            border-radius:12px; font-size:15px; font-family:'DM Sans',sans-serif;
-            background:white; color:var(--ink); transition:border-color 0.2s, box-shadow 0.2s;
-            -webkit-appearance:none;
-        }
-        .input:focus { outline:none; border-color:var(--plum); box-shadow:0 0 0 3px rgba(109,40,217,0.08); }
-        .input::placeholder { color:#c0bcd0; }
-        .input-error { border-color:var(--rose) !important; }
-
-        /* Botões */
-        .btn-primary {
-            width:100%; padding:15px; border-radius:14px; font-weight:700; font-size:15px;
-            background:linear-gradient(135deg, var(--rose) 0%, var(--plum) 100%);
-            color:white; border:none; cursor:pointer; transition:all 0.2s;
-            display:flex; align-items:center; justify-content:center; gap:8px;
-            font-family:'DM Sans',sans-serif;
-        }
-        .btn-primary:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 20px rgba(225,29,72,0.3); }
-        .btn-primary:active:not(:disabled) { transform:translateY(0); }
-        .btn-primary:disabled { opacity:0.6; cursor:not-allowed; }
-        .btn-secondary {
-            padding:12px 20px; border-radius:12px; font-weight:600; font-size:13px;
-            background:white; color:var(--ink-mid); border:1.5px solid var(--border);
-            cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif;
-        }
-        .btn-secondary:hover { border-color:var(--plum); color:var(--plum); background:var(--plum-light); }
-        .btn-ghost { background:none; border:none; cursor:pointer; color:var(--ink-mid); font-family:'DM Sans',sans-serif; }
-
-        /* Loader */
-        .spinner { width:20px; height:20px; border:2.5px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.8s linear infinite; }
-        .spinner-dark { border-color:rgba(109,40,217,0.2); border-top-color:var(--plum); }
-
-        /* Toast */
-        #toast-container { position:fixed; top:16px; right:16px; z-index:9999; display:flex; flex-direction:column; gap:8px; pointer-events:none; }
-        .toast { 
-            padding:12px 16px; border-radius:12px; font-size:13px; font-weight:600;
-            color:white; min-width:200px; max-width:300px; pointer-events:all;
-            animation:slideUp 0.3s ease both;
-            display:flex; align-items:center; gap:8px;
-        }
-        .toast-success { background:#059669; }
-        .toast-error { background:var(--rose); }
-        .toast-info { background:var(--plum); }
-
-        /* Cards */
-        .card {
-            background:white; border:1.5px solid var(--border); border-radius:16px;
-            transition:all 0.2s;
-        }
-        .card:hover { border-color:var(--rose-mid); box-shadow:0 4px 16px rgba(225,29,72,0.08); }
+        body { font-family: 'Poppins', sans-serif; background-color: #fdf2f8; margin: 0; padding: 0; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Slot de horário */
-        .slot { padding:10px 8px; border-radius:10px; font-weight:700; font-size:12px; border:1.5px solid var(--border); cursor:pointer; transition:all 0.15s; text-align:center; background:white; color:var(--ink); }
-        .slot:hover:not(.slot-busy) { border-color:var(--rose); color:var(--rose); }
-        .slot-selected { background:var(--rose) !important; color:white !important; border-color:var(--rose) !important; transform:scale(1.05); box-shadow:0 4px 12px rgba(225,29,72,0.3); }
-        .slot-busy { background:#f9f9f9; color:#d1d5db; cursor:not-allowed; border-color:#f3f4f6; }
-
-        /* Tag */
-        .tag { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:99px; font-size:11px; font-weight:700; }
-        .tag-rose { background:var(--rose-light); color:var(--rose); }
-        .tag-plum { background:var(--plum-light); color:var(--plum); }
-        .tag-green { background:#f0fdf4; color:#059669; }
-
-        /* Modal overlay */
-        .modal-overlay { position:fixed; inset:0; background:rgba(15,10,30,0.7); z-index:200; display:flex; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(4px); }
-        .modal-box { background:white; border-radius:20px; width:100%; max-width:400px; overflow:hidden; animation:scaleIn 0.25s ease both; }
-
-        /* Toggle */
-        .toggle-wrap { display:flex; align-items:center; gap:10px; }
-        .toggle-input { display:none; }
-        .toggle-track { width:44px; height:24px; background:#e5e7eb; border-radius:99px; cursor:pointer; transition:background 0.2s; position:relative; flex-shrink:0; }
-        .toggle-input:checked + .toggle-track { background:var(--rose); }
-        .toggle-thumb { position:absolute; top:3px; left:3px; width:18px; height:18px; background:white; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
-        .toggle-input:checked + .toggle-track .toggle-thumb { transform:translateX(20px); }
-
-        /* Scrollbar fino */
-        ::-webkit-scrollbar { width:4px; }
-        ::-webkit-scrollbar-track { background:transparent; }
-        ::-webkit-scrollbar-thumb { background:var(--border); border-radius:99px; }
-
-        /* Depoimento */
-        .depo-enter { animation:fadeUp 0.5s ease both; }
-
-        /* Service card expanded */
-        .service-options { overflow:hidden; transition:max-height 0.3s ease; }
-
-        /* Checkmark animado */
-        .check-svg { stroke-dasharray:50; stroke-dashoffset:50; animation:checkmark 0.6s ease 0.3s forwards; }
-
-        input[type="date"] { min-height:48px; }
+        input[type="date"], input[type="time"] {
+            -webkit-appearance: none; display: block; width: 100%; height: 50px; padding: 10px;
+            background: white !important; border: 1px solid #e5e7eb; border-radius: 0.75rem; font-size: 16px;
+        }
+        
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #db2777; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .toggle-checkbox:checked { right: 0; border-color: #db2777; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #db2777; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .modal-gradient { background: linear-gradient(135deg, #fce7f3 0%, #e9d5ff 100%); }
     </style>
 </head>
 <body>
-    <div id="toast-container"></div>
+
     <div id="root">
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;">
-            <div class="spinner spinner-dark" style="width:32px;height:32px;border-width:3px;"></div>
-            <p style="color:var(--ink-mid);font-size:14px;font-family:DM Sans,sans-serif;">Carregando...</p>
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #db2777;">
+            <h2 style="font-family: sans-serif;">Carregando Agenda...</h2>
+            <div class="loader" style="margin-top: 15px;"></div>
         </div>
     </div>
 
-    <script type="text/babel" data-presets="env,react" data-plugins="transform-async-to-generator,proposal-async-generator-functions">
-    const { useState, useEffect, useRef, useCallback, useMemo } = React;
+    <script type="text/babel">
 
-    // =============================================
-    // CONFIGURAÇÕES — edite apenas aqui
-    // =============================================
-    const CONFIG = {
-        nomeProfissional: "Le",
-        telefoneProfissional: "5511989224362",
-        emailProfissional: "lscilios.contato@gmail.com",
-        // ATENÇÃO: A senha é verificada via hash, não fica exposta como texto puro.
-        // Para trocar: abra o console do navegador e rode btoa("sua_senha") e cole o resultado aqui.
-        senhaAdminHash: btoa("1234"),  // senha atual: 1234
-        scriptGoogleUrl: "https://script.google.com/macros/s/AKfycbwZ4F0MuUlrFDufyaECtkfsevLZ_EtZRWVhOR3gRrJ089XP_3cSgN5tt51C9fUcEHlWZA/exec",
-        // A chave Gemini NUNCA deve ficar aqui. Use um proxy ou Cloud Function.
-        // Se quiser usar IA, coloque a URL do seu proxy:
-        geminiProxyUrl: "", // Ex: "https://meu-proxy.vercel.app/api/gemini"
+        const { useState, useEffect, useRef } = React;
 
-        sobrancelha: { id: 999, nome: "Design de Sobrancelhas", preco: 35, duracao: 0.5 },
+        // --- 1. CONFIGURAÇÕES E CHAVES ---
+        const apiKey = ""; 
 
-        servicos: [
-            { id: 1,  nome: "Volume Pamela",   desc: "Fio a Fio Black. Fios ocos com pontinha dupla — leve, com efeito rímel e mais volume.",          imagem: "img/pamela.jpg",   duracao: 2,   precos: { aplicacao: 115, manutencao: 95,  remocao: 30 } },
-            { id: 2,  nome: "Volume Paty",     desc: "Brasileiro. Fios em Y que criam volume de acordo com seus cílios naturais. Efeito entrelaçado.",  imagem: "img/paty.jpg",     duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
-            { id: 3,  nome: "Volume Marcela",  desc: "Brasileiro versão marrom. Mesma técnica do Paty, com a delicadeza e naturalidade da cor marrom.", imagem: "img/marcela.jpg",  duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
-            { id: 4,  nome: "Volume Jaque",    desc: "Fox Eyes. Olhar alongado, sensual e marcante no estilo olhos de raposa.",                         imagem: "img/jaque.jpg",    duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
-            { id: 5,  nome: "Volume Emily",    desc: "Efeito delineado sutil. Curvatura M com efeito lifting — base reta que curva só na metade.",      imagem: "img/emily.jpg",    duracao: 2.5, precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
-            { id: 6,  nome: "Volume Duda",     desc: "Volume 3D. Fios sintéticos ultrafinos com fio marcante no meio. Efeito dramático e marcante.",    imagem: "img/duda.jpg",     duracao: 3,   precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
-            { id: 7,  nome: "Volume Carol",    desc: "Inglês 5D preto. Leque com até 5 fios por cílio natural. Volumoso e dramático.",                  imagem: "img/carol.jpg",    duracao: 3,   precos: { aplicacao: 155, manutencao: 105, remocao: 30 } },
-            { id: 8,  nome: "Volume Carine",   desc: "Inglês 5D marrom. Igual ao Carol, mas com fios marrom para um efeito volumoso e delicado.",       imagem: "img/carine.jpg",   duracao: 3,   precos: { aplicacao: 155, manutencao: 105, remocao: 30 } },
-            { id: 9,  nome: "Volume Nath",     desc: "Efeito molhado. Agrupamentos de fios que criam a sensação de fios levemente úmidos. Elegante.",   imagem: "img/nath.jpg",     duracao: 2.5, precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
-            { id: 10, nome: "Volume Grazi",    desc: "Naturalmente marcante. Semelhante ao fio a fio com toque extra de volume. Suave e equilibrado.",  imagem: "img/grazi.jpg",    duracao: 2,   precos: { aplicacao: 135, manutencao: 105, remocao: 30 } },
-            { id: 11, nome: "Volume Bia",      desc: "Sirena. Aplicado do meio ao final dos olhos. Fios 5D curvatura M — puxadinho e elegante.",        imagem: "img/bia.jpg",      duracao: 2.5, precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
-            { id: 12, nome: "Volume Fernanda", desc: "Delicado e elegante. 3 fios fechadinhos na curvatura C. Um pouco mais cheio que o Grazi.",        imagem: "img/fernanda.jpg", duracao: 2,   precos: { aplicacao: 135, manutencao: 105, remocao: 30 } }
-        ],
+        const CONFIG = {
+            nomeProfissional: "Le",
+            telefoneProfissional: "5511989224362", 
+            emailProfissional: "lscilios.contato@gmail.com", 
+            senhaAdmin: "1234",
+            
+            // O SEU NOVO LINK ATUALIZADO AQUI (A CHAVE MESTRA)
+            scriptGoogleUrl: "https://script.google.com/macros/s/AKfycbwZ4F0MuUlrFDufyaECtkfsevLZ_EtZRWVhOR3gRrJ089XP_3cSgN5tt51C9fUcEHlWZA/exec", 
+            
+            depoimentos: [
+                { nome: "Cliente", texto: "Amo sua flexibilidade, paciência e atendimento. Você me dá a liberdade de escolher o estilo e a durabilidade é ótima!" },
+                { nome: "Cliente", texto: "Seu trabalho é ótimo! O espaço aconchegante. Higiene impecável e cuidado para não arder os olhos." },
+                { nome: "Cliente", texto: "Seu trabalho é sinceramente o melhor que já fiz. Não fico mais sem cílios e sem você!" }
+            ],
 
-        depoimentos: [
-            { texto: "Amo sua flexibilidade, paciência e atendimento. Você me dá a liberdade de escolher o estilo e a durabilidade é ótima!" },
-            { texto: "Seu trabalho é ótimo! Espaço aconchegante, higiene impecável e cuidado para não arder os olhos." },
-            { texto: "Seu trabalho é sinceramente o melhor que já fiz. Não fico mais sem cílios e sem você!" }
-        ]
-    };
+            sobrancelha: { id: 999, nome: "Design de Sobrancelhas", preco: 35, duracao: 0.5 },
 
-    // =============================================
-    // UTILITÁRIOS
-    // =============================================
+            servicos: [
+                { id: 1, nome: "Volume Pamela", desc: "Fio a Fio Black. Leve e natural.", imagem: "img/pamela.jpg", duracao: 2, precos: { aplicacao: 115, manutencao: 95, remocao: 30 } },
+                { id: 2, nome: "Volume Paty", desc: "Brasileiro. Fios em Y.", imagem: "img/paty.jpg", duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
+                { id: 3, nome: "Volume Jaque", desc: "Fox Eyes. Olhar sensual.", imagem: "img/jaque.jpg", duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
+                { id: 4, nome: "Volume Emily", desc: "Efeito Delineado. Curvatura M.", imagem: "img/emily.jpg", duracao: 2.5, precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
+                { id: 5, nome: "Volume Duda", desc: "Volume 3D. Fios ultrafinos.", imagem: "img/duda.jpg", duracao: 3, precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
+                { id: 6, nome: "Volume Carol", desc: "Inglês 5D. Volumoso.", imagem: "img/carol.jpg", duracao: 3, precos: { aplicacao: 155, manutencao: 105, remocao: 30 } },
+                { id: 7, nome: "Volume Nath", desc: "Efeito Molhado. Elegante.", imagem: "img/nath.jpg", duracao: 2.5, precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
+                { id: 8, nome: "Volume Grazi", desc: "Naturalmente marcante.", imagem: "img/grazi.jpg", duracao: 2, precos: { aplicacao: 135, manutencao: 105, remocao: 30 } },
+                { id: 9, nome: "Volume Bia", desc: "Volume Sirena. Puxadinho.", imagem: "img/bia.jpg", duracao: 2.5, precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
+                { id: 10, nome: "Volume Fernanda", desc: "Delicado e elegante. 3 fios.", imagem: "img/fernanda.jpg", duracao: 2, precos: { aplicacao: 135, manutencao: 105, remocao: 30 } }
+            ]
+        };
 
-    /** Toast system — substitui todos os alert() */
-    const toast = {
-        show(msg, type = 'info', duration = 3500) {
-            const el = document.createElement('div');
-            el.className = `toast toast-${type}`;
-            el.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span><span>${msg}</span>`;
-            document.getElementById('toast-container').appendChild(el);
-            setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity 0.3s'; setTimeout(()=>el.remove(),300); }, duration);
-        },
-        success: (msg) => toast.show(msg, 'success'),
-        error:   (msg) => toast.show(msg, 'error'),
-        info:    (msg) => toast.show(msg, 'info'),
-    };
+        // --- 2. ÍCONES ---
+        const Icons = {
+            Whatsapp: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>,
+            Lock: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
+            Close: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+            Check: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
+            Info: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
+            Gemini: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>,
+            EyeOff: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>,
+            Clock: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
+            Star: () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="text-yellow-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>,
+            Briefcase: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>,
+            Home: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
+            Chart: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>,
+            Robot: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>,
+            Gift: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>,
+            Sparkles: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275-1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>,
+            Analysis: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h5"></path><path d="M17 12h5"></path><path d="M12 2v5"></path><path d="M12 17v5"></path><circle cx="12" cy="12" r="4"></circle><path d="M10 2 2.5 9.5"></path><path d="M14 2l7.5 7.5"></path><path d="M10 22l-7.5-7.5"></path><path d="M14 22l7.5-7.5"></path></svg>,
+            LogOut: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>,
+            Refresh: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>,
+            Copy: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>,
+            Calendar: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
+            Alert: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>,
+            MapPin: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>,
+            CreditCard: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>,
+            Smartphone: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>,
+            Dollar: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>,
+            User: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
+            CloudDownload: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>,
+            Cake: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M2 21h20"></path><path d="M7 8v2"></path><path d="M12 8v2"></path><path d="M17 8v2"></path><path d="M7 4h.01"></path><path d="M12 4h.01"></path><path d="M17 4h.01"></path></svg>,
+            Search: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
+            Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        };
 
-    const formatarTelefone = (v) => {
-        if (!v) return "";
-        const n = v.replace(/\D/g, "").substring(0, 11);
-        if (n.length <= 6)  return n.replace(/^(\d{0,2})(\d{0,4})/, "($1) $2").replace(/\(\) /, '');
-        if (n.length <= 10) return n.replace(/^(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
-        return n.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    };
-
-    const validarEmail = (e) => !e || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-
-    const gerarLinkWhatsApp = (num, msg) => {
-        const n = String(num || "").replace(/\D/g, "");
-        if (n.length < 10) return null;
-        const final = n.startsWith('55') ? n : '55' + n;
-        return `https://wa.me/${final}?text=${encodeURIComponent(msg)}`;
-    };
-
-    const hoje = () => new Date().toISOString().split('T')[0];
-
-    /** Gera slots de horário para a data */
-    const gerarHorarios = (dateStr) => {
-        if (!dateStr) return [];
-        const dia = new Date(dateStr + 'T12:00:00').getDay();
-        if (dia === 0 || dia === 1) return [];
-        const slots = [];
-        const inicio = (dia === 2 || dia === 4) ? 9 : 10;
-        const fim    = dia === 6 ? 14 : 18;
-        for (let h = inicio; h <= fim; h++) slots.push(`${String(h).padStart(2,'0')}:00`);
-        return slots;
-    };
-
-    /** Busca horários ocupados via Google Apps Script */
-    const buscarHorariosOcupados = async (date) => {
-        try {
-            const url = `${CONFIG.scriptGoogleUrl}?action=get_agenda&date=${date}`;
-            const res = await fetch(url, { method: 'GET', redirect: 'follow' });
-            const text = await res.text();
-            const eventos = JSON.parse(text);
-            return Array.isArray(eventos) ? eventos : [];
-        } catch {
-            return [];
-        }
-    };
-
-    /** Calcula slots realmente ocupados (considerando duração real do serviço) */
-    const calcularOcupados = (slots, eventos, duracaoHoras) => {
-        const dur = Math.ceil(duracaoHoras || 1);
-        const ocupados = new Set();
-
-        eventos.forEach(ev => {
-            if (ev.isAllDay) {
-                slots.forEach(s => ocupados.add(s));
-                return;
+        // --- 3. FUNÇÕES GLOBAIS ---
+        const formatarTelefone = (value) => {
+            if(!value) return "";
+            const numero = value.replace(/\D/g, "");
+            if (numero.length <= 11) {
+                return numero.replace(/^(\d{2})(\d{0,5})(\d{0,4}).*/, "($1) $2-$3").replace(/-$/, ''); 
+            } else {
+                return numero.substring(0, 11).replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
             }
-            slots.forEach(slot => {
-                const [sh] = slot.split(':').map(Number);
-                const slotStart = sh * 60;
-                const slotEnd   = slotStart + 60;
-                const evStart   = ev.startHour * 60 + ev.startMin;
-                const evEnd     = ev.endHour   * 60 + ev.endMin;
-                if (slotStart < evEnd && slotEnd > evStart) ocupados.add(slot);
-            });
-        });
+        };
 
-        // Bloqueia slots onde o serviço não caberia inteiro
-        const resultado = new Set(ocupados);
-        slots.forEach(slot => {
-            const [sh] = slot.split(':').map(Number);
-            for (let i = 0; i < dur; i++) {
-                const h = String(sh + i).padStart(2, '0') + ':00';
-                if (ocupados.has(h) || !slots.includes(h)) { resultado.add(slot); break; }
+        const validarEmail = (email) => {
+            if (!email) return true; 
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        };
+
+        const gerarLinkWhatsApp = (numeroBruto, mensagem) => {
+            let zapLimpo = String(numeroBruto || "").replace(/\D/g, '');
+            if (zapLimpo.length < 10) return null; 
+            if (!zapLimpo.startsWith('55')) {
+                zapLimpo = '55' + zapLimpo;
             }
-        });
-
-        return resultado;
-    };
-
-    /** Salva agendamento na planilha */
-    const salvarAgendamentoPlanilha = async (dados) => {
-        if (!CONFIG.scriptGoogleUrl) return true;
-        try {
-            let nomeServico = dados.servico || (dados.servicoObj ? dados.servicoObj.nome : "Serviço");
-            if (dados.incluiSobrancelha && dados.servicoObj?.id !== 999) {
-                nomeServico += " + Design Sobrancelhas";
-            }
-            const payload = {
-                nome: dados.nome || "",
-                whatsapp: dados.whatsapp || "",
-                email: dados.email || "",
-                nascimento: dados.nascimento || "",
-                servico: nomeServico,
-                duracaoTotal: dados.duracaoTotal || 2,
-                tipoServico: dados.tipoServico || "Aplicação",
-                precoFinal: dados.precoFinal || 0,
-                data: dados.data || "",
-                hora: dados.hora || "",
-                tipoAtendimento: dados.tipoAtendimento || "studio",
-                endereco: dados.endereco || ""
-            };
-            // Usamos text/plain para contornar preflight CORS — Google Apps Script exige isso
-            const res = await fetch(CONFIG.scriptGoogleUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify(payload)
-            });
-            return true;
-        } catch (e) {
-            console.error("Erro ao salvar:", e);
-            return false;
-        }
-    };
-
-    /** Chama IA via proxy (nunca exponha a chave no frontend) */
-    const chamarIA = async (prompt) => {
-        if (!CONFIG.geminiProxyUrl) return "IA não configurada.";
-        try {
-            const res = await fetch(CONFIG.geminiProxyUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt })
-            });
-            const data = await res.json();
-            return data.text || "Sem resposta.";
-        } catch {
-            return "Erro de conexão com a IA.";
-        }
-    };
-
-    // =============================================
-    // HOOK: agenda + ocupados
-    // =============================================
-    function useAgenda(data, duracaoHoras) {
-        const [slots, setSlots]       = useState([]);
-        const [ocupados, setOcupados] = useState(new Set());
-        const [loading, setLoading]   = useState(false);
-
-        useEffect(() => {
-            if (!data) { setSlots([]); setOcupados(new Set()); return; }
-            const s = gerarHorarios(data);
-            setSlots(s);
-            if (s.length === 0) { setOcupados(new Set()); return; }
-            setLoading(true);
-            buscarHorariosOcupados(data).then(eventos => {
-                setOcupados(calcularOcupados(s, eventos, duracaoHoras));
-                setLoading(false);
-            });
-        }, [data, duracaoHoras]);
-
-        return { slots, ocupados, loadingAgenda: loading };
-    }
-
-    // =============================================
-    // COMPONENTE: Seletor de Horário (reutilizável)
-    // =============================================
-    function SeletorHorario({ data, duracaoHoras, horaSelecionada, onSelect }) {
-        const { slots, ocupados, loadingAgenda } = useAgenda(data, duracaoHoras);
-
-        if (!data) return null;
-        if (loadingAgenda) return (
-            <div style={{display:'flex',alignItems:'center',gap:8,padding:'12px 0',color:'var(--plum)',fontSize:13,fontWeight:600}}>
-                <div className="spinner spinner-dark" style={{width:16,height:16}}/> Verificando agenda...
-            </div>
-        );
-        if (slots.length === 0) return (
-            <div style={{padding:'12px',background:'#fff1f4',borderRadius:10,color:'var(--rose)',fontSize:13,fontWeight:600}}>
-                Studio fechado neste dia.
-            </div>
-        );
-
-        return (
-            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8}}>
-                {slots.map(h => {
-                    const busy = ocupados.has(h);
-                    return (
-                        <button key={h} disabled={busy}
-                            onClick={() => !busy && onSelect(h)}
-                            className={`slot ${busy ? 'slot-busy' : horaSelecionada === h ? 'slot-selected' : ''}`}>
-                            {h}
-                        </button>
-                    );
-                })}
-            </div>
-        );
-    }
-
-    // =============================================
-    // COMPONENTE: Modal de Confirmação de Horário
-    // =============================================
-    function ModalConfirmacaoHorario({ hora, onConfirm, onCancel }) {
-        if (!hora) return null;
-        return (
-            <div className="modal-overlay" onClick={onCancel}>
-                <div className="modal-box" style={{maxWidth:320,padding:'28px 24px',textAlign:'center'}} onClick={e=>e.stopPropagation()}>
-                    <div style={{fontSize:40,marginBottom:12}}>⏰</div>
-                    <h3 style={{margin:'0 0 8px',fontSize:20}}>Confirmar horário?</h3>
-                    <p style={{color:'var(--ink-mid)',fontSize:14,marginBottom:24}}>Você escolheu as <strong style={{color:'var(--rose)'}}>{hora}</strong>. Confirma?</p>
-                    <div style={{display:'flex',gap:10}}>
-                        <button className="btn-secondary" style={{flex:1}} onClick={onCancel}>Voltar</button>
-                        <button className="btn-primary" style={{flex:1}} onClick={onConfirm}>Confirmar</button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    // =============================================
-    // COMPONENTE: Modal de Detalhes do Serviço
-    // =============================================
-    function ModalDetalhesServico({ servico, onClose }) {
-        if (!servico) return null;
-        return (
-            <div className="modal-overlay" onClick={onClose}>
-                <div className="modal-box" onClick={e=>e.stopPropagation()}>
-                    <div style={{height:220,background:'#f3f0ff',position:'relative'}}>
-                        <img src={servico.imagem} alt={servico.nome} style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none'}}/>
-                        <button onClick={onClose} style={{position:'absolute',top:12,right:12,background:'rgba(0,0,0,0.5)',color:'white',border:'none',borderRadius:'50%',width:32,height:32,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>✕</button>
-                    </div>
-                    <div style={{padding:'20px 24px 24px'}}>
-                        <h3 style={{margin:'0 0 8px',fontSize:22}}>{servico.nome}</h3>
-                        <p style={{color:'var(--ink-mid)',fontSize:14,lineHeight:1.7}}>{servico.desc}</p>
-                        <div style={{marginTop:16,display:'flex',gap:8,flexWrap:'wrap'}}>
-                            <span className="tag tag-rose">⏱ {servico.duracao}h</span>
-                            <span className="tag tag-plum">A partir de R$ {Math.min(servico.precos.aplicacao, servico.precos.manutencao)}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    // =============================================
-    // TELA DO CLIENTE
-    // =============================================
-    function TelaCliente({ aoFinalizar }) {
-        const [step, setStep]   = useState(0);
-        const [servico, setServico]   = useState(null);
-        const [tipo, setTipo]         = useState('');
-        const [preco, setPreco]       = useState(0);
-        const [incluiSobrancelha, setIncluiSobrancelha] = useState(false);
-        const [duracao, setDuracao]   = useState(2);
-        const [expandido, setExpandido] = useState(null);
-        const [modalServico, setModalServico] = useState(null);
-        const [horaPendente, setHoraPendente] = useState('');
-        const [confirmandoHora, setConfirmandoHora] = useState(false);
-
-        const [form, setForm] = useState({
-            nome:'', whatsapp:'', email:'', nascimento:'', data:'',
-            hora:'', tipoAtendimento:'studio', endereco:'', complemento:''
-        });
-        const [sabeNascimento, setSabeNascimento] = useState(false);
-        const [loading, setLoading] = useState(false);
-        const [errors, setErrors]   = useState({});
-        const [depoIndex, setDepoIndex] = useState(0);
-
-        useEffect(()=>{
-            const t = setInterval(()=>setDepoIndex(i=>(i+1)%CONFIG.depoimentos.length), 5000);
-            return ()=>clearInterval(t);
-        },[]);
-
-        const steps = ['Serviço','Tipo','Dados'];
-        const stepAtual = step >= 2 ? 2 : step;
-
-        const selecionarCategoria = (cat) => {
-            if (cat === 'cilios')      { setIncluiSobrancelha(false); setStep(1); }
-            else if (cat === 'sobr')   {
-                setServico({...CONFIG.sobrancelha, precos:{aplicacao:CONFIG.sobrancelha.preco,manutencao:CONFIG.sobrancelha.preco}});
-                setTipo('aplicacao'); setPreco(CONFIG.sobrancelha.preco); setDuracao(CONFIG.sobrancelha.duracao);
-                setIncluiSobrancelha(false); setStep(2);
-            }
-            else { setIncluiSobrancelha(true); setStep(1); }
+            return `https://wa.me/${zapLimpo}?text=${encodeURIComponent(mensagem)}`;
         };
 
-        const selecionarServico = (s, t) => {
-            const extra = (incluiSobrancelha && s.id !== 999) ? CONFIG.sobrancelha.preco : 0;
-            const p = s.precos[t] + extra;
-            let d = s.duracao;
-            if (t === 'remocao') d = 1;
-            else if (incluiSobrancelha) d = Math.max(d, 2) + CONFIG.sobrancelha.duracao;
-            setServico(s); setTipo(t); setPreco(p); setDuracao(d);
-            setExpandido(null); setModalServico(null); setStep(2);
-        };
-
-        const setField = (k, v) => { setForm(f=>({...f,[k]:v})); setErrors(e=>({...e,[k]:null})); };
-
-        const validar = () => {
-            const e = {};
-            if (!form.nome.trim())    e.nome = 'Obrigatório';
-            if (form.whatsapp.replace(/\D/g,'').length < 10) e.whatsapp = 'Número inválido';
-            if (form.email && !validarEmail(form.email)) e.email = 'E-mail inválido';
-            if (!form.data)  e.data = 'Obrigatório';
-            if (!form.hora)  e.hora = 'Selecione um horário';
-            if (form.tipoAtendimento === 'domicilio' && form.endereco.trim().length < 10) e.endereco = 'Endereço muito curto';
-            setErrors(e);
-            return Object.keys(e).length === 0;
-        };
-
-        const salvar = async () => {
-            if (!validar()) { toast.error('Corrija os campos em vermelho.'); return; }
-            setLoading(true);
-            const payload = { ...form, servicoObj: servico, servico: servico?.nome, tipoServico: tipo, precoFinal: preco, duracaoTotal: duracao, incluiSobrancelha, nascimento: sabeNascimento ? form.nascimento : '' };
-            const ok = await salvarAgendamentoPlanilha(payload);
-            setLoading(false);
-            if (ok) aoFinalizar(payload);
-            else toast.error('Erro ao salvar. Tente novamente.');
-        };
-
-        return (
-            <div style={{background:'white',borderRadius:20,border:'1.5px solid var(--border)',overflow:'hidden',boxShadow:'0 4px 32px rgba(109,40,217,0.08)'}}>
-                {/* Progress */}
-                {step > 0 && (
-                    <div style={{padding:'16px 20px 0'}}>
-                        <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
-                            {steps.map((s,i) => (
-                                <span key={i} style={{fontSize:11,fontWeight:700,color:i===stepAtual?'var(--rose)':i<stepAtual?'var(--plum)':'#c0bcd0',textTransform:'uppercase',letterSpacing:'0.5px'}}>{s}</span>
-                            ))}
-                        </div>
-                        <div className="progress-track">
-                            <div className="progress-fill" style={{width: stepAtual === 1 ? '50%' : stepAtual === 2 ? '100%' : '0%'}}/>
-                        </div>
-                    </div>
-                )}
-
-                <div style={{padding:20}}>
-                    {/* STEP 0 - Categoria */}
-                    {step === 0 && (
-                        <div className="fade-up">
-                            {/* Depoimento rotativo */}
-                            <div style={{background:'linear-gradient(135deg,#fff1f4,#f5f3ff)',borderRadius:14,padding:'16px 18px',marginBottom:20,borderLeft:'3px solid var(--rose)'}}>
-                                <div className="depo-enter" key={depoIndex}>
-                                    <p style={{fontSize:13,color:'var(--ink)',fontStyle:'italic',margin:'0 0 8px',lineHeight:1.7}}>"{CONFIG.depoimentos[depoIndex].texto}"</p>
-                                    <span style={{fontSize:11,color:'var(--rose)',fontWeight:700}}>{'★★★★★'}</span>
-                                </div>
-                            </div>
-
-                            <h2 style={{margin:'0 0 4px',fontSize:22}}>Olá, maravilhosa! ✨</h2>
-                            <p style={{color:'var(--ink-mid)',fontSize:14,marginBottom:20}}>O que vamos realçar hoje?</p>
-
-                            {[
-                                { key:'cilios',  emoji:'👁️', title:'Cílios',          sub:'Extensão, Manutenção ou Remoção' },
-                                { key:'sobr',    emoji:'✏️', title:'Sobrancelhas',     sub:'Design Simples · 30 min · R$ 35' },
-                                { key:'combo',   emoji:'💖', title:'Combo Completo',   sub:'Cílios + Sobrancelha', hot:true },
-                            ].map(({ key, emoji, title, sub, hot }) => (
-                                <button key={key} onClick={() => selecionarCategoria(key)}
-                                    style={{
-                                        width:'100%', marginBottom:10, padding:'16px',
-                                        background: hot ? 'linear-gradient(135deg,var(--rose),var(--plum))' : 'white',
-                                        border: hot ? 'none' : '1.5px solid var(--border)',
-                                        borderRadius:14, cursor:'pointer', textAlign:'left',
-                                        display:'flex', alignItems:'center', gap:14, position:'relative',
-                                        transition:'all 0.2s', color: hot ? 'white' : 'var(--ink)',
-                                        boxShadow: hot ? '0 6px 20px rgba(225,29,72,0.25)' : 'none'
-                                    }}
-                                    onMouseEnter={e=>{if(!hot){e.currentTarget.style.borderColor='var(--rose-mid)';e.currentTarget.style.boxShadow='0 4px 12px rgba(225,29,72,0.08)';}}}
-                                    onMouseLeave={e=>{if(!hot){e.currentTarget.style.borderColor='var(--border)';e.currentTarget.style.boxShadow='none';}}}>
-                                    {hot && <span style={{position:'absolute',top:0,right:0,background:'#facc15',color:'#1e1b2e',fontSize:9,fontWeight:800,padding:'3px 8px',borderRadius:'0 14px 0 8px'}}>MAIS PEDIDO 🔥</span>}
-                                    <span style={{fontSize:26}}>{emoji}</span>
-                                    <div>
-                                        <p style={{margin:0,fontWeight:700,fontSize:15}}>{title}</p>
-                                        <p style={{margin:0,fontSize:12,opacity:0.75,marginTop:2}}>{sub}</p>
-                                    </div>
-                                    <span style={{marginLeft:'auto',fontSize:18,opacity:0.5}}>›</span>
-                                </button>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* STEP 1 - Serviço */}
-                    {step === 1 && (
-                        <div className="fade-up">
-                            <button className="btn-ghost" style={{marginBottom:12,fontSize:13}} onClick={()=>setStep(0)}>← Voltar</button>
-                            <h2 style={{margin:'0 0 4px',fontSize:22}}>Escolha o Modelo</h2>
-                            <p style={{color:'var(--ink-mid)',fontSize:13,marginBottom:16}}>Clique no nome para ver as opções de preço.</p>
-
-                            {/* Toggle sobrancelha */}
-                            <div style={{background:'linear-gradient(135deg,#fff1f4,#f5f3ff)',border:'1.5px solid var(--border)',borderRadius:14,padding:'12px 16px',marginBottom:16,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                                <div>
-                                    <p style={{margin:0,fontWeight:700,fontSize:14}}>Adicionar Sobrancelha?</p>
-                                    <p style={{margin:0,fontSize:12,color:'var(--ink-mid)'}}>Design Simples · +R$ 35</p>
-                                </div>
-                                <div className="toggle-wrap">
-                                    <input type="checkbox" id="togSobr" className="toggle-input" checked={incluiSobrancelha} onChange={e=>setIncluiSobrancelha(e.target.checked)}/>
-                                    <label htmlFor="togSobr" className="toggle-track"><div className="toggle-thumb"/></label>
-                                </div>
-                            </div>
-
-                            <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                                {CONFIG.servicos.map(s => (
-                                    <div key={s.id} className="card">
-                                        <div style={{display:'flex',gap:12,alignItems:'center',padding:'12px 14px',cursor:'pointer'}}
-                                            onClick={()=>setExpandido(expandido===s.id?null:s.id)}>
-                                            <div style={{width:52,height:52,borderRadius:10,overflow:'hidden',flexShrink:0,background:'#f3f0ff'}}>
-                                                <img src={s.imagem} alt={s.nome} style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none'}}/>
-                                            </div>
-                                            <div style={{flex:1,minWidth:0}}>
-                                                <p style={{margin:0,fontWeight:700,fontSize:14}}>{s.nome}</p>
-                                                <p style={{margin:0,fontSize:12,color:'var(--ink-mid)',marginTop:2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{s.desc}</p>
-                                            </div>
-                                            <button onClick={e=>{e.stopPropagation();setModalServico(s);}} style={{color:'var(--rose-mid)',background:'none',border:'none',cursor:'pointer',fontSize:16,padding:'0 4px'}}>ℹ</button>
-                                            <span style={{color:'var(--ink-mid)',fontSize:12,transition:'transform 0.2s',display:'block',transform:expandido===s.id?'rotate(90deg)':''}}>›</span>
-                                        </div>
-                                        {expandido === s.id && (
-                                            <div className="fade-up" style={{borderTop:'1px solid var(--border)',padding:'10px 14px',display:'flex',flexDirection:'column',gap:6}}>
-                                                {[
-                                                    { key:'aplicacao',  label:'✨ Aplicação Nova', color:'var(--rose)' },
-                                                    { key:'manutencao', label:'🔧 Manutenção',      color:'var(--plum)' },
-                                                    { key:'remocao',    label:'🧼 Remoção',          color:'#6b7280' },
-                                                ].map(({ key, label, color }) => (
-                                                    <button key={key} onClick={()=>selecionarServico(s,key)}
-                                                        style={{padding:'10px 12px',border:'1.5px solid var(--border)',borderRadius:10,background:'white',
-                                                            display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',transition:'all 0.15s'}}
-                                                        onMouseEnter={e=>{e.currentTarget.style.borderColor=color;e.currentTarget.style.background='#fafafa';}}
-                                                        onMouseLeave={e=>{e.currentTarget.style.borderColor='var(--border)';e.currentTarget.style.background='white';}}>
-                                                        <span style={{fontSize:13,fontWeight:500}}>{label}</span>
-                                                        <span style={{fontWeight:800,color,fontSize:14}}>R$ {s.precos[key] + (incluiSobrancelha ? CONFIG.sobrancelha.preco : 0)}</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* STEP 2 - Dados */}
-                    {step === 2 && (
-                        <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:14}}>
-                            <button className="btn-ghost" style={{fontSize:13}} onClick={()=>servico?.id===999?setStep(0):setStep(1)}>← Voltar</button>
-
-                            {/* Resumo do serviço */}
-                            <div style={{background:'linear-gradient(135deg,var(--rose-light),var(--plum-light))',borderRadius:14,padding:'14px 16px',border:'1.5px solid var(--border)'}}>
-                                <p style={{margin:0,fontWeight:700,color:'var(--rose)',fontSize:15}}>{servico?.nome}{incluiSobrancelha && servico?.id!==999?' + Sobrancelha':''}</p>
-                                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:4}}>
-                                    <span style={{fontSize:13,color:'var(--ink-mid)',textTransform:'capitalize'}}>{tipo}</span>
-                                    <span style={{fontWeight:800,fontSize:18,color:'var(--ink)'}}>R$ {preco}</span>
-                                </div>
-                            </div>
-
-                            {/* Avisos */}
-                            <div style={{background:'#f9fafb',borderRadius:12,padding:'12px 14px',border:'1px solid #e5e7eb'}}>
-                                <p style={{margin:'0 0 8px',fontWeight:700,fontSize:12,color:'var(--ink-mid)',textTransform:'uppercase',letterSpacing:'0.5px'}}>Antes de vir:</p>
-                                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6,fontSize:12,color:'var(--ink)'}}>
-                                    {[['⏱','Duração: '+duracao+'h'],['💄','Sem rímel'],['👓','Remover lentes'],['⏰','Tolerância 15min']].map(([e,t])=>(
-                                        <div key={t} style={{display:'flex',alignItems:'center',gap:6}}><span>{e}</span><span>{t}</span></div>
-                                    ))}
-                                </div>
-                                <p style={{margin:'10px 0 0',fontSize:11,color:'#f43f5e',lineHeight:1.5}}>
-                                    ⚠️ Contraindicações: alergias, conjuntivite ativa ou pele extremamente sensível.
-                                </p>
-                            </div>
-
-                            {/* Campos do formulário */}
-                            <div>
-                                <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',letterSpacing:'0.5px',display:'block',marginBottom:6}}>Nome *</label>
-                                <input className={`input ${errors.nome?'input-error':''}`} placeholder="Seu nome completo" value={form.nome} onChange={e=>setField('nome',e.target.value)}/>
-                                {errors.nome && <p style={{color:'var(--rose)',fontSize:11,marginTop:4}}>{errors.nome}</p>}
-                            </div>
-                            <div>
-                                <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',letterSpacing:'0.5px',display:'block',marginBottom:6}}>WhatsApp *</label>
-                                <input className={`input ${errors.whatsapp?'input-error':''}`} type="tel" placeholder="(11) 99999-9999" value={form.whatsapp} onChange={e=>setField('whatsapp',formatarTelefone(e.target.value))} maxLength={15}/>
-                                {errors.whatsapp && <p style={{color:'var(--rose)',fontSize:11,marginTop:4}}>{errors.whatsapp}</p>}
-                            </div>
-                            <div>
-                                <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',letterSpacing:'0.5px',display:'block',marginBottom:6}}>E-mail</label>
-                                <input className={`input ${errors.email?'input-error':''}`} type="email" placeholder="seu@email.com" value={form.email} onChange={e=>setField('email',e.target.value)}/>
-                                {errors.email && <p style={{color:'var(--rose)',fontSize:11,marginTop:4}}>{errors.email}</p>}
-                            </div>
-
-                            {/* Aniversário opcional */}
-                            <div style={{background:'#f9fafb',borderRadius:12,padding:'12px 14px',border:'1px solid #e5e7eb'}}>
-                                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',userSelect:'none'}}>
-                                    <input type="checkbox" style={{width:16,height:16,accentColor:'var(--rose)',cursor:'pointer'}} checked={sabeNascimento} onChange={e=>setSabeNascimento(e.target.checked)}/>
-                                    <span style={{fontSize:13,fontWeight:600,color:'var(--ink)'}}>Informar data de aniversário 🎂</span>
-                                </label>
-                                {sabeNascimento && (
-                                    <div className="fade-up" style={{marginTop:10}}>
-                                        <input type="date" className="input" value={form.nascimento} onChange={e=>setField('nascimento',e.target.value)}/>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Tipo de atendimento */}
-                            <div>
-                                <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',letterSpacing:'0.5px',display:'block',marginBottom:8}}>Onde será o atendimento?</label>
-                                <div style={{display:'flex',gap:8}}>
-                                    {['studio','domicilio'].map(t=>(
-                                        <button key={t} onClick={()=>setField('tipoAtendimento',t)}
-                                            style={{flex:1,padding:'10px',borderRadius:10,border:'1.5px solid',cursor:'pointer',fontWeight:700,fontSize:13,transition:'all 0.15s',
-                                                borderColor:form.tipoAtendimento===t?'var(--rose)':'var(--border)',
-                                                background:form.tipoAtendimento===t?'var(--rose-light)':'white',
-                                                color:form.tipoAtendimento===t?'var(--rose)':'var(--ink-mid)'}}>
-                                            {t==='studio'?'🏢 No Studio':'🏠 A Domicílio'}
-                                        </button>
-                                    ))}
-                                </div>
-                                {form.tipoAtendimento === 'domicilio' && (
-                                    <div className="fade-up" style={{marginTop:10,padding:'10px',background:'#fffbeb',borderRadius:10,border:'1px solid #fde68a'}}>
-                                        <p style={{margin:'0 0 10px',fontSize:12,color:'#92400e'}}>⚠️ Taxa de deslocamento será combinada previamente.</p>
-                                        <input className={`input ${errors.endereco?'input-error':''}`} placeholder="Rua, número, bairro, cidade *" value={form.endereco} onChange={e=>setField('endereco',e.target.value)} style={{marginBottom:8}}/>
-                                        {errors.endereco && <p style={{color:'var(--rose)',fontSize:11,marginBottom:6}}>{errors.endereco}</p>}
-                                        <input className="input" placeholder="Complemento (apto, bloco...)" value={form.complemento} onChange={e=>setField('complemento',e.target.value)}/>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Data */}
-                            <div>
-                                <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',letterSpacing:'0.5px',display:'block',marginBottom:6}}>Data *</label>
-                                <input type="date" className={`input ${errors.data?'input-error':''}`} min={hoje()} value={form.data} onChange={e=>{setField('data',e.target.value);setField('hora','');}}/>
-                                {errors.data && <p style={{color:'var(--rose)',fontSize:11,marginTop:4}}>{errors.data}</p>}
-                            </div>
-
-                            {/* Horários */}
-                            {form.data && (
-                                <div className="fade-up">
-                                    <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',letterSpacing:'0.5px',display:'block',marginBottom:8}}>Horário disponível *</label>
-                                    <SeletorHorario
-                                        data={form.data}
-                                        duracaoHoras={duracao}
-                                        horaSelecionada={form.hora}
-                                        onSelect={h=>{setHoraPendente(h);setConfirmandoHora(true);}}
-                                    />
-                                    {errors.hora && <p style={{color:'var(--rose)',fontSize:11,marginTop:6}}>{errors.hora}</p>}
-                                </div>
-                            )}
-
-                            {form.hora && (
-                                <div className="fade-up">
-                                    <div style={{background:'var(--plum-light)',border:'1.5px solid #ddd6fe',borderRadius:12,padding:'10px 14px',marginBottom:14,display:'flex',alignItems:'center',gap:8}}>
-                                        <span style={{fontSize:16}}>✅</span>
-                                        <p style={{margin:0,fontSize:13,color:'var(--plum)',fontWeight:600}}>{form.data.split('-').reverse().join('/')} às {form.hora}</p>
-                                    </div>
-                                    <button className="btn-primary" onClick={salvar} disabled={loading}>
-                                        {loading ? <><div className="spinner"/>Processando...</> : <>Agendar e Enviar WhatsApp 💬</>}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* Modais */}
-                <ModalDetalhesServico servico={modalServico} onClose={()=>setModalServico(null)}/>
-                <ModalConfirmacaoHorario hora={confirmandoHora?horaPendente:null} onConfirm={()=>{setField('hora',horaPendente);setConfirmandoHora(false);}} onCancel={()=>setConfirmandoHora(false)}/>
-            </div>
-        );
-    }
-
-    // =============================================
-    // TELA DE SUCESSO
-    // =============================================
-    function TelaSucesso({ dados, onReiniciar }) {
-        const irWhatsapp = () => {
-            const s = dados.servicoObj?.nome || dados.servico || 'Serviço';
-            const msg = `Olá Le! Acabei de agendar pelo site 😊\n\n*Serviço:* ${s}\n*Data:* ${dados.data.split('-').reverse().join('/')} às ${dados.hora}\n*Nome:* ${dados.nome}`;
-            const link = gerarLinkWhatsApp(CONFIG.telefoneProfissional, msg);
-            if (link) window.open(link, '_blank');
-        };
-
-        return (
-            <div className="slide-up" style={{background:'white',borderRadius:20,border:'1.5px solid var(--border)',overflow:'hidden',boxShadow:'0 4px 32px rgba(109,40,217,0.08)',padding:'40px 24px',textAlign:'center'}}>
-                <div style={{width:72,height:72,background:'#f0fdf4',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px'}}>
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline className="check-svg" points="20 6 9 17 4 12"/>
-                    </svg>
-                </div>
-                <h2 style={{margin:'0 0 8px',fontSize:26}}>Agendado! 🎉</h2>
-                <p style={{color:'var(--ink-mid)',fontSize:14,marginBottom:24}}>Seu horário está pré-reservado. Confirme pelo WhatsApp.</p>
+        const salvarAgendamentoPlanilha = async (dadosCliente) => {
+            if (!CONFIG.scriptGoogleUrl) return true; 
+            try {
+                let nomeServico = dadosCliente.servico || (dadosCliente.servicoObj ? dadosCliente.servicoObj.nome : "Serviço Avulso");
+                if (dadosCliente.incluiSobrancelha && dadosCliente.servicoObj && dadosCliente.servicoObj.id !== 999) {
+                    nomeServico += " + Design Sobrancelhas";
+                }
+                const payload = {
+                    nome: dadosCliente.nome || "",
+                    whatsapp: dadosCliente.whatsapp || "",
+                    email: dadosCliente.email || "",
+                    nascimento: dadosCliente.nascimento || "",
+                    servico: nomeServico,
+                    duracaoTotal: dadosCliente.duracaoTotal || 2,
+                    tipoServico: dadosCliente.tipoServico || "Aplicação",
+                    precoFinal: dadosCliente.precoFinal || 0,
+                    data: dadosCliente.data || "",
+                    hora: dadosCliente.hora || "",
+                    tipoAtendimento: dadosCliente.tipoAtendimento || "studio",
+                    endereco: dadosCliente.endereco || ""
+                };
                 
-                <div style={{background:'var(--rose-light)',border:'1.5px solid var(--rose-mid)',borderRadius:14,padding:'16px',textAlign:'left',marginBottom:24}}>
-                    <p style={{margin:'0 0 4px',fontSize:11,color:'var(--ink-mid)',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.5px'}}>Resumo</p>
-                    <p style={{margin:0,fontWeight:700,fontSize:16,color:'var(--ink)'}}>{dados.servicoObj?.nome || dados.servico}</p>
-                    <p style={{margin:'4px 0 0',fontSize:14,color:'var(--ink-mid)'}}>📅 {dados.data.split('-').reverse().join('/')} às {dados.hora}</p>
-                    <p style={{margin:'2px 0 0',fontSize:14,color:'var(--ink-mid)'}}>👤 {dados.nome}</p>
-                </div>
+                await fetch(CONFIG.scriptGoogleUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+                return true;
+            } catch (e) { 
+                console.error("Erro ao salvar:", e);
+                return true; 
+            }
+        };
 
-                <button className="btn-primary" style={{background:'#25D366',boxShadow:'0 6px 20px rgba(37,211,102,0.3)'}} onClick={irWhatsapp}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                    Confirmar no WhatsApp
-                </button>
-                <button className="btn-ghost" style={{marginTop:16,fontSize:13,display:'block',width:'100%'}} onClick={onReiniciar}>← Voltar ao início</button>
-            </div>
-        );
-    }
-
-    // =============================================
-    // PAINEL PROFISSIONAL
-    // =============================================
-    function TelaProfissional({ onSair }) {
-        const [aba, setAba]                = useState('agenda');
-        const [dataLote, setDataLote]      = useState(hoje());
-        const [clientes, setClientes]      = useState([]);
-        const [bancoDB, setBancoDB]        = useState([]);
-        const [despesas, setDespesas]      = useState([]);
-        const [loadingSync, setLoadingSync] = useState(false);
-        const [loadingDB, setLoadingDB]    = useState(false);
-        const [modalNovoAg, setModalNovoAg] = useState(false);
-        const [loadingNovoAg, setLoadingNovoAg] = useState(false);
-        const [modalSelecionarContato, setModalSelecionarContato] = useState(false);
-        const [clientePendente, setClientePendente] = useState(null);
-        const [novaDespesa, setNovaDespesa] = useState({ nome:'', valor:'' });
-        const [modalAnalisar, setModalAnalisar] = useState(null);
-        const [incentivoIA, setIncentivoIA] = useState('');
-        const [msgIA, setMsgIA]            = useState('');
-        const [loadingIA, setLoadingIA]    = useState(false);
-        const [modalNiver, setModalNiver]  = useState(null);
-        const [descontoNiver, setDescontoNiver] = useState(0); // 0 = sem desconto
-        const [msgNiver, setMsgNiver]      = useState('');
-
-        useEffect(()=>{
-            const saved = localStorage.getItem('ls_despesas_v2');
-            if(saved) try { setDespesas(JSON.parse(saved)); } catch {}
-            baixarClientes();
-        },[]);
-
-        const sincronizarAgenda = async () => {
-            setLoadingSync(true);
+        async function chamarGemini(prompt, systemInstruction = "") {
+            const fullPrompt = systemInstruction ? `Instrução do Sistema: ${systemInstruction}\n\nUsuário: ${prompt}` : prompt;
             try {
-                const eventos = await buscarHorariosOcupados(dataLote);
-                const lista = eventos.filter(ev=>!ev.isAllDay).map(ev=>{
-                    const m = ev.description?.match(/(?:Whats|Whatsapp)[a-z]*:\s*([+\d() -]+)/i);
-                    const loc = (ev.location||'').toLowerCase();
-                    return {
-                        id: Math.random(),
-                        nome: (ev.title||'Cliente').replace(/^Cílios:\s*/i,'').trim(),
-                        hora: `${String(ev.startHour).padStart(2,'0')}:${String(ev.startMin).padStart(2,'0')}`,
-                        tipo: (!loc || loc.length<5 || loc.includes('studio') || loc.includes('prestes')) ? 'studio' : 'domicilio',
-                        whatsapp: m?m[1].trim():null,
-                        location: ev.location
-                    };
-                }).sort((a,b)=>a.hora.localeCompare(b.hora));
-                setClientes(lista);
-            } catch(e) { toast.error('Erro ao sincronizar agenda.'); }
-            setLoadingSync(false);
-        };
-
-        const baixarClientes = async () => {
-            setLoadingDB(true);
-            try {
-                const res = await fetch(`${CONFIG.scriptGoogleUrl}?action=readClients`, { method:'GET', redirect:'follow' });
-                const data = await res.json();
-                if(Array.isArray(data)) setBancoDB(data);
-            } catch { toast.error('Erro ao buscar clientes.'); }
-            setLoadingDB(false);
-        };
-
-        const salvarDespesa = () => {
-            if(!novaDespesa.nome || !novaDespesa.valor) return;
-            const upd = [...despesas, {...novaDespesa, id:Date.now(), valor:parseFloat(novaDespesa.valor)}];
-            setDespesas(upd);
-            localStorage.setItem('ls_despesas_v2', JSON.stringify(upd));
-            setNovaDespesa({nome:'',valor:''});
-            toast.success('Despesa adicionada!');
-        };
-
-        const removerDespesa = (id) => {
-            const upd = despesas.filter(d=>d.id!==id);
-            setDespesas(upd);
-            localStorage.setItem('ls_despesas_v2', JSON.stringify(upd));
-        };
-
-        /** RECEITA REAL: soma os preços reais de cada cliente */
-        const receitaTotal = useMemo(()=> bancoDB.reduce((acc,c)=>acc+(parseFloat(c.precoFinal)||0),0), [bancoDB]);
-        const despesaTotal = useMemo(()=> despesas.reduce((acc,d)=>acc+(parseFloat(d.valor)||0),0), [despesas]);
-
-        const iniciarConfirmacao = (c) => {
-            let zap = c.whatsapp;
-            if (!zap || String(zap).replace(/\D/g,'').length < 10) {
-                const match = bancoDB.find(b => b.nome.toLowerCase().includes(c.nome.toLowerCase()) || c.nome.toLowerCase().includes(b.nome.toLowerCase()));
-                if(match?.zap) zap = match.zap;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }] })
+                });
+                if (!response.ok) {
+                    return "Opa, a IA está tirando um cochilo.";
+                }
+                const data = await response.json();
+                return data.candidates?.[0]?.content?.parts?.[0]?.text;
+            } catch (error) { 
+                return "Erro de conexão."; 
             }
-            if (zap && String(zap).replace(/\D/g,'').length >= 10) {
-                enviarConfirmacao(c, zap);
-            } else {
-                setClientePendente(c);
-                setModalSelecionarContato(true);
-            }
-        };
+        }
 
-        const enviarConfirmacao = (c, zap) => {
-            let msg = c.tipo === 'studio'
-                ? `Oiiiii, *${c.nome}* !!!\nSó pra confirmar seu horário amanhã às ${c.hora} no Studio 💜\n\n📍 Av. Prestes Maia, 221 - Jardim D'abril, Osasco\n\n⏰ Tolerância de 15 minutos. Te espero! 💜`
-                : `Oiiiii, *${c.nome}* !!!\nPassando pra confirmar nosso atendimento a domicílio amanhã às ${c.hora} 💜\n\n${c.location && c.location.length > 5 ? `📍 ${c.location}` : '📍 Pode me confirmar o endereço certinho? 🥰'}\n\nQualquer imprevisto me avise!`;
-            const link = gerarLinkWhatsApp(zap, msg);
-            if(link) window.open(link,'_blank');
-            else toast.error('Número inválido. Selecione manualmente.');
-        };
+        // --- 4. COMPONENTES DE UI ---
 
-        const abrirModalNiver = (c) => {
-            setModalNiver(c);
-            setDescontoNiver(0);
-            // Monta mensagem padrão
-            setMsgNiver(`Oiiii *${c.nome}*! 🎂🎉\n\nHoje é o seu dia especial e eu não poderia deixar passar sem te dar um abraço virtual e desejar um feliz aniversário! 🥳\n\nEspero que você realize tudo que desejar nesse novo ciclo que começa! 💜\n\nCom carinho, Le 💜`);
-        };
+        function ChatbotIA() {
+            const [aberto, setAberto] = useState(false);
+            const [msg, setMsg] = useState('');
+            const [historico, setHistorico] = useState([{ role: 'bot', text: 'Olá! Sou a assistente virtual da Le. Tem alguma dúvida? 💖' }]);
+            const [loading, setLoading] = useState(false);
+            const msgEndRef = useRef(null);
+            useEffect(() => { msgEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [historico]);
+            
+            const enviarMsg = async () => {
+                if (!msg.trim()) return;
+                const novaMsg = { role: 'user', text: msg };
+                setHistorico(prev => [...prev, novaMsg]);
+                setMsg('');
+                setLoading(true);
+                const resposta = await chamarGemini(msg, "Você é a assistente virtual da Ls Cílios. Responda curto e simpática. Se não souber, peça para falar com a Le.");
+                setHistorico(prev => [...prev, { role: 'bot', text: resposta || "Desculpe, não entendi." }]);
+                setLoading(false);
+            };
+            
+            const irParaWhatsApp = () => {
+                const link = gerarLinkWhatsApp(CONFIG.telefoneProfissional, "Olá Le, tenho uma dúvida.");
+                if(link) window.open(link, '_blank');
+            };
 
-        const atualizarMsgNiver = (cliente, desc) => {
-            const base = `Oiiii *${cliente.nome}*! 🎂🎉\n\nHoje é o seu dia especial e eu não poderia deixar passar sem te dar um abraço virtual e desejar um feliz aniversário! 🥳\n\nEspero que você realize tudo que desejar nesse novo ciclo que começa!`;
-            const extra = desc ? `\n\n${desc}` : '';
-            setMsgNiver(`${base}${extra}\n\nCom carinho, Le 💜`);
-        };
-
-        const selecionarDescontoNiver = (valor) => {
-            setDescontoNiver(valor);
-            if (!modalNiver) return;
-            if (valor === 0) {
-                atualizarMsgNiver(modalNiver, '');
-            } else {
-                atualizarMsgNiver(modalNiver, `🎁 *Presente especial de aniversário:* ${valor}% OFF no seu próximo atendimento! É só me chamar para agendar. 😍`);
-            }
-        };
-
-        const enviarMsgNiver = () => {
-            if (!modalNiver) return;
-            const link = gerarLinkWhatsApp(modalNiver.zap, msgNiver);
-            if (link) window.open(link, '_blank');
-            setModalNiver(null);
-        };
-
-
-            if(!modalAnalisar) return;
-            setLoadingIA(true);
-            setMsgIA('');
-            const prompt = `Você é Leticia Souza (Le), Lash Designer do Studio Ls Cílios. Escreva uma mensagem WhatsApp carinhosa para a cliente ${modalAnalisar.nome} dizendo que sente falta dela. ${incentivoIA ? `Ofereça: ${incentivoIA}.` : 'Convide carinhosamente para agendar.'} Assine APENAS como "Com carinho, Le 💜". A mensagem deve estar 100% pronta, sem colchetes nem espaços a preencher.`;
-            const resp = await chamarIA(prompt);
-            setMsgIA(resp);
-            setLoadingIA(false);
-        };
-
-        const isAniversariante = (d) => {
-            if(!d) return false;
-            const p = d.split('-');
-            if(p.length!==3) return false;
-            const now = new Date();
-            return parseInt(p[2])===now.getDate() && parseInt(p[1])===(now.getMonth()+1);
-        };
-
-        const salvarNovoAgendamento = async (payload) => {
-            setLoadingNovoAg(true);
-            const ok = await salvarAgendamentoPlanilha(payload);
-            if(ok) {
-                await baixarClientes();
-                if(payload.data === dataLote) sincronizarAgenda();
-                toast.success('Agendamento salvo!');
-                setModalNovoAg(false);
-            } else {
-                toast.error('Erro ao salvar. Tente novamente.');
-            }
-            setLoadingNovoAg(false);
-        };
-
-        return (
-            <div style={{background:'white',borderRadius:20,border:'1.5px solid var(--border)',overflow:'hidden',boxShadow:'0 4px 32px rgba(109,40,217,0.08)',minHeight:600,display:'flex',flexDirection:'column'}}>
-                <div style={{background:'linear-gradient(135deg,var(--plum),#9333ea)',padding:'20px 20px 0',color:'white'}}>
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:16}}>
-                        <div>
-                            <h2 style={{margin:0,fontSize:22,color:'white'}}>Painel da Le</h2>
-                            <p style={{margin:'4px 0 0',fontSize:13,opacity:0.75}}>{new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</p>
-                        </div>
-                        <button onClick={onSair} style={{background:'rgba(255,255,255,0.15)',border:'none',color:'white',borderRadius:10,padding:'8px 12px',cursor:'pointer',fontSize:13,fontWeight:600}}>Sair</button>
-                    </div>
-                    <div style={{display:'flex',gap:4,overflowX:'auto'}}>
-                        {[['agenda','📅 Agenda'],['clientes','👥 Clientes'],['financeiro','💰 Financeiro']].map(([k,l])=>(
-                            <button key={k} onClick={()=>setAba(k)} style={{padding:'8px 16px',borderRadius:'10px 10px 0 0',border:'none',cursor:'pointer',fontWeight:700,fontSize:12,whiteSpace:'nowrap',transition:'all 0.15s',background:aba===k?'white':'transparent',color:aba===k?'var(--plum)':'rgba(255,255,255,0.7)'}}>
-                                {l}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <div style={{flex:1,overflowY:'auto',padding:16}}>
-                    {/* ABA AGENDA */}
-                    {aba === 'agenda' && (
-                        <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
-                            <button className="btn-primary" onClick={()=>setModalNovoAg(true)}>+ Agendar Manualmente</button>
-                            <div style={{display:'flex',gap:8}}>
-                                <input type="date" className="input" style={{flex:1}} value={dataLote} onChange={e=>setDataLote(e.target.value)}/>
-                                <button onClick={sincronizarAgenda} disabled={loadingSync} style={{padding:'0 16px',background:'var(--plum)',color:'white',border:'none',borderRadius:12,cursor:'pointer',fontWeight:700,minWidth:48}}>
-                                    {loadingSync ? <div className="spinner" style={{width:16,height:16}}/> : '↻'}
-                                </button>
+            return (
+                <React.Fragment>
+                    <button onClick={() => setAberto(!aberto)} className="fixed bottom-4 left-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-full shadow-lg z-50 hover:scale-105 transition-transform flex items-center gap-2 font-bold text-xs">{aberto ? <Icons.Close /> : <span className="text-xl">🤖</span>}{!aberto && "Dúvidas?"}</button>
+                    {aberto && (
+                        <div className="fixed bottom-20 left-4 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4" style={{maxHeight: '60vh'}}>
+                            <div className="bg-purple-600 p-3 text-white flex justify-between items-center"><span className="font-bold text-sm flex items-center gap-2">🤖 Assistente Ls Cílios</span><button onClick={() => setAberto(false)}><Icons.Close /></button></div>
+                            <div className="flex-1 p-3 overflow-y-auto bg-gray-50 space-y-3 text-xs">
+                                {historico.map((m, i) => (<div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[85%] p-2 rounded-xl ${m.role === 'user' ? 'bg-purple-100 text-purple-800 rounded-tr-none' : 'bg-white border border-gray-200 text-gray-600 rounded-tl-none'}`}>{m.text}</div></div>))}
+                                <div ref={msgEndRef} />
                             </div>
-                            {clientes.length === 0 ? (
-                                <div style={{textAlign:'center',padding:'32px 0',color:'var(--ink-mid)'}}>
-                                    <p style={{fontSize:28,marginBottom:8}}>📅</p>
-                                    <p style={{fontSize:14}}>Nenhum cliente para esta data.</p>
-                                    <p style={{fontSize:12}}>Clique em ↻ para sincronizar a agenda.</p>
-                                </div>
-                            ) : clientes.map(c=>(
-                                <div key={c.id} className="card" style={{padding:'14px'}}>
-                                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
+                            <div className="p-2 bg-gray-50 border-t border-gray-100 text-center"><button onClick={irParaWhatsApp} className="text-xs text-green-600 font-bold hover:underline flex items-center justify-center gap-1 w-full"><Icons.Whatsapp /> Falar com a Le no Zap</button></div>
+                            <div className="p-2 bg-white border-t border-gray-100 flex gap-2">
+                                <input type="text" className="flex-1 border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-500" placeholder="Digite..." value={msg} onChange={(e) => setMsg(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && enviarMsg()} />
+                                <button onClick={enviarMsg} disabled={loading} className="bg-purple-600 text-white p-2 rounded-lg">➤</button>
+                            </div>
+                        </div>
+                    )}
+                </React.Fragment>
+            );
+        }
+
+        function TelaFinanceiro({ listaClientes, despesas, setDespesas }) {
+            const [novaDespesa, setNovaDespesa] = useState({ nome: '', valor: '', tipo: 'fixa' });
+            const salvarDespesa = () => {
+                if(!novaDespesa.nome || !novaDespesa.valor) return;
+                const updated = [...despesas, { ...novaDespesa, id: Date.now() }];
+                setDespesas(updated);
+                localStorage.setItem('ls_despesas', JSON.stringify(updated));
+                setNovaDespesa({ nome: '', valor: '', tipo: 'fixa' });
+            };
+            const receitaTotal = listaClientes.reduce((acc) => acc + 120, 0); 
+            const despesaTotal = despesas.reduce((acc, curr) => acc + parseFloat(curr.valor), 0);
+            const lucro = receitaTotal - despesaTotal;
+            return (
+                <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
+                    <div className="grid grid-cols-3 gap-2">
+                        <div className="bg-green-50 p-2 rounded-xl border border-green-100 text-center"><span className="text-[10px] uppercase font-bold text-green-400 block">Receita</span><span className="text-lg font-bold text-green-700">R${receitaTotal}</span></div>
+                        <div className="bg-red-50 p-2 rounded-xl border border-red-100 text-center"><span className="text-[10px] uppercase font-bold text-red-400 block">Despesas</span><span className="text-lg font-bold text-red-700">R${despesaTotal}</span></div>
+                        <div className="bg-blue-50 p-2 rounded-xl border border-blue-100 text-center"><span className="text-[10px] uppercase font-bold text-blue-400 block">Lucro</span><span className="text-lg font-bold text-blue-700">R${lucro}</span></div>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <h3 className="font-bold text-gray-700 mb-3 text-sm flex gap-2"><Icons.Chart /> Nova Despesa</h3>
+                        <div className="flex gap-2 mb-2">
+                            <input type="text" placeholder="Ex: Luz" className="flex-1 p-2 rounded-lg border text-sm" value={novaDespesa.nome} onChange={e => setNovaDespesa({...novaDespesa, nome: e.target.value})} />
+                            <input type="number" placeholder="R$" className="w-20 p-2 rounded-lg border text-sm" value={novaDespesa.valor} onChange={e => setNovaDespesa({...novaDespesa, valor: e.target.value})} />
+                        </div>
+                        <button onClick={salvarDespesa} className="w-full bg-red-500 text-white rounded-lg text-sm font-bold hover:bg-red-600 py-2">Adicionar</button>
+                        <div className="mt-3 space-y-1">{despesas.slice(-3).map(d => (<div key={d.id} className="flex justify-between text-xs text-gray-500 border-b border-gray-200 pb-1"><span>{d.nome}</span><span>- R${d.valor}</span></div>))}</div>
+                    </div>
+                </div>
+            );
+        }
+
+        function ModalSelecionarContato({ isOpen, onClose, clientes, onSelect }) {
+            const [termoBusca, setTermoBusca] = useState('');
+            if (!isOpen) return null;
+
+            const clientesFiltrados = clientes.filter(c => 
+                c.nome.toLowerCase().includes(termoBusca.toLowerCase()) || 
+                c.zap.includes(termoBusca)
+            );
+            
+            const enviarSemNumero = () => {
+                window.open(`https://api.whatsapp.com/send?text=`, '_blank');
+                onClose();
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" onClick={onClose}>
+                    <div className="bg-white rounded-xl w-full max-w-sm max-h-[80vh] flex flex-col overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+                        <div className="bg-purple-600 p-4 text-white flex justify-between items-center">
+                            <h3 className="font-bold">Selecione o Contato</h3>
+                            <button onClick={onClose}><Icons.Close /></button>
+                        </div>
+                        <div className="p-2 border-b bg-gray-50">
+                            <div className="flex items-center bg-white border border-gray-200 rounded-lg px-2 shadow-sm">
+                                <Icons.Search className="text-gray-400 w-4 h-4" />
+                                <input 
+                                    type="text" 
+                                    className="w-full p-2 bg-transparent text-sm focus:outline-none"
+                                    placeholder="Buscar por nome..." 
+                                    value={termoBusca}
+                                    onChange={(e) => setTermoBusca(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                            {clientesFiltrados.length > 0 ? (
+                                clientesFiltrados.map((c, i) => (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => onSelect(c)}
+                                        className="w-full text-left p-3 hover:bg-purple-50 rounded-lg border border-transparent hover:border-purple-100 flex justify-between items-center transition-all"
+                                    >
                                         <div>
-                                            <p style={{margin:0,fontWeight:700,fontSize:14}}>{c.nome}</p>
-                                            <div style={{display:'flex',gap:6,marginTop:4,flexWrap:'wrap'}}>
-                                                <span className="tag tag-plum">{c.hora}</span>
-                                                <span className={`tag ${c.tipo==='domicilio'?'tag-rose':'tag-green'}`}>
-                                                    {c.tipo==='domicilio'?'🏠 Domicílio':'🏢 Studio'}
-                                                </span>
-                                            </div>
+                                            <span className="font-bold text-gray-700 text-sm block">{c.nome}</span>
+                                            <span className="text-xs text-gray-400">{c.zap}</span>
                                         </div>
-                                    </div>
-                                    <button onClick={()=>iniciarConfirmacao(c)} style={{width:'100%',padding:'10px',background:'#f0fdf4',border:'1.5px solid #bbf7d0',borderRadius:10,color:'#059669',fontWeight:700,fontSize:13,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6,transition:'all 0.15s'}}
-                                        onMouseEnter={e=>{e.currentTarget.style.background='#059669';e.currentTarget.style.color='white';}}
-                                        onMouseLeave={e=>{e.currentTarget.style.background='#f0fdf4';e.currentTarget.style.color='#059669';}}>
-                                        💬 Confirmar Presença
                                     </button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* ABA CLIENTES */}
-                    {aba === 'clientes' && (
-                        <div className="fade-up">
-                            <button onClick={baixarClientes} disabled={loadingDB} style={{width:'100%',padding:'10px',background:'var(--plum-light)',border:'1.5px solid #ddd6fe',borderRadius:10,color:'var(--plum)',fontWeight:700,fontSize:13,cursor:'pointer',marginBottom:12,display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
-                                {loadingDB?<><div className="spinner spinner-dark" style={{width:14,height:14}}/>Carregando...</>:<>↻ Atualizar lista</>}
-                            </button>
-
-                            {/* Aniversariantes do dia em destaque */}
-                            {bancoDB.filter(c=>isAniversariante(c.nascimento)).length > 0 && (
-                                <div className="fade-up" style={{background:'linear-gradient(135deg,#fff1f4,#f5f3ff)',border:'2px solid var(--rose-mid)',borderRadius:16,padding:'14px 16px',marginBottom:16}}>
-                                    <p style={{margin:'0 0 10px',fontWeight:800,fontSize:14,color:'var(--rose)'}}>🎂 Aniversariantes de hoje!</p>
-                                    {bancoDB.filter(c=>isAniversariante(c.nascimento)).map((c,i)=>(
-                                        <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:'white',borderRadius:10,padding:'10px 12px',marginBottom:6,border:'1px solid var(--border)'}}>
-                                            <div>
-                                                <p style={{margin:0,fontWeight:700,fontSize:14}}>{c.nome} 🎉</p>
-                                                <p style={{margin:'2px 0 0',fontSize:12,color:'var(--ink-mid)'}}>{c.zap}</p>
-                                            </div>
-                                            <button onClick={()=>abrirModalNiver(c)} style={{padding:'8px 14px',background:'linear-gradient(135deg,var(--rose),var(--plum))',border:'none',borderRadius:10,color:'white',fontWeight:700,fontSize:12,cursor:'pointer',whiteSpace:'nowrap'}}>
-                                                🎁 Parabenizar
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
+                                ))
+                            ) : (
+                                <p className="text-center text-gray-500 text-sm py-8">Nenhum cliente encontrado.</p>
                             )}
-
-                            <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                                {bancoDB.map((c,i)=>(
-                                    <div key={i} className="card" style={{padding:'12px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                                        <div>
-                                            <p style={{margin:0,fontWeight:700,fontSize:14,display:'flex',alignItems:'center',gap:6}}>
-                                                {c.nome}
-                                                {isAniversariante(c.nascimento) && <span style={{fontSize:16}}>🎂</span>}
-                                            </p>
-                                            <p style={{margin:'2px 0 0',fontSize:12,color:'var(--ink-mid)'}}>{c.zap}</p>
-                                        </div>
-                                        <div style={{display:'flex',gap:6,flexShrink:0}}>
-                                            {isAniversariante(c.nascimento) && (
-                                                <button onClick={()=>abrirModalNiver(c)} style={{padding:'6px 10px',background:'linear-gradient(135deg,var(--rose),var(--plum))',border:'none',borderRadius:8,color:'white',fontWeight:700,fontSize:11,cursor:'pointer'}}>🎁</button>
-                                            )}
-                                            {CONFIG.geminiProxyUrl && (
-                                                <button onClick={()=>{setModalAnalisar(c);setIncentivoIA('');setMsgIA('');}} style={{padding:'6px 10px',background:'var(--plum-light)',border:'none',borderRadius:8,color:'var(--plum)',fontWeight:700,fontSize:11,cursor:'pointer'}}>Reconquistar</button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                                {bancoDB.length === 0 && !loadingDB && <p style={{textAlign:'center',color:'var(--ink-mid)',fontSize:14,padding:'24px 0'}}>Nenhum cliente ainda.</p>}
-                            </div>
                         </div>
-                    )}
+                        <div className="p-3 border-t bg-gray-50">
+                            <button onClick={enviarSemNumero} className="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold text-sm flex justify-center items-center gap-2">
+                                <Icons.Whatsapp /> Abrir WhatsApp sem Número
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
 
-                    {/* ABA FINANCEIRO */}
-                    {aba === 'financeiro' && (
-                        <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
-                            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
-                                {[
-                                    {label:'Receita',  val:`R$ ${receitaTotal.toFixed(0)}`,  bg:'#f0fdf4', border:'#bbf7d0', color:'#059669'},
-                                    {label:'Despesas', val:`R$ ${despesaTotal.toFixed(0)}`,  bg:'#fff1f2', border:'#fecdd3', color:'var(--rose)'},
-                                    {label:'Lucro',    val:`R$ ${(receitaTotal-despesaTotal).toFixed(0)}`, bg:'#f0f9ff', border:'#bae6fd', color:'#0284c7'},
-                                ].map(({label,val,bg,border,color})=>(
-                                    <div key={label} style={{background:bg,border:`1.5px solid ${border}`,borderRadius:12,padding:'10px 8px',textAlign:'center'}}>
-                                        <p style={{margin:0,fontSize:10,fontWeight:700,color,textTransform:'uppercase',letterSpacing:'0.5px'}}>{label}</p>
-                                        <p style={{margin:'4px 0 0',fontWeight:800,fontSize:16,color}}>{val}</p>
-                                    </div>
-                                ))}
+        // LÓGICA PARA EXIBIR HORÁRIOS BASE
+        const gerarHorarios = (dateStr) => {
+            if (!dateStr) return [];
+            const dia = new Date(dateStr + 'T12:00:00').getDay();
+            if (dia === 0 || dia === 1) return []; 
+            const lista = [];
+            const inicio = dia === 2 || dia === 4 ? 9 : 10;
+            const fim = dia === 6 ? 14 : 18;
+            for (let h = inicio; h <= fim; h++) lista.push((h < 10 ? '0'+h : h) + ":00");
+            return lista;
+        };
+
+        function ModalNovoAgendamentoManual({ isOpen, onClose, onSalvar, loading }) {
+            const [nome, setNome] = useState('');
+            const [whatsapp, setWhatsapp] = useState('');
+            const [data, setData] = useState('');
+            const [hora, setHora] = useState('');
+            const [servicoNome, setServicoNome] = useState('');
+            const [sabeNascimento, setSabeNascimento] = useState(false);
+            const [nascimento, setNascimento] = useState('');
+
+            const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
+            const [horariosOcupadosLocal, setHorariosOcupadosLocal] = useState([]);
+            const [carregandoHorariosLocal, setCarregandoHorariosLocal] = useState(false);
+
+            const verificarAgenda = async (dataSelecionada) => {
+                setCarregandoHorariosLocal(true);
+                const slots = gerarHorarios(dataSelecionada);
+                setHorariosDisponiveis(slots);
+                
+                try {
+                    // LÊ A AGENDA DIRETO DO GOOGLE APPS SCRIPT
+                    const url = `${CONFIG.scriptGoogleUrl}?action=get_agenda&date=${dataSelecionada}`;
+                    const response = await fetch(url, { method: 'GET', redirect: 'follow' });
+                    const responseText = await response.text();
+                    
+                    let eventos = [];
+                    try {
+                        eventos = JSON.parse(responseText);
+                    } catch (e) {
+                         console.error("Não foi possível processar a resposta como JSON:", responseText);
+                    }
+                    
+                    const ocupados = [];
+                    if (Array.isArray(eventos)) {
+                        eventos.forEach(ev => {
+                            if (ev.isAllDay) {
+                                slots.forEach(h => { if (!ocupados.includes(h)) ocupados.push(h); });
+                            } else {
+                                slots.forEach(slot => {
+                                    const [sh, sm] = slot.split(':').map(Number);
+                                    const slotStartMinutes = sh * 60 + sm;
+                                    const slotEndMinutes = slotStartMinutes + 60; // Duração de cada slot é 1 hr
+
+                                    const evStartMinutes = ev.startHour * 60 + ev.startMin;
+                                    const evEndMinutes = ev.endHour * 60 + ev.endMin;
+
+                                    if (slotStartMinutes < evEndMinutes && slotEndMinutes > evStartMinutes) {
+                                        if (!ocupados.includes(slot)) ocupados.push(slot);
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        // Se não for um array (ex: erro ou outra resposta do script), tratamos silenciosamente
+                        console.error("Resposta inesperada da agenda:", eventos);
+                    }
+                    setHorariosOcupadosLocal(ocupados);
+                } catch (e) {
+                    console.error("Erro ao ler agenda viva:", e);
+                }
+                setCarregandoHorariosLocal(false);
+            };
+
+            useEffect(() => { 
+                if (data) { 
+                    verificarAgenda(data); 
+                    setHora(''); 
+                } 
+            }, [data]);
+
+            if (!isOpen) return null;
+
+            const handleSave = () => {
+                if (!nome || !data || !hora) {
+                    alert("Nome, Data e Hora são obrigatórios para agendar!");
+                    return;
+                }
+                if (!servicoNome) {
+                    alert("Por favor, selecione o serviço que será realizado.");
+                    return;
+                }
+                
+                const payload = {
+                    nome: nome,
+                    whatsapp: whatsapp,
+                    servico: servicoNome,
+                    data: data,
+                    hora: hora,
+                    nascimento: sabeNascimento ? nascimento : "",
+                    duracaoTotal: 2, 
+                    tipoServico: "Agendamento Manual",
+                    precoFinal: 0,
+                    tipoAtendimento: "studio",
+                    endereco: ""
+                };
+                
+                onSalvar(payload);
+            };
+
+            let duracaoServico = 2; 
+            if (servicoNome === "Design de Sobrancelhas") duracaoServico = 1;
+            else if (servicoNome) {
+                const servicoEncontrado = CONFIG.servicos.find(s => s.nome === servicoNome);
+                if (servicoEncontrado) duracaoServico = Math.ceil(servicoEncontrado.duracao);
+            }
+
+            return (
+                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" onClick={onClose}>
+                    <div className="bg-white rounded-xl w-full max-w-sm p-6 relative shadow-2xl" onClick={e => e.stopPropagation()}>
+                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800"><Icons.Close /></button>
+                        <h3 className="font-bold text-lg mb-1 text-gray-800">Agendamento Manual</h3>
+                        <p className="text-xs text-gray-500 mb-4">Adiciona o evento direto na sua Agenda e salva na Planilha.</p>
+                        
+                        <div className="space-y-3">
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 mb-1 block">Nome da Cliente *</label>
+                                <input type="text" placeholder="Ex: Maria Silva" className="w-full p-2 border rounded-lg text-sm" value={nome} onChange={e => setNome(e.target.value)} />
+                            </div>
+                            
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 mb-1 block">WhatsApp</label>
+                                <input type="tel" placeholder="(11) 99999-9999" className="w-full p-2 border rounded-lg text-sm" value={whatsapp} onChange={e => setWhatsapp(formatarTelefone(e.target.value))} maxLength="15" />
                             </div>
 
-                            <div style={{background:'#f9fafb',borderRadius:14,padding:'14px',border:'1px solid #e5e7eb'}}>
-                                <p style={{margin:'0 0 10px',fontWeight:700,fontSize:14}}>Nova despesa</p>
-                                <input className="input" style={{marginBottom:8}} placeholder="Nome da despesa (ex: Luz)" value={novaDespesa.nome} onChange={e=>setNovaDespesa(d=>({...d,nome:e.target.value}))}/>
-                                <div style={{display:'flex',gap:8}}>
-                                    <input className="input" type="number" placeholder="R$ 0,00" value={novaDespesa.valor} onChange={e=>setNovaDespesa(d=>({...d,valor:e.target.value}))}/>
-                                    <button onClick={salvarDespesa} style={{padding:'0 20px',background:'var(--rose)',color:'white',border:'none',borderRadius:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}>Adicionar</button>
+                            <div className="bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <input type="checkbox" id="checkNiverManual" checked={sabeNascimento} onChange={e => setSabeNascimento(e.target.checked)} className="w-4 h-4 text-purple-500 rounded cursor-pointer" />
+                                    <label htmlFor="checkNiverManual" className="text-xs font-bold text-gray-600 cursor-pointer">Sabe o dia de aniversário da cliente?</label>
                                 </div>
+                                {sabeNascimento && (
+                                    <input type="date" className="w-full p-2 border rounded-lg text-sm fade-in" value={nascimento} onChange={e => setNascimento(e.target.value)} />
+                                )}
+                            </div>
+                            
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 mb-1 block">Serviço *</label>
+                                <select className="w-full p-2 border rounded-lg text-sm bg-white" value={servicoNome} onChange={e => setServicoNome(e.target.value)}>
+                                    <option value="" disabled>Selecione um serviço...</option>
+                                    <option value="Design de Sobrancelhas">Design de Sobrancelhas</option>
+                                    {CONFIG.servicos.map(s => <option key={s.id} value={s.nome}>{s.nome}</option>)}
+                                </select>
                             </div>
 
                             <div>
-                                <p style={{fontWeight:700,fontSize:14,marginBottom:8}}>Histórico de despesas</p>
-                                {despesas.length === 0 && <p style={{color:'var(--ink-mid)',fontSize:13}}>Nenhuma despesa cadastrada.</p>}
-                                {despesas.map(d=>(
-                                    <div key={d.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',background:'white',border:'1.5px solid var(--border)',borderRadius:10,marginBottom:6}}>
-                                        <span style={{fontSize:13,fontWeight:600}}>{d.nome}</span>
-                                        <div style={{display:'flex',alignItems:'center',gap:10}}>
-                                            <span style={{fontWeight:800,color:'var(--rose)',fontSize:14}}>- R$ {parseFloat(d.valor).toFixed(2)}</span>
-                                            <button onClick={()=>removerDespesa(d.id)} style={{background:'none',border:'none',cursor:'pointer',color:'#d1d5db',fontSize:16}} title="Remover">✕</button>
+                                <label className="text-xs font-bold text-gray-500 mb-1 block">Data *</label>
+                                <input type="date" className="w-full p-2 border rounded-lg text-sm h-[40px]" value={data} onChange={e => setData(e.target.value)} />
+                            </div>
+                            
+                            {data && (
+                                <div className="pt-1">
+                                    <label className="block text-xs font-bold text-gray-500 mb-1">Horário Livre *</label>
+                                    {carregandoHorariosLocal ? (
+                                        <p className="text-xs text-purple-500 font-bold animate-pulse">Verificando agenda da Le...</p>
+                                    ) : horariosDisponiveis.length === 0 ? (
+                                        <p className="text-xs text-red-500 font-bold bg-red-50 p-2 rounded">Sem horários para este dia (Fechado).</p>
+                                    ) : (
+                                        <div className="grid grid-cols-4 gap-2 max-h-[120px] overflow-y-auto pr-1">
+                                            {horariosDisponiveis.map((h) => {
+                                                let isOcupado = false;
+                                                for (let i = 0; i < duracaoServico; i++) {
+                                                    const [hh] = h.split(':').map(Number);
+                                                    const hourToCheck = (hh + i < 10 ? '0' : '') + (hh + i) + ':00';
+                                                    if (horariosOcupadosLocal.includes(hourToCheck) || !horariosDisponiveis.includes(hourToCheck)) {
+                                                        isOcupado = true;
+                                                        break;
+                                                    }
+                                                }
+
+                                                return (
+                                                    <button 
+                                                        key={h} 
+                                                        disabled={isOcupado} 
+                                                        onClick={() => setHora(h)} 
+                                                        className={`p-2 rounded text-xs font-bold border transition-all ${isOcupado ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed opacity-50' : hora === h ? 'bg-pink-500 text-white border-pink-500 shadow-md transform scale-105' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'}`}
+                                                    >
+                                                        {h}
+                                                    </button>
+                                                )
+                                            })}
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Modal de Aniversário */}
-                {modalNiver && (
-                    <div className="modal-overlay" onClick={()=>setModalNiver(null)}>
-                        <div className="modal-box" style={{padding:0,overflow:'hidden'}} onClick={e=>e.stopPropagation()}>
-                            {/* Header festivo */}
-                            <div style={{background:'linear-gradient(135deg,var(--rose),var(--plum))',padding:'24px 20px',textAlign:'center',position:'relative'}}>
-                                <button onClick={()=>setModalNiver(null)} style={{position:'absolute',top:12,right:12,background:'rgba(255,255,255,0.2)',border:'none',color:'white',borderRadius:'50%',width:28,height:28,cursor:'pointer',fontSize:14}}>✕</button>
-                                <div style={{fontSize:48,marginBottom:8}}>🎂</div>
-                                <h3 style={{margin:0,color:'white',fontSize:20}}>Parabéns, {modalNiver.nome.split(' ')[0]}!</h3>
-                                <p style={{margin:'6px 0 0',color:'rgba(255,255,255,0.85)',fontSize:13}}>Envie uma mensagem especial agora 💜</p>
-                            </div>
-
-                            <div style={{padding:'20px'}}>
-                                {/* Seletor de desconto */}
-                                <p style={{margin:'0 0 10px',fontWeight:700,fontSize:13,color:'var(--ink)'}}>Quer dar um presente especial?</p>
-                                <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:16}}>
-                                    {[0, 10, 15, 20, 30].map(v => (
-                                        <button key={v} onClick={()=>selecionarDescontoNiver(v)}
-                                            style={{padding:'8px 14px',borderRadius:10,border:'1.5px solid',cursor:'pointer',fontWeight:700,fontSize:13,transition:'all 0.15s',
-                                                borderColor: descontoNiver===v ? 'var(--rose)' : 'var(--border)',
-                                                background:  descontoNiver===v ? 'var(--rose-light)' : 'white',
-                                                color:       descontoNiver===v ? 'var(--rose)' : 'var(--ink-mid)'}}>
-                                            {v === 0 ? '🚫 Sem desconto' : `🎁 ${v}% OFF`}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                {/* Preview / edição da mensagem */}
-                                <p style={{margin:'0 0 6px',fontWeight:700,fontSize:13,color:'var(--ink)'}}>Mensagem (pode editar):</p>
-                                <textarea
-                                    value={msgNiver}
-                                    onChange={e=>setMsgNiver(e.target.value)}
-                                    style={{width:'100%',minHeight:140,padding:'10px 12px',border:'1.5px solid var(--border)',borderRadius:12,fontSize:13,fontFamily:'DM Sans,sans-serif',resize:'vertical',lineHeight:1.6,color:'var(--ink)'}}
-                                />
-
-                                <button onClick={enviarMsgNiver}
-                                    style={{marginTop:12,width:'100%',padding:'14px',background:'#25D366',border:'none',borderRadius:12,color:'white',fontWeight:800,fontSize:15,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 4px 16px rgba(37,211,102,0.3)',transition:'all 0.2s'}}
-                                    onMouseEnter={e=>e.currentTarget.style.background='#1ebd59'}
-                                    onMouseLeave={e=>e.currentTarget.style.background='#25D366'}>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                                    Enviar no WhatsApp
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Modal selecionar contato */}
-                {modalSelecionarContato && (
-                    <ModalSelecionarContato
-                        clientes={bancoDB}
-                        onSelect={c=>{ enviarConfirmacao(clientePendente, c.zap); setModalSelecionarContato(false); setClientePendente(null); }}
-                        onClose={()=>{ setModalSelecionarContato(false); setClientePendente(null); }}
-                    />
-                )}
-
-                {/* Modal novo agendamento */}
-                {modalNovoAg && (
-                    <ModalNovoAgendamento
-                        onClose={()=>setModalNovoAg(false)}
-                        onSalvar={salvarNovoAgendamento}
-                        loading={loadingNovoAg}
-                    />
-                )}
-
-                {/* Modal Reconquistar IA */}
-                {modalAnalisar && (
-                    <div className="modal-overlay" onClick={()=>setModalAnalisar(null)}>
-                        <div className="modal-box" style={{padding:'20px 24px'}} onClick={e=>e.stopPropagation()}>
-                            <div style={{display:'flex',justifyContent:'space-between',marginBottom:16,alignItems:'center'}}>
-                                <h3 style={{margin:0,fontSize:18}}>Reconquistar {modalAnalisar.nome.split(' ')[0]}</h3>
-                                <button className="btn-ghost" onClick={()=>setModalAnalisar(null)}>✕</button>
-                            </div>
-                            <p style={{fontSize:13,color:'var(--ink-mid)',marginBottom:12}}>Oferta de incentivo (opcional):</p>
-                            <input className="input" style={{marginBottom:12}} placeholder="Ex: 15% de desconto" value={incentivoIA} onChange={e=>setIncentivoIA(e.target.value)}/>
-                            {!msgIA && <button className="btn-primary" onClick={gerarMsgIA} disabled={loadingIA}>{loadingIA?<><div className="spinner"/>Gerando...</>:'✨ Gerar mensagem'}</button>}
-                            {msgIA && (
-                                <div className="fade-up">
-                                    <textarea style={{width:'100%',minHeight:140,padding:'10px',border:'1.5px solid var(--border)',borderRadius:12,fontSize:13,fontFamily:'DM Sans,sans-serif',resize:'vertical',marginBottom:10}} value={msgIA} onChange={e=>setMsgIA(e.target.value)}/>
-                                    <button className="btn-primary" style={{background:'#25D366'}} onClick={()=>{const l=gerarLinkWhatsApp(modalAnalisar.zap,msgIA);if(l)window.open(l,'_blank');}}>
-                                        💬 Enviar no WhatsApp
-                                    </button>
+                                    )}
                                 </div>
                             )}
-                        </div>
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    // =============================================
-    // MODAL: Selecionar Contato
-    // =============================================
-    function ModalSelecionarContato({ clientes, onSelect, onClose }) {
-        const [busca, setBusca] = useState('');
-        const filtrados = useMemo(()=>
-            clientes.filter(c=>c.nome.toLowerCase().includes(busca.toLowerCase())||c.zap.includes(busca))
-        ,[clientes, busca]);
-
-        return (
-            <div className="modal-overlay" onClick={onClose}>
-                <div className="modal-box" style={{maxHeight:'80vh',display:'flex',flexDirection:'column'}} onClick={e=>e.stopPropagation()}>
-                    <div style={{background:'var(--plum)',padding:'16px 20px',color:'white',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                        <h3 style={{margin:0,fontSize:16,color:'white'}}>Selecionar Contato</h3>
-                        <button onClick={onClose} style={{background:'none',border:'none',color:'white',cursor:'pointer',fontSize:20}}>✕</button>
-                    </div>
-                    <div style={{padding:'10px 12px',borderBottom:'1px solid var(--border)'}}>
-                        <input className="input" placeholder="Buscar por nome..." value={busca} onChange={e=>setBusca(e.target.value)} autoFocus/>
-                    </div>
-                    <div style={{flex:1,overflowY:'auto',padding:'8px'}}>
-                        {filtrados.map((c,i)=>(
-                            <button key={i} onClick={()=>onSelect(c)} style={{width:'100%',padding:'12px',border:'none',borderRadius:10,background:'white',cursor:'pointer',textAlign:'left',display:'flex',justifyContent:'space-between',transition:'background 0.1s',marginBottom:4}}
-                                onMouseEnter={e=>e.currentTarget.style.background='var(--plum-light)'}
-                                onMouseLeave={e=>e.currentTarget.style.background='white'}>
-                                <span style={{fontWeight:700,fontSize:14}}>{c.nome}</span>
-                                <span style={{fontSize:12,color:'var(--ink-mid)'}}>{c.zap}</span>
+                            
+                            <button onClick={handleSave} disabled={loading} className="w-full mt-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold py-3 rounded-lg flex justify-center items-center gap-2 shadow-md hover:shadow-lg transition-all">
+                                {loading ? 'Agendando...' : <><Icons.Calendar /> Salvar na Agenda</>}
                             </button>
-                        ))}
-                        {filtrados.length === 0 && <p style={{textAlign:'center',color:'var(--ink-mid)',padding:'24px 0',fontSize:13}}>Nenhuma cliente encontrada.</p>}
+                        </div>
                     </div>
                 </div>
-            </div>
-        );
-    }
+            );
+        }
 
-    // =============================================
-    // MODAL: Novo Agendamento Manual
-    // =============================================
-    function ModalNovoAgendamento({ onClose, onSalvar, loading }) {
-        const [form, setForm] = useState({ nome:'', whatsapp:'', servico:'', data:'', hora:'', nascimento:'' });
-        const [sabeNasc, setSabeNasc] = useState(false);
-        const [errors, setErrors] = useState({});
+        // --- TELA CLIENTE PRINCIPAL ---
+        function TelaCliente({ aoFinalizar }) {
+            const [step, setStep] = useState(0); 
+            const [dados, setDados] = useState({ 
+                nome: '', whatsapp: '', email: '', nascimento: '', 
+                servicoObj: null, tipoServico: '', precoFinal: 0, 
+                incluiSobrancelha: false, duracaoTotal: 0,
+                data: '', hora: '', tipoAtendimento: 'studio', endereco: '', complemento: '' 
+            });
+            const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
+            const [horariosOcupadosLocal, setHorariosOcupadosLocal] = useState([]);
+            const [carregandoHorariosLocal, setCarregandoHorariosLocal] = useState(false);
+            const [servicoExpandido, setServicoExpandido] = useState(null);
+            const [modalDetalhes, setModalDetalhes] = useState(null); 
+            const [showModalIA, setShowModalIA] = useState(false);
+            const [inputIA, setInputIA] = useState('');
+            const [loadingIA, setLoadingIA] = useState(false);
+            const [respostaIA, setRespostaIA] = useState(null);
+            const [depoimentoIndex, setDepoimentoIndex] = useState(0);
+            const [modalConfirmacao, setModalConfirmacao] = useState(false);
+            const [horarioPendente, setHorarioPendente] = useState('');
+            const [loadingSalvar, setLoadingSalvar] = useState(false);
+            const [sabeNascimento, setSabeNascimento] = useState(false);
 
-        const duracaoServico = useMemo(()=>{
-            if(form.servico === 'Design de Sobrancelhas') return 0.5;
-            const s = CONFIG.servicos.find(s=>s.nome===form.servico);
-            return s ? s.duracao : 2;
-        },[form.servico]);
+            const hoje = new Date().toISOString().split('T')[0];
 
-        const setField = (k,v) => { setForm(f=>({...f,[k]:v})); setErrors(e=>({...e,[k]:null})); };
+            useEffect(() => { const interval = setInterval(() => { setDepoimentoIndex((prev) => (prev + 1) % CONFIG.depoimentos.length); }, 5000); return () => clearInterval(interval); }, []);
 
-        const handleSave = () => {
-            const e = {};
-            if(!form.nome.trim()) e.nome='Obrigatório';
-            if(!form.servico) e.servico='Selecione um serviço';
-            if(!form.data) e.data='Obrigatório';
-            if(!form.hora) e.hora='Selecione um horário';
-            setErrors(e);
-            if(Object.keys(e).length>0) return;
-            onSalvar({...form, nascimento:sabeNasc?form.nascimento:'', duracaoTotal:duracaoServico, tipoServico:'Manual', precoFinal:0, tipoAtendimento:'studio', endereco:''});
-        };
+            const verificarAgendaCliente = async (data) => {
+                setCarregandoHorariosLocal(true);
+                const slots = gerarHorarios(data);
+                setHorariosDisponiveis(slots);
+                
+                try {
+                    // LÊ A AGENDA DIRETO DO GOOGLE APPS SCRIPT
+                    const url = `${CONFIG.scriptGoogleUrl}?action=get_agenda&date=${data}`;
+                    const response = await fetch(url, { method: 'GET', redirect: 'follow' });
+                    const responseText = await response.text();
+                    
+                    let eventos = [];
+                    try {
+                        eventos = JSON.parse(responseText);
+                    } catch (e) {
+                         console.error("Não foi possível processar a resposta como JSON:", responseText);
+                    }
+                    
+                    const ocupados = [];
+                    if (Array.isArray(eventos)) {
+                        eventos.forEach(ev => {
+                            if (ev.isAllDay) {
+                                slots.forEach(h => { if (!ocupados.includes(h)) ocupados.push(h); });
+                            } else {
+                                slots.forEach(slot => {
+                                    const [sh, sm] = slot.split(':').map(Number);
+                                    const slotStartMinutes = sh * 60 + sm;
+                                    const slotEndMinutes = slotStartMinutes + 60; 
 
-        return (
-            <div className="modal-overlay" onClick={onClose}>
-                <div className="modal-box" style={{maxHeight:'90vh',overflowY:'auto'}} onClick={e=>e.stopPropagation()}>
-                    <div style={{padding:'16px 20px',borderBottom:'1px solid var(--border)',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,background:'white',zIndex:1}}>
-                        <h3 style={{margin:0,fontSize:16}}>Agendamento Manual</h3>
-                        <button className="btn-ghost" onClick={onClose}>✕</button>
-                    </div>
-                    <div style={{padding:'16px 20px',display:'flex',flexDirection:'column',gap:14}}>
-                        <div>
-                            <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',display:'block',marginBottom:6}}>Nome *</label>
-                            <input className={`input ${errors.nome?'input-error':''}`} placeholder="Nome da cliente" value={form.nome} onChange={e=>setField('nome',e.target.value)}/>
-                        </div>
-                        <div>
-                            <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',display:'block',marginBottom:6}}>WhatsApp</label>
-                            <input className="input" type="tel" placeholder="(11) 99999-9999" value={form.whatsapp} onChange={e=>setField('whatsapp',formatarTelefone(e.target.value))} maxLength={15}/>
-                        </div>
-                        <div style={{background:'#f9fafb',borderRadius:12,padding:'10px 12px',border:'1px solid #e5e7eb'}}>
-                            <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-                                <input type="checkbox" style={{accentColor:'var(--rose)'}} checked={sabeNasc} onChange={e=>setSabeNasc(e.target.checked)}/>
-                                <span style={{fontSize:13,fontWeight:600}}>Sabe o aniversário? 🎂</span>
-                            </label>
-                            {sabeNasc && <input type="date" className="input" style={{marginTop:8}} value={form.nascimento} onChange={e=>setField('nascimento',e.target.value)}/>}
-                        </div>
-                        <div>
-                            <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',display:'block',marginBottom:6}}>Serviço *</label>
-                            <select className={`input ${errors.servico?'input-error':''}`} value={form.servico} onChange={e=>setField('servico',e.target.value)}>
-                                <option value="" disabled>Selecione...</option>
-                                <option>Design de Sobrancelhas</option>
-                                {CONFIG.servicos.map(s=><option key={s.id}>{s.nome}</option>)}
-                            </select>
-                        </div>
-                        <div>
-                            <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',display:'block',marginBottom:6}}>Data *</label>
-                            <input type="date" className={`input ${errors.data?'input-error':''}`} value={form.data} onChange={e=>{setField('data',e.target.value);setField('hora','');}}/>
-                        </div>
-                        {form.data && form.servico && (
-                            <div className="fade-up">
-                                <label style={{fontSize:12,fontWeight:700,color:'var(--ink-mid)',textTransform:'uppercase',display:'block',marginBottom:8}}>Horário *</label>
-                                <SeletorHorario data={form.data} duracaoHoras={duracaoServico} horaSelecionada={form.hora} onSelect={h=>setField('hora',h)}/>
-                                {errors.hora && <p style={{color:'var(--rose)',fontSize:11,marginTop:4}}>{errors.hora}</p>}
+                                    const evStartMinutes = ev.startHour * 60 + ev.startMin;
+                                    const evEndMinutes = ev.endHour * 60 + ev.endMin;
+
+                                    if (slotStartMinutes < evEndMinutes && slotEndMinutes > evStartMinutes) {
+                                        if (!ocupados.includes(slot)) ocupados.push(slot);
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        console.error("Erro na resposta da agenda:", eventos);
+                    }
+                    setHorariosOcupadosLocal(ocupados);
+                } catch (e) {
+                    console.error("Erro agenda cliente:", e);
+                }
+                setCarregandoHorariosLocal(false);
+            };
+
+            useEffect(() => { if (dados.data) { verificarAgendaCliente(dados.data); } }, [dados.data]);
+
+            const selecionarCategoria = (tipo) => {
+                if (tipo === 'cilios') { setDados({...dados, incluiSobrancelha: false}); setStep(1); } 
+                else if (tipo === 'sobrancelha') {
+                    const s = {...CONFIG.sobrancelha, precos: { aplicacao: CONFIG.sobrancelha.preco, manutencao: CONFIG.sobrancelha.preco }};
+                    setDados({...dados, servicoObj: s, tipoServico: 'aplicacao', precoFinal: s.preco, incluiSobrancelha: false, duracaoTotal: s.duracao});
+                    setStep(2); 
+                } 
+                else if (tipo === 'combo') { setDados({...dados, incluiSobrancelha: true}); setStep(1); }
+            };
+
+            const toggleCombo = () => {
+                setDados(prev => ({ ...prev, incluiSobrancelha: !prev.incluiSobrancelha }));
+            };
+
+            const selecionarServico = (servico, tipo) => {
+                let preco = servico.precos[tipo];
+                let isCombo = dados.incluiSobrancelha;
+                let duracao = 2;
+                
+                if (servico.id === 999) { 
+                    isCombo = false; 
+                    duracao = CONFIG.sobrancelha.duracao; 
+                } else {
+                    if (isCombo) { duracao = 3; preco += CONFIG.sobrancelha.preco; } 
+                    else if (tipo === 'remocao') { duracao = 1; } 
+                    else { duracao = 2; }
+                }
+                
+                setDados({ ...dados, servicoObj: servico, tipoServico: tipo, precoFinal: preco, duracaoTotal: duracao, incluiSobrancelha: isCombo });
+                setModalDetalhes(null);
+                setStep(2);
+            };
+
+            const selecionarHorario = (h) => {
+                setHorarioPendente(h);
+                setModalConfirmacao(true);
+            };
+
+            const confirmarHorario = () => {
+                setDados({ ...dados, hora: horarioPendente });
+                setModalConfirmacao(false);
+            };
+
+            const handlePhoneChange = (e) => {
+                const formatted = formatarTelefone(e.target.value);
+                setDados({ ...dados, whatsapp: formatted });
+            };
+
+            const salvarEAvancar = async () => {
+                if (!dados.nome || !dados.whatsapp || !dados.data || !dados.hora) { alert("Preencha todos os campos obrigatórios!"); return; }
+                if (dados.whatsapp.length < 14) { alert("WhatsApp inválido!"); return; }
+                if (!validarEmail(dados.email)) { alert("Digite um e-mail válido."); return; }
+                if (!dados.servicoObj) { alert("Erro: Serviço não selecionado."); return; }
+                if (dados.tipoAtendimento === 'domicilio' && (!dados.endereco || dados.endereco.trim().length < 10)) { 
+                    alert("Endereço muito curto. Por favor, preencha o endereço completo."); return; 
+                }
+
+                setLoadingSalvar(true);
+                const dadosParaSalvar = { ...dados, nascimento: sabeNascimento ? dados.nascimento : '' };
+                await salvarAgendamentoPlanilha(dadosParaSalvar);
+                setLoadingSalvar(false);
+                aoFinalizar(dadosParaSalvar);
+            };
+
+            const consultarEstiloIA = async () => {
+                if (!inputIA.trim()) return;
+                setLoadingIA(true);
+                setRespostaIA(null);
+                const resp = await chamarGemini(inputIA, "Recomende um estilo de cílios do catálogo da Ls Cílios.");
+                setRespostaIA({ motivo: resp || "Recomendo o Volume Brasileiro, é super versátil!" });
+                setLoadingIA(false);
+            };
+
+            const duracaoNecessaria = Math.ceil(dados.duracaoTotal || 1);
+
+            return (
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-pink-100 relative min-h-[500px]">
+                    <div className="bg-pink-50 h-2 w-full flex"><div className={`h-full bg-pink-500 transition-all duration-300 ${step > 0 ? 'w-full' : 'w-1/3'}`}></div></div>
+                    <div className="p-6">
+                        {step === 0 && (
+                            <div className="fade-in text-center py-4 space-y-3">
+                                <h2 className="text-xl font-bold text-gray-800 mb-2">Olá, maravilhosa! ✨</h2>
+                                <p className="text-gray-500 text-sm mb-6">O que vamos realçar hoje?</p>
+                                <button onClick={() => selecionarCategoria('cilios')} className="w-full bg-white border border-pink-200 p-4 rounded-xl flex items-center justify-between hover:bg-pink-50 card-hover transition-all"><div className="flex items-center gap-3"><span className="text-2xl">👁️</span><div className="text-left"><span className="block font-bold text-gray-700">Cílios</span><span className="text-xs text-gray-400">Extensão, Manutenção...</span></div></div><span className="text-pink-300">➜</span></button>
+                                <button onClick={() => selecionarCategoria('sobrancelha')} className="w-full bg-white border border-purple-200 p-4 rounded-xl flex items-center justify-between hover:bg-purple-50 card-hover transition-all"><div className="flex items-center gap-3"><span className="text-2xl">✏️</span><div className="text-left"><span className="block font-bold text-gray-700">Sobrancelhas</span><span className="text-xs text-gray-400">Design Simples (30min)</span></div></div><span className="text-purple-300">➜</span></button>
+                                <button onClick={() => selecionarCategoria('combo')} className="w-full bg-gradient-to-r from-pink-500 to-purple-600 p-4 rounded-xl flex items-center justify-between text-white shadow-lg card-hover transition-all relative overflow-hidden"><div className="absolute top-0 right-0 bg-yellow-400 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">MAIS PEDIDO 🔥</div><div className="flex items-center gap-3"><span className="text-2xl bg-white/20 p-1 rounded-full">💖</span><div className="text-left"><span className="block font-bold">COMBO COMPLETO</span><span className="text-xs text-white/90">Cílios + Sobrancelha</span></div></div><span className="text-xl">➜</span></button>
                             </div>
                         )}
-                        <button className="btn-primary" onClick={handleSave} disabled={loading}>
-                            {loading?<><div className="spinner"/>Salvando...</>:'📅 Salvar Agendamento'}
-                        </button>
+                        {step === 1 && (
+                            <div className="fade-in space-y-4">
+                                <button onClick={() => setStep(0)} className="text-xs text-gray-400 mb-2 hover:text-pink-500 flex items-center gap-1">← Voltar</button>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-xl font-bold text-gray-800">Escolha o Modelo</h2>
+                                    <button onClick={() => setShowModalIA(true)} className="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-full font-bold flex items-center gap-1 hover:bg-purple-200 transition-colors sparkle-icon"><Icons.Gemini /> Me ajude</button>
+                                </div>
+                                <div className="mb-4 p-3 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100 flex items-center justify-between shadow-sm">
+                                    <div className="flex items-center gap-2"><span className="text-xl">✨</span><div><p className="text-sm font-bold text-gray-800">Adicionar Sobrancelha?</p><p className="text-xs text-gray-500">+ Design Simples (+R$35)</p></div></div>
+                                    <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in"><input type="checkbox" className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked={dados.incluiSobrancelha} onChange={toggleCombo}/><label className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer ${dados.incluiSobrancelha ? 'bg-pink-500' : 'bg-gray-300'}`}></label></div>
+                                </div>
+                                <div className="space-y-4">{CONFIG.servicos.map((s) => !s.isSobrancelha && (
+                                    <div key={s.id} className="border border-pink-100 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all">
+                                        <div onClick={() => setServicoExpandido(servicoExpandido === s.id ? null : s.id)} className="w-full text-left p-4 flex gap-4 items-center bg-gray-50 hover:bg-pink-50 transition-colors relative cursor-pointer">
+                                            <div className="w-16 h-16 shrink-0 bg-white rounded-lg border border-pink-100 overflow-hidden relative group"><img src={s.imagem} alt={s.nome} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} /><div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); setModalDetalhes(s); }}><Icons.Info className="text-white"/></div></div>
+                                            <div className="flex-1"><div className="flex justify-between items-start"><span className="font-bold text-gray-700 block">{s.nome}</span><button onClick={(e) => { e.stopPropagation(); setModalDetalhes(s); }} className="text-pink-400 hover:text-pink-600 text-xs px-2 py-1 rounded bg-pink-50"><Icons.Info /></button></div><span className="text-[10px] text-gray-500 line-clamp-2 mt-1">{s.desc}</span></div>
+                                            <div className="text-pink-400 pl-2">{servicoExpandido === s.id ? '▼' : '▶'}</div>
+                                        </div>
+                                        {servicoExpandido === s.id && (<div className="p-3 bg-white grid gap-2 animate-in fade-in slide-in-from-top-2 border-t border-pink-50"><button onClick={() => selecionarServico(s, 'aplicacao')} className="w-full text-left p-3 rounded-lg border border-gray-100 hover:border-pink-300 hover:bg-pink-50 flex justify-between items-center group"><span className="text-sm font-medium text-gray-600 group-hover:text-pink-600">✨ Aplicação Nova</span><span className="font-bold text-pink-500">R$ {s.precos.aplicacao + (dados.incluiSobrancelha ? 35 : 0)}</span></button><button onClick={() => selecionarServico(s, 'manutencao')} className="w-full text-left p-3 rounded-lg border border-gray-100 hover:border-purple-300 hover:bg-purple-50 flex justify-between items-center group"><span className="text-sm font-medium text-gray-600 group-hover:text-purple-600">🔧 Manutenção</span><span className="font-bold text-purple-500">R$ {s.precos.manutencao + (dados.incluiSobrancelha ? 35 : 0)}</span></button><button onClick={() => selecionarServico(s, 'remocao')} className="w-full text-left p-3 rounded-lg border hover:bg-red-50 flex justify-between items-center group"><span className="text-sm font-medium text-gray-600 group-hover:text-red-600">🧼 Remoção</span><span className="font-bold text-red-400">R$ {s.precos.remocao + (dados.incluiSobrancelha ? 35 : 0)}</span></button></div>)}
+                                    </div>
+                                ))}</div>
+                            </div>
+                        )}
+                        {step === 2 && (
+                            <div className="fade-in space-y-3">
+                                <button onClick={() => setStep(1)} className="text-xs text-gray-400">← Voltar</button>
+                                <div className="bg-pink-50 p-3 rounded-lg text-center border border-pink-100">
+                                    <p className="font-bold text-pink-600 text-sm">{dados.servicoObj.nome} {dados.incluiSobrancelha && !dados.servicoObj.nome.includes("Sobrancelhas") ? "+ Sobrancelha" : ""}</p>
+                                    <p className="text-xs text-gray-600 uppercase">{dados.tipoServico} - R$ {dados.precoFinal}</p>
+                                </div>
+                                <div className="mb-4 bg-white border border-gray-100 rounded-xl p-3 shadow-sm">
+                                    <h3 className="text-xs font-bold text-gray-500 mb-2 uppercase flex items-center gap-1">Antes de vir:</h3>
+                                    <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-600">
+                                        <div className="flex items-center gap-1"><Icons.Clock /><span>Duração: {dados.duracaoTotal}h</span></div>
+                                        <div className="flex items-center gap-1"><Icons.EyeOff /><span>Sem Rímel</span></div>
+                                        <div className="flex items-center gap-1"><span>👓</span><span>Remover Lentes</span></div>
+                                        <div className="flex items-center gap-1"><span>⏰</span><span>Tolerância 15min</span></div>
+                                    </div>
+                                    <div className="mt-2 pt-2 border-t border-gray-100 text-[9px] text-red-400 leading-tight">⚠️ <strong>Contraindicações:</strong> Alergias, doenças oculares ativas (conjuntivite) ou pele extremamente sensível.</div>
+                                </div>
+                                
+                                <input type="text" className="w-full p-3 border rounded-xl text-sm" placeholder="Seu Nome *" value={dados.nome} onChange={e => setDados({...dados, nome: e.target.value})} />
+                                <input type="tel" className="w-full p-3 border rounded-xl text-sm" placeholder="WhatsApp (DDD) *" value={dados.whatsapp} onChange={handlePhoneChange} maxLength="15" />
+                                <input type="email" className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="E-mail" value={dados.email} onChange={(e) => setDados({...dados, email: e.target.value})} />
+                                
+                                <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <input type="checkbox" id="checkNiver" checked={sabeNascimento} onChange={e => setSabeNascimento(e.target.checked)} className="w-4 h-4 text-pink-500 rounded cursor-pointer" />
+                                        <label htmlFor="checkNiver" className="text-xs font-bold text-gray-600 cursor-pointer">Gostaria de informar sua data de aniversário? 🎂</label>
+                                    </div>
+                                    {sabeNascimento && (
+                                        <div className="fade-in mt-2">
+                                            <input type="date" className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900" value={dados.nascimento} onChange={(e) => setDados({...dados, nascimento: e.target.value})} />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                                    <label className="block text-xs font-bold text-gray-500 mb-2">ONDE SERÁ O ATENDIMENTO?</label>
+                                    <div className="flex gap-2 mb-3">
+                                        <button onClick={() => setDados({...dados, tipoAtendimento: 'studio'})} className={`flex-1 py-2 text-xs rounded-lg border font-bold ${dados.tipoAtendimento === 'studio' ? 'bg-pink-500 text-white' : 'bg-white'}`}>No Studio</button>
+                                        <button onClick={() => setDados({...dados, tipoAtendimento: 'domicilio'})} className={`flex-1 py-2 text-xs rounded-lg border font-bold ${dados.tipoAtendimento === 'domicilio' ? 'bg-pink-500 text-white' : 'bg-white'}`}>A Domicílio</button>
+                                    </div>
+                                    {dados.tipoAtendimento === 'domicilio' && (
+                                        <div className="fade-in space-y-2">
+                                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-[10px] text-yellow-800 mb-2">⚠️ Taxa de Uber será cobrada.</div>
+                                            <input type="text" className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="Endereço Completo *" value={dados.endereco} onChange={(e) => setDados({...dados, endereco: e.target.value})} />
+                                            <input type="text" className="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400" placeholder="Complemento" value={dados.complemento} onChange={(e) => setDados({...dados, complemento: e.target.value})} />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="pt-2">
+                                    <label className="block text-xs font-bold text-gray-500 mb-1">ESCOLHA DATA E HORA</label>
+                                    <input type="date" min={hoje} className="w-full p-3 bg-white rounded-xl border border-gray-200 mb-3 font-bold text-gray-700" value={dados.data} onChange={(e) => { setDados({...dados, data: e.target.value, hora: ''}); }} />
+                                    {dados.data && (
+                                        <div className="grid grid-cols-4 gap-2 pb-2 mt-2">
+                                            {carregandoHorariosLocal ? <p className="col-span-4 text-center text-xs text-gray-400">Verificando agenda...</p> : 
+                                            horariosDisponiveis.map((h) => {
+                                                let isOcupado = false;
+                                                for (let i = 0; i < duracaoNecessaria; i++) {
+                                                    const [hh] = h.split(':').map(Number);
+                                                    const hourToCheck = (hh + i < 10 ? '0' : '') + (hh + i) + ':00';
+                                                    if (horariosOcupadosLocal.includes(hourToCheck) || !horariosDisponiveis.includes(hourToCheck)) {
+                                                        isOcupado = true;
+                                                        break;
+                                                    }
+                                                }
+                                                return (<button key={h} disabled={isOcupado} onClick={() => { setHorarioPendente(h); setModalConfirmacao(true); }} className={`p-2 rounded text-xs font-bold border transition-all ${isOcupado ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed opacity-50' : dados.hora === h ? 'bg-pink-500 text-white border-pink-500 shadow-md transform scale-105' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'}`}>{h}</button>)
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                                {dados.hora && (
+                                    <div className="fade-in space-y-3 pt-2">
+                                        <button 
+                                            onClick={salvarEAvancar} 
+                                            disabled={loadingSalvar}
+                                            className={`w-full bg-gradient-to-r from-purple-600 to-purple-800 text-white font-bold py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 mt-2 flex items-center justify-center gap-2 ${loadingSalvar ? 'opacity-75 cursor-wait' : ''}`}
+                                        >
+                                            {loadingSalvar ? 'Processando...' : 'AGENDAR E ENVIAR ZAP'} <Icons.Whatsapp />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    {/* MODAIS (Detalhes, Confirmação, IA) */}
+                    {modalDetalhes && (
+                        <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 fade-in" onClick={() => setModalDetalhes(null)}>
+                            <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
+                                <button onClick={() => setModalDetalhes(null)} className="absolute top-3 right-3 bg-black/50 text-white rounded-full p-1 z-10"><Icons.Close /></button>
+                                <div className="h-64 bg-gray-100"><img src={modalDetalhes.imagem} className="w-full h-full object-cover" /></div>
+                                <div className="p-6">
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-2">{modalDetalhes.nome}</h3>
+                                    <p className="text-gray-600 text-sm leading-relaxed mb-6 text-justify">{modalDetalhes.fullDesc || modalDetalhes.desc}</p>
+                                    <button onClick={() => setModalDetalhes(null)} className="w-full bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200">Fechar</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {modalConfirmacao && (
+                        <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center p-4 fade-in">
+                            <div className="bg-white rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl border border-pink-100">
+                                <div className="text-pink-500 text-3xl mb-3">⏰</div>
+                                <h3 className="font-bold text-gray-800 mb-2">Confirmar Horário?</h3>
+                                <p className="text-sm text-gray-500 mb-6">Você escolheu as <strong className="text-pink-500">{horarioPendente}</strong>.</p>
+                                <div className="flex gap-3">
+                                    <button onClick={() => setModalConfirmacao(false)} className="flex-1 py-3 rounded-xl text-xs font-bold text-gray-400 bg-gray-100">Voltar</button>
+                                    <button onClick={confirmarHorario} className="flex-1 py-3 rounded-xl text-xs font-bold bg-pink-500 text-white">Confirmar</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {showModalIA && (
+                        <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 fade-in" onClick={() => setShowModalIA(false)}>
+                            <div className="bg-white rounded-2xl w-full max-w-sm p-6 relative" onClick={e => e.stopPropagation()}>
+                                <h3 className="font-bold text-lg mb-2">Consultora IA</h3>
+                                <textarea className="w-full p-2 border rounded mb-2 text-sm" rows="3" placeholder="Ex: Quero algo natural..." value={inputIA} onChange={e => setInputIA(e.target.value)}></textarea>
+                                <button onClick={consultarEstiloIA} disabled={loadingIA} className="w-full bg-purple-600 text-white py-2 rounded mb-2">{loadingIA ? '...' : 'Analisar'}</button>
+                                {respostaIA && <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">{respostaIA.motivo}</p>}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- TELA PROFISSIONAL ---
+        function TelaProfissional({ onSair }) {
+            const [aba, setAba] = useState('confirma'); 
+            const [dataLote, setDataLote] = useState(new Date().toISOString().split('T')[0]);
+            const [listaClientes, setListaClientes] = useState([]);
+            const [bancoClientes, setBancoClientes] = useState([]);
+            const [loadingSync, setLoadingSync] = useState(false);
+            const [loadingPlanilha, setLoadingPlanilha] = useState(false);
+            const [despesas, setDespesas] = useState([]); 
+            
+            // Modais IA e Aniversário
+            const [modalAnaliseIA, setModalAnaliseIA] = useState(null); 
+            const [loadingMsgIA, setLoadingMsgIA] = useState(false);
+            const [modalNiver, setModalNiver] = useState(null);
+            const [temDesconto, setTemDesconto] = useState(false);
+            const [valorDesconto, setValorDesconto] = useState(10);
+            const [postIA, setPostIA] = useState({ servico: '', tom: 'Divertido', legenda: '' });
+            
+            // Modais de Cadastro e Contato
+            const [modalSelecionarContato, setModalSelecionarContato] = useState(false);
+            const [clienteParaConfirmar, setClienteParaConfirmar] = useState(null);
+            const [modalNovoAgendamento, setModalNovoAgendamento] = useState(false);
+            const [loadingSalvarAgendamento, setLoadingSalvarAgendamento] = useState(false);
+
+            useEffect(() => {
+                const saved = localStorage.getItem('ls_despesas');
+                if(saved) setDespesas(JSON.parse(saved));
+                baixarClientesPlanilha();
+            }, []);
+
+            const sincronizarGoogleAgenda = async () => { 
+                setLoadingSync(true); 
+                try {
+                    // Pede direto ao Script do Google os eventos do dia
+                    const url = `${CONFIG.scriptGoogleUrl}?action=get_agenda&date=${dataLote}`;
+                    const response = await fetch(url, { method: 'GET', redirect: 'follow' });
+                    const responseText = await response.text();
+                    let eventos = [];
+                    try {
+                        eventos = JSON.parse(responseText);
+                    } catch (e) {
+                        console.error("Não foi possível processar a resposta como JSON:", responseText);
+                    }
+
+                    if (Array.isArray(eventos)) {
+                        const listaFinal = eventos.filter(ev => !ev.isAllDay).map(ev => {
+                            const whatsMatch = ev.description ? ev.description.match(/(?:Whats|Whatsapp)[a-z]*:\s*([+\d() -]+)/i) : null;
+                            const zap = whatsMatch ? whatsMatch[1].trim() : null;
+
+                            const loc = ev.location ? ev.location.toLowerCase() : "";
+                            const tipo = (!loc || loc.length < 5 || loc.includes('studio') || loc.includes('prestes')) ? 'studio' : 'domicilio';
+
+                            return {
+                                id: Math.random(),
+                                nome: ev.title ? ev.title.replace(/^Cílios:\s*/i, '').trim() : 'Cliente',
+                                hora: (ev.startHour < 10 ? '0'+ev.startHour : ev.startHour) + ":" + (ev.startMin < 10 ? '0'+ev.startMin : ev.startMin),
+                                tipo: tipo,
+                                whatsapp: zap,
+                                location: ev.location
+                            };
+                        });
+                        
+                        listaFinal.sort((a,b) => a.hora.localeCompare(b.hora));
+                        setListaClientes(listaFinal);
+                    } else {
+                        console.error("Erro na resposta da agenda:", eventos);
+                    }
+                } catch (e) {
+                    console.error("Erro sincronização de profissionais", e);
+                }
+                setLoadingSync(false); 
+            };
+
+            const baixarClientesPlanilha = async () => {
+                setLoadingPlanilha(true);
+                try {
+                    const res = await fetch(`${CONFIG.scriptGoogleUrl}?action=readClients`, { method: 'GET', redirect: 'follow' });
+                    const data = await res.json();
+                    if (Array.isArray(data)) setBancoClientes(data);
+                } catch (e) { console.error(e); }
+                setLoadingPlanilha(false);
+            };
+
+            const handleSalvarAgendamentoManual = async (novoAgendamento) => {
+                setLoadingSalvarAgendamento(true);
+                
+                await salvarAgendamentoPlanilha(novoAgendamento);
+                await baixarClientesPlanilha(); 
+                
+                if (novoAgendamento.data === dataLote) {
+                    sincronizarGoogleAgenda();
+                }
+                
+                setLoadingSalvarAgendamento(false);
+                setModalNovoAgendamento(false);
+                alert("Agendamento salvo com sucesso!");
+            };
+            
+            const iniciarConfirmacao = (cliente) => {
+                let zap = cliente.whatsapp;
+                
+                let zapLimpo = zap ? String(zap).replace(/\D/g, '') : '';
+                
+                if (zapLimpo.length < 10) {
+                    const clienteEncontrado = bancoClientes.find(c => 
+                        cliente.nome.toLowerCase().includes(c.nome.toLowerCase()) || 
+                        c.nome.toLowerCase().includes(cliente.nome.toLowerCase())
+                    );
+                    if (clienteEncontrado && clienteEncontrado.zap) {
+                        zap = clienteEncontrado.zap;
+                        zapLimpo = String(zap).replace(/\D/g, '');
+                    }
+                }
+
+                if (zapLimpo.length >= 10) {
+                    enviarMensagemConfirmacao(cliente, zap);
+                } else {
+                    setClienteParaConfirmar(cliente);
+                    setModalSelecionarContato(true);
+                }
+            };
+            
+            const selecionarContatoEConfirmar = (contatoSelecionado) => {
+                if (clienteParaConfirmar) {
+                    enviarMensagemConfirmacao(clienteParaConfirmar, contatoSelecionado.zap);
+                    setModalSelecionarContato(false);
+                    setClienteParaConfirmar(null);
+                }
+            };
+
+            const enviarMensagemConfirmacao = (cliente, zapForcado = null) => {
+                let msg = "";
+                if (cliente.tipo === 'studio') {
+                    msg = `Oiiiii, *${cliente.nome}* !!!\nSó pra confirmar seu horário amanhã às ${cliente.hora} no Studio 💜\n\n📍endereço:\nAv. Prestes Maia, 221 - Jardim D’abril, Osasco\n\n⏰ Só para lembrar que temos uma tolerância de 15 minutos de atraso.\n\nTe espero 💜`;
+                } else {
+                    const loc = cliente.location ? cliente.location.toLowerCase() : "";
+                    const semEndereco = !cliente.location || loc === 'domicilio' || loc.length < 5;
+                    
+                    if (semEndereco) {
+                         msg = `Oiiiii, *${cliente.nome}* !!!\nPassando pra confirmar nosso atendimento a domicílio amanhã às ${cliente.hora} 💜\n\n📍 *Poderia me confirmar seu endereço certinho, por favor?* 🥰\n\nQualquer imprevisto me avise!`;
+                    } else {
+                         msg = `Oiiiii, *${cliente.nome}* !!!\nPassando pra confirmar nosso atendimento a domicílio amanhã às ${cliente.hora} 💜\n\n📍No endereço: ${cliente.location}\n\nQualquer imprevisto me avise! 🥰`;
+                    }
+                }
+                
+                let numProcessar = zapForcado || cliente.whatsapp;
+                const link = gerarLinkWhatsApp(numProcessar, msg);
+                
+                if (link) {
+                    window.open(link, '_blank');
+                } else {
+                    alert("⚠️ O número desta cliente está vazio ou inválido. Por favor, pesquise o nome dela na lista manualmente.");
+                    setClienteParaConfirmar(cliente);
+                    setModalSelecionarContato(true);
+                }
+            };
+
+            const abrirModalNiver = (cliente) => {
+                setModalNiver(cliente);
+                setTemDesconto(false);
+            };
+
+            const enviarMensagemNiver = () => {
+                if (!modalNiver) return;
+                const msg = `Parabéns ${modalNiver.nome}! 🎂🥳 Estamos enviando um presente especial de ${temDesconto ? valorDesconto + '% OFF' : 'uma surpresa'} para você realçar seu olhar! 🥰`;
+                const link = gerarLinkWhatsApp(modalNiver.zap, msg);
+                if(link) window.open(link, '_blank');
+                setModalNiver(null);
+            };
+
+            const abrirModalAnalise = (cliente) => {
+                setModalAnaliseIA({ cliente: cliente, step: 'input', incentivo: '', resultado: '' });
+            };
+
+            const gerarAnaliseCliente = async () => {
+                if (!modalAnaliseIA || !modalAnaliseIA.cliente) return;
+                
+                setLoadingMsgIA(true);
+                setModalAnaliseIA(prev => ({ ...prev, step: 'loading' }));
+                
+                const promptIA = `Você é Leticia Souza (conhecida como Le), Lash Designer e dona do Studio Ls Cílios. Escreva uma mensagem de WhatsApp muito carinhosa para a cliente ${modalAnaliseIA.cliente.nome}, dizendo que sente falta dela. ${modalAnaliseIA.incentivo ? `Para incentivar o retorno, ofereça: ${modalAnaliseIA.incentivo}.` : 'Convide-a carinhosamente para agendar uma manutenção ou nova aplicação.'} 
+                REGRA ABSOLUTA: Assine a mensagem APENAS como "Com carinho, Le 💜". 
+                PROIBIDO: Não utilize colchetes [], chaves {}, espaços em branco como [Nome] ou qualquer texto genérico que precise ser preenchido. A mensagem deve estar 100% pronta para eu apenas copiar e enviar.`;
+
+                const resp = await chamarGemini(promptIA, "Especialista em Fidelização de Clientes");
+                
+                setModalAnaliseIA(prev => ({ 
+                    ...prev, 
+                    step: 'result', 
+                    resultado: resp || "Erro ao gerar mensagem. Tente novamente." 
+                }));
+                setLoadingMsgIA(false);
+            };
+
+            const enviarMensagemAnalise = () => {
+                if(!modalAnaliseIA || !modalAnaliseIA.cliente || !modalAnaliseIA.resultado) return;
+                const link = gerarLinkWhatsApp(modalAnaliseIA.cliente.zap, modalAnaliseIA.resultado);
+                if(link) window.open(link, '_blank');
+            };
+            
+            const isAniversariante = (dataNasc) => {
+                if (!dataNasc) return false;
+                const parts = dataNasc.split('-');
+                if(parts.length !== 3) return false;
+                const hoje = new Date();
+                return parseInt(parts[2]) === hoje.getDate() && parseInt(parts[1]) === (hoje.getMonth() + 1);
+            };
+
+            return (
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 fade-in relative min-h-[600px] flex flex-col">
+                    <button onClick={onSair} className="absolute top-4 right-4 text-white z-10"><Icons.LogOut /></button>
+                    <div className="bg-purple-600 p-6 text-white">
+                        <h2 className="text-xl font-bold">Painel da Le</h2>
+                        <div className="flex gap-4 mt-4 text-[10px] font-bold overflow-x-auto no-scrollbar whitespace-nowrap">
+                            {['confirma', 'financeiro', 'clientes'].map(t => (
+                                <button key={t} onClick={() => setAba(t)} className={`pb-1 border-b-2 uppercase ${aba === t ? 'border-white text-white' : 'border-transparent text-purple-300'}`}>{t}</button>
+                            ))}
+                        </div>
+                    </div>
+                    
+                    {aba === 'confirma' && (
+                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in">
+                            <button onClick={() => setModalNovoAgendamento(true)} className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold py-3 rounded-xl text-sm flex justify-center items-center gap-2 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
+                                <Icons.Plus /> Agendar Manualmente
+                            </button>
+                            <div className="bg-gray-50 p-4 rounded-xl border flex gap-2"><input type="date" className="flex-1 p-2 rounded-lg border text-sm" value={dataLote} onChange={e => setDataLote(e.target.value)} /><button onClick={sincronizarGoogleAgenda} className="bg-blue-600 text-white px-3 rounded-lg text-xs font-bold">{loadingSync ? '...' : <Icons.Refresh />}</button></div>
+                            <div className="flex-1 overflow-y-auto space-y-2">
+                                {listaClientes.length === 0 && !loadingSync && (
+                                    <p className="text-center text-gray-400 text-sm py-8">Nenhum cliente agendado para esta data.</p>
+                                )}
+                                {listaClientes.map((c) => (
+                                    <div key={c.id} className="p-3 rounded-xl border flex flex-col gap-2 bg-white">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <p className="font-bold text-sm text-gray-800">{c.nome}</p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="bg-gray-100 text-xs px-1.5 rounded text-gray-600 font-bold">{c.hora}</span>
+                                                    <span className={`text-[10px] px-2 py-0.5 rounded ${c.tipo === 'domicilio' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                                                        {c.tipo === 'domicilio' ? '🏠 Casa' : '🏢 Studio'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => iniciarConfirmacao(c)} className="w-full py-2 rounded-lg text-xs bg-green-500 text-white font-bold flex justify-center items-center gap-1 shadow-sm hover:bg-green-600 transition-all"><Icons.Whatsapp /> Confirmar</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {aba === 'financeiro' && <TelaFinanceiro listaClientes={listaClientes} despesas={despesas} setDespesas={setDespesas} />}
+                    
+                    {aba === 'clientes' && (
+                        <div className="p-4 flex-1 flex flex-col gap-4 fade-in overflow-y-auto">
+                            <button onClick={baixarClientesPlanilha} className="w-full bg-green-100 text-green-700 font-bold py-2 rounded-lg text-xs flex justify-center items-center gap-1"><Icons.Refresh /> Atualizar Lista</button>
+                            
+                            {bancoClientes.map((c, i) => (
+                                <div key={i} className="p-3 rounded-xl border mb-2 bg-white flex justify-between items-center">
+                                    <div className="flex flex-col"><p className="font-bold text-sm text-gray-700">{c.nome}</p><p className="text-[10px] text-gray-400">{c.zap}</p></div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => abrirModalAnalise(c)} className="bg-purple-100 text-purple-600 py-1 px-2 rounded text-[10px] font-bold">Analisar</button>
+                                        {isAniversariante(c.nascimento) && <button onClick={() => abrirModalNiver(c)} className="bg-pink-100 text-pink-600 py-1 px-2 rounded text-[10px] font-bold flex items-center gap-1"><Icons.Cake /> Parabéns</button>}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* MODAIS GERAIS DA TELA PROFISSIONAL */}
+                    <ModalSelecionarContato 
+                        isOpen={modalSelecionarContato} 
+                        onClose={() => setModalSelecionarContato(false)}
+                        clientes={bancoClientes}
+                        onSelect={selecionarContatoEConfirmar}
+                    />
+
+                    <ModalNovoAgendamentoManual
+                        isOpen={modalNovoAgendamento}
+                        onClose={() => setModalNovoAgendamento(false)}
+                        onSalvar={handleSalvarAgendamentoManual}
+                        loading={loadingSalvarAgendamento}
+                    />
+
+                    {modalNiver && (
+                        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 fade-in">
+                            <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden relative transform scale-100 transition-all shadow-2xl">
+                                <div className="modal-gradient p-8 text-center flex flex-col items-center justify-center relative h-96">
+                                    <button onClick={()=>setModalNiver(null)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/50 rounded-full p-1"><Icons.Close /></button>
+                                    <div className="text-7xl mb-4 animate-bounce filter drop-shadow-md">🎂</div>
+                                    <h3 className="font-bold text-3xl text-purple-800 mb-2">Parabéns, {modalNiver.nome.split(' ')[0]}!</h3>
+                                    <p className="text-purple-600 text-base mb-8 font-medium">Vamos mimar essa cliente especial?</p>
+                                    <div className="w-full space-y-4">
+                                        <div className="flex gap-3 justify-center">
+                                            <button onClick={()=>setTemDesconto(true)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${temDesconto?'bg-pink-50 text-pink-600 border-pink-400':'bg-white text-gray-500 border-gray-200'}`}>Sim, Desconto 🎁</button>
+                                            <button onClick={()=>setTemDesconto(false)} className={`flex-1 py-4 rounded-2xl text-sm font-bold border-2 shadow-sm transition-all transform hover:-translate-y-1 ${!temDesconto?'bg-white text-gray-600 border-gray-300':'bg-white text-gray-400 border-gray-100'}`}>Só Mensagem 💌</button>
+                                        </div>
+                                        {temDesconto && (
+                                            <div className="fade-in flex items-center justify-center gap-3 bg-white/80 p-3 rounded-2xl border border-pink-200 shadow-inner">
+                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Desconto:</span>
+                                                <input type="number" className="w-24 p-2 border-b-2 border-pink-300 text-center font-bold text-pink-600 text-2xl focus:outline-none bg-transparent" value={valorDesconto} onChange={e=>setValorDesconto(e.target.value)} />
+                                                <span className="text-2xl font-bold text-pink-400">%</span>
+                                            </div>
+                                        )}
+                                        <button onClick={enviarMensagemNiver} className="w-full py-4 bg-[#25D366] hover:bg-[#1ebd59] text-white rounded-2xl font-bold shadow-lg flex justify-center items-center gap-3 transition-all transform hover:scale-105 active:scale-95 text-lg mt-4">
+                                            <Icons.Whatsapp /> Enviar Mensagem Agora
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MODAL DE ANÁLISE IA MELHORADO */}
+                    {modalAnaliseIA && (
+                        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setModalAnaliseIA(null)}>
+                            <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
+                                <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 text-white font-bold flex justify-between items-center">
+                                    <h3 className="flex gap-2 items-center"><Icons.Analysis /> Reconquistar Cliente</h3>
+                                    <button onClick={()=>setModalAnaliseIA(null)}><Icons.Close /></button>
+                                </div>
+                                <div className="p-5 space-y-4">
+                                    {modalAnaliseIA.step === 'input' && (
+                                        <div className="fade-in">
+                                            <p className="text-sm text-gray-600 mb-3">O que você gostaria de oferecer para <strong>{modalAnaliseIA.cliente.nome.split(' ')[0]}</strong> voltar?</p>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Ex: 15% de desconto, Design grátis, etc." 
+                                                className="w-full p-3 border rounded-xl text-sm mb-4"
+                                                value={modalAnaliseIA.incentivo}
+                                                onChange={e => setModalAnaliseIA({...modalAnaliseIA, incentivo: e.target.value})}
+                                            />
+                                            <button onClick={gerarAnaliseCliente} className="w-full bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 transition-all flex justify-center items-center gap-2 shadow-md">
+                                                <Icons.Gemini /> Gerar Mensagem Mágica
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {modalAnaliseIA.step === 'loading' && (
+                                        <div className="text-center py-8">
+                                            <div className="loader mx-auto mb-4 border-purple-500"></div>
+                                            <p className="text-sm text-purple-600 font-bold animate-pulse">Le, a IA está escrevendo...</p>
+                                        </div>
+                                    )}
+
+                                    {modalAnaliseIA.step === 'result' && (
+                                        <div className="fade-in">
+                                            <div className="bg-purple-50 p-2 rounded-lg border border-purple-100 mb-3"><p className="text-xs font-bold text-purple-700 flex items-center gap-1"><Icons.Check /> Mensagem Pronta!</p></div>
+                                            <textarea className="w-full h-40 p-3 border rounded-xl text-sm bg-gray-50 text-gray-700 mb-2 focus:outline-none focus:border-purple-300" value={modalAnaliseIA.resultado} onChange={e => setModalAnaliseIA({...modalAnaliseIA, resultado: e.target.value})}></textarea>
+                                            <button onClick={enviarMensagemAnalise} className="w-full mt-2 bg-[#25D366] text-white py-4 rounded-xl font-bold hover:bg-[#1ebd59] flex justify-center items-center gap-2 shadow-lg transition-transform hover:scale-105">
+                                                Enviar Agora <Icons.Whatsapp />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- COMPONENTE PRINCIPAL (APP) ---
+        function App() {
+            const [tela, setTela] = useState('cliente');
+            const [dadosFinal, setDadosFinal] = useState(null);
+
+            const handleSucesso = (dados) => {
+                setDadosFinal(dados);
+                setTela('sucesso');
+            };
+
+            const irWhatsapp = () => {
+                if(!dadosFinal) return;
+                const msg = `Olá! Agendei pelo site: ${dadosFinal.servicoObj ? dadosFinal.servicoObj.nome : dadosFinal.servico} - Dia ${dadosFinal.data.split('-').reverse().join('/')} às ${dadosFinal.hora}. Nome: ${dadosFinal.nome}`;
+                const link = gerarLinkWhatsApp(CONFIG.telefoneProfissional, msg);
+                if(link) window.open(link, '_blank');
+            };
+
+            return (
+                <div className="min-h-screen bg-pink-50 p-4 font-sans flex flex-col items-center">
+                    <div className="w-full max-w-md mb-4 text-center">
+                        <img src="img/logo.png" alt="Logo" className="w-40 h-auto mb-2 object-contain mx-auto" onError={(e) => { e.target.style.display = 'none'; }} />
+                        <h1 className="text-2xl font-bold text-gray-800">Ls <span className="text-pink-600">Cílios</span></h1>
+                    </div>
+
+                    {tela === 'sucesso' && (
+                        <div className="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-6 animate-in">
+                            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-4xl text-green-500 mb-4 animate-bounce">✓</div>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-2">Agendado! 🎉</h2>
+                            <p className="text-center text-gray-600 text-sm mb-8">Seu horário está pré-reservado. Envie a mensagem para confirmar.</p>
+                            <div className="bg-pink-50 p-4 rounded-xl w-full max-w-xs mb-8 text-left border border-pink-100">
+                                <p className="text-xs text-gray-500 uppercase font-bold mb-1">DETALHES:</p>
+                                <p className="text-gray-800 font-bold">{dadosFinal?.servicoObj ? dadosFinal.servicoObj.nome : dadosFinal?.servico}</p>
+                                <p className="text-gray-600 text-sm">{dadosFinal?.data.split('-').reverse().join('/')} às {dadosFinal?.hora}</p>
+                            </div>
+                            <button onClick={irWhatsapp} className="w-full max-w-xs bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-green-600 transition-all animate-pulse">
+                                <Icons.Whatsapp /> Enviar no WhatsApp
+                            </button>
+                            <button onClick={() => window.location.reload()} className="mt-6 text-gray-400 text-xs underline">Voltar ao início</button>
+                        </div>
+                    )}
+
+                    {tela === 'cliente' && (
+                        <div className="w-full max-w-md">
+                            <TelaCliente aoFinalizar={handleSucesso} />
+                        </div>
+                    )}
+                    
+                    {tela === 'login' && <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100"><TelaLogin onLogin={() => setTela('profissional')} /></div>}
+                    
+                    {tela === 'profissional' && <TelaProfissional onSair={() => setTela('cliente')} />}
+                    
+                    {tela !== 'login' && tela !== 'profissional' && tela !== 'sucesso' && (
+                        <div className="mt-8 text-center"><button onClick={() => setTela('login')} className="text-xs text-gray-300 flex items-center justify-center gap-1 mx-auto"><Icons.Lock /> Área Profissional</button></div>
+                    )}
+                    <ChatbotIA />
+                </div>
+            );
+        }
+
+        // --- COMPONENTE LOGIN ---
+        function TelaLogin({ onLogin }) {
+            const [pass, setPass] = useState('');
+            const [erro, setErro] = useState(false);
+            const tentarLogin = () => { if(pass === CONFIG.senhaAdmin) { onLogin(); } else { setErro(true); } };
+            return (
+                <div className="flex items-center justify-center min-h-[300px] p-8 fade-in">
+                    <div className="w-full max-w-xs text-center">
+                        <div className="mb-4 text-purple-600 text-5xl"><Icons.Lock /></div>
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Acesso Restrito</h2>
+                        <input type="password" placeholder="Senha" className="w-full p-3 border rounded-xl mb-3 text-center" value={pass} onChange={e => {setPass(e.target.value); setErro(false);}} />
+                        {erro && <p className="text-red-500 text-xs font-bold mb-3">Senha incorreta!</p>}
+                        <button onClick={tentarLogin} className="w-full bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700">Entrar</button>
+                        <button onClick={() => window.location.reload()} className="mt-4 text-xs text-gray-400 hover:text-gray-600">Voltar</button>
                     </div>
                 </div>
-            </div>
-        );
-    }
+            )
+        }
 
-    // =============================================
-    // LOGIN
-    // =============================================
-    function TelaLogin({ onLogin }) {
-        const [pass, setPass] = useState('');
-        const [erro, setErro] = useState(false);
-        const [show, setShow] = useState(false);
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
 
-        const tentar = () => {
-            if(btoa(pass) === CONFIG.senhaAdminHash) onLogin();
-            else { setErro(true); setPass(''); }
-        };
-
-        return (
-            <div className="fade-up" style={{background:'white',borderRadius:20,border:'1.5px solid var(--border)',padding:'32px 24px',maxWidth:360,margin:'0 auto',textAlign:'center',boxShadow:'0 4px 32px rgba(109,40,217,0.08)'}}>
-                <div style={{width:64,height:64,background:'var(--plum-light)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px',fontSize:28}}>🔒</div>
-                <h2 style={{margin:'0 0 6px',fontSize:22}}>Área Profissional</h2>
-                <p style={{color:'var(--ink-mid)',fontSize:13,marginBottom:24}}>Acesso restrito à Le</p>
-                <div style={{position:'relative',marginBottom:12}}>
-                    <input type={show?'text':'password'} className={`input ${erro?'input-error':''}`} placeholder="Senha" value={pass} onChange={e=>{setPass(e.target.value);setErro(false);}} onKeyDown={e=>e.key==='Enter'&&tentar()} style={{paddingRight:44}}/>
-                    <button onClick={()=>setShow(s=>!s)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'var(--ink-mid)',fontSize:16}}>{show?'🙈':'👁️'}</button>
-                </div>
-                {erro && <p style={{color:'var(--rose)',fontSize:12,marginBottom:12,fontWeight:600}}>Senha incorreta!</p>}
-                <button className="btn-primary" onClick={tentar}>Entrar</button>
-                <button className="btn-ghost" style={{marginTop:12,fontSize:13,display:'block',width:'100%'}} onClick={()=>window.location.reload()}>Voltar</button>
-            </div>
-        );
-    }
-
-    // =============================================
-    // APP RAIZ
-    // =============================================
-    function App() {
-        const [tela, setTela]         = useState('cliente');
-        const [agendado, setAgendado] = useState(null);
-
-        return (
-            <div style={{minHeight:'100vh',background:'var(--surface)',padding:'16px',display:'flex',flexDirection:'column',alignItems:'center'}}>
-                {/* Header */}
-                <div style={{width:'100%',maxWidth:440,marginBottom:20,textAlign:'center'}}>
-                    <img src="img/logo.png" alt="Logo Ls Cílios" style={{width:120,height:'auto',objectFit:'contain'}} onError={e=>{e.target.style.display='none'}}/>
-                    <h1 style={{margin:'8px 0 0',fontSize:24,fontFamily:'Playfair Display,serif'}}>
-                        Ls <span style={{color:'var(--rose)'}}>Cílios</span>
-                    </h1>
-                    <p style={{margin:'4px 0 0',fontSize:12,color:'var(--ink-mid)'}}>Studio de beleza — Osasco, SP</p>
-                </div>
-
-                <div style={{width:'100%',maxWidth:440}}>
-                    {tela === 'cliente'     && <TelaCliente aoFinalizar={d=>{setAgendado(d);setTela('sucesso');}}/>}
-                    {tela === 'sucesso'     && <TelaSucesso dados={agendado} onReiniciar={()=>{ setAgendado(null); setTela('cliente'); window.scrollTo(0,0); }}/>}
-                    {tela === 'login'       && <TelaLogin onLogin={()=>setTela('profissional')}/>}
-                    {tela === 'profissional'&& <TelaProfissional onSair={()=>setTela('cliente')}/>}
-                </div>
-
-                {/* Link área profissional (só visível na tela cliente) */}
-                {(tela === 'cliente' || tela === 'sucesso') && (
-                    <div style={{marginTop:32,textAlign:'center'}}>
-                        <button onClick={()=>setTela('login')} style={{background:'none',border:'none',cursor:'pointer',fontSize:12,color:'#d1d5db',display:'flex',alignItems:'center',gap:4,margin:'0 auto'}}>
-                            🔒 Área Profissional
-                        </button>
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
     </script>
 </body>
 </html>
