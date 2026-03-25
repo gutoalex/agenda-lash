@@ -50,8 +50,6 @@
         const { useState, useEffect, useRef } = React;
 
         // --- 1. CONFIGURAÇÕES E CHAVES ---
-        const apiKey = ""; 
-
         const CONFIG = {
             nomeProfissional: "Le",
             telefoneProfissional: "5511989224362", 
@@ -60,6 +58,12 @@
             
             scriptGoogleUrl: "https://script.google.com/macros/s/AKfycbwZ4F0MuUlrFDufyaECtkfsevLZ_EtZRWVhOR3gRrJ089XP_3cSgN5tt51C9fUcEHlWZA/exec", 
             
+            // AQUI ESTÃO OS TEXTOS FIXOS PARA VOCÊ MUDAR QUANDO QUISER!
+            mensagensPadrao: {
+                reconquistar: "Oii {nome}!! Tudo bem? Senti sua falta aqui no studio 💜. {incentivo}Vamos agendar para deixar seus cílios lindos de novo? Beijos, Le!",
+                aniversario: "Parabéns {nome}! 🎂🥳 Estamos enviando um presente especial de {desconto} para você realçar seu olhar! 🥰"
+            },
+
             depoimentos: [
                 { nome: "Cliente", texto: "Amo sua flexibilidade, paciência (quando preciso amamentar) e atendimento. Você me dá a liberdade de escolher o melhor estilo!" },
                 { nome: "Cliente", texto: "Seu trabalho é ótimo! O espaço aconchegante. Cuidado para não arder os olhos e higiene impecável." },
@@ -71,18 +75,18 @@
             sobrancelha: { id: 999, nome: "Design de Sobrancelhas", preco: 35, duracao: 0.5 },
 
             servicos: [
-                { id: 1, nome: "Volume Pamela", desc: "Fio a Fio Black. Fios ocos por dentro com ponta dupla, mais leve e com efeito rímel.", imagem: "img/pamela.jpg", duracao: 2, precos: { aplicacao: 115, manutencao: 95, remocao: 30 } },
-                { id: 2, nome: "Volume Paty", desc: "Volume Brasileiro. Fios em Y, proporciona volume de acordo com os fios naturais. Efeito entrelaçado.", imagem: "img/paty.jpg", duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
-                { id: 11, nome: "Volume Marcela", desc: "Brasileiro Marrom. Fios em Y, efeito entrelaçado com a delicadeza e naturalidade da cor marrom.", imagem: "img/marcela.jpg", duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
-                { id: 3, nome: "Volume Jaque", desc: "Fox Eyes. Olhos com formato mais alongado, proporcionando um olhar mais sensual e marcante.", imagem: "img/jaque.jpg", duracao: 2.5, precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
-                { id: 4, nome: "Volume Emily", desc: "Efeito Delineado (Curvatura M). Efeito lifting, base reta com excelente aderência. Acabamento natural e sofisticado.", imagem: "img/emily.jpg", duracao: 2.5, precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
-                { id: 5, nome: "Volume Duda", desc: "Volume 3D. Fios sintéticos ultrafinos com um fio mais marcante no meio. Efeito dramático.", imagem: "img/duda.jpg", duracao: 3, precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
-                { id: 6, nome: "Volume Carol", desc: "Volume Inglês 5D. Leque com até 5 fios. Efeito volumoso e dramático.", imagem: "img/carol.jpg", duracao: 3, precos: { aplicacao: 155, manutencao: 105, remocao: 30 } },
-                { id: 12, nome: "Volume Carine", desc: "Inglês 5D Marrom. Leque com até 5 fios marrons. Efeito volumoso, mas deixando delicado nos cílios naturais.", imagem: "img/carine.jpg", duracao: 3, precos: { aplicacao: 155, manutencao: 105, remocao: 30 } },
-                { id: 7, nome: "Volume Nath", desc: "Efeito Molhado. Agrupamentos delicados. Cria a sensação de fios levemente úmidos. Marcante e natural.", imagem: "img/nath.jpg", duracao: 2.5, precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
-                { id: 8, nome: "Volume Grazi", desc: "Naturalmente Marcante. Semelhante ao fio a fio, com um toque a mais de volume. Leve, natural e equilibrado.", imagem: "img/grazi.jpg", duracao: 2, precos: { aplicacao: 135, manutencao: 105, remocao: 30 } },
-                { id: 9, nome: "Volume Bia", desc: "Volume Sirena. Aplicado do meio ao final (Curvatura M). Alonga e dá efeito delineado. Natural e puxadinho.", imagem: "img/bia.jpg", duracao: 2.5, precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
-                { id: 10, nome: "Volume Fernanda", desc: "Delicado e elegante. Um pouco mais cheio que o Grazi, utilizando 3 fios (Curvatura C). Presença na medida certa.", imagem: "img/fernanda.jpg", duracao: 2, precos: { aplicacao: 135, manutencao: 105, remocao: 30 } }
+                { id: 1, nome: "Volume Pamela", desc: "Fio a Fio Black. Fios ocos por dentro com ponta dupla, mais leve e com efeito rímel.", imagem: "img/pamela.jpg", precos: { aplicacao: 115, manutencao: 95, remocao: 30 } },
+                { id: 2, nome: "Volume Paty", desc: "Volume Brasileiro. Fios em Y, proporciona volume de acordo com os fios naturais. Efeito entrelaçado.", imagem: "img/paty.jpg", precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
+                { id: 11, nome: "Volume Marcela", desc: "Brasileiro Marrom. Fios em Y, efeito entrelaçado com a delicadeza e naturalidade da cor marrom.", imagem: "img/marcela.jpg", precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
+                { id: 3, nome: "Volume Jaque", desc: "Fox Eyes. Olhos com formato mais alongado, proporcionando um olhar mais sensual e marcante.", imagem: "img/jaque.jpg", precos: { aplicacao: 135, manutencao: 100, remocao: 30 } },
+                { id: 4, nome: "Volume Emily", desc: "Efeito Delineado (Curvatura M). Efeito lifting, base reta com excelente aderência. Acabamento natural e sofisticado.", imagem: "img/emily.jpg", precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
+                { id: 5, nome: "Volume Duda", desc: "Volume 3D. Fios sintéticos ultrafinos com um fio mais marcante no meio. Efeito dramático.", imagem: "img/duda.jpg", precos: { aplicacao: 140, manutencao: 105, remocao: 30 } },
+                { id: 6, nome: "Volume Carol", desc: "Volume Inglês 5D. Leque com até 5 fios. Efeito volumoso e dramático.", imagem: "img/carol.jpg", precos: { aplicacao: 155, manutencao: 105, remocao: 30 } },
+                { id: 12, nome: "Volume Carine", desc: "Inglês 5D Marrom. Leque com até 5 fios marrons. Efeito volumoso, mas deixando delicado nos cílios naturais.", imagem: "img/carine.jpg", precos: { aplicacao: 155, manutencao: 105, remocao: 30 } },
+                { id: 7, nome: "Volume Nath", desc: "Efeito Molhado. Agrupamentos delicados. Cria a sensação de fios levemente úmidos. Marcante e natural.", imagem: "img/nath.jpg", precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
+                { id: 8, nome: "Volume Grazi", desc: "Naturalmente Marcante. Semelhante ao fio a fio, com um toque a mais de volume. Leve, natural e equilibrado.", imagem: "img/grazi.jpg", precos: { aplicacao: 135, manutencao: 105, remocao: 30 } },
+                { id: 9, nome: "Volume Bia", desc: "Volume Sirena. Aplicado do meio ao final (Curvatura M). Alonga e dá efeito delineado. Natural e puxadinho.", imagem: "img/bia.jpg", precos: { aplicacao: 130, manutencao: 100, remocao: 30 } },
+                { id: 10, nome: "Volume Fernanda", desc: "Delicado e elegante. Um pouco mais cheio que o Grazi, utilizando 3 fios (Curvatura C). Presença na medida certa.", imagem: "img/fernanda.jpg", precos: { aplicacao: 135, manutencao: 105, remocao: 30 } }
             ]
         };
 
@@ -93,7 +97,6 @@
             Close: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
             Check: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
             Info: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
-            Gemini: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>,
             EyeOff: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>,
             Clock: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
             Star: () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="text-yellow-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>,
@@ -103,7 +106,6 @@
             Robot: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>,
             Gift: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>,
             Sparkles: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275-1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>,
-            Analysis: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h5"></path><path d="M17 12h5"></path><path d="M12 2v5"></path><path d="M12 17v5"></path><circle cx="12" cy="12" r="4"></circle><path d="M10 2 2.5 9.5"></path><path d="M14 2l7.5 7.5"></path><path d="M10 22l-7.5-7.5"></path><path d="M14 22l7.5-7.5"></path></svg>,
             LogOut: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>,
             Refresh: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>,
             Copy: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>,
@@ -117,7 +119,8 @@
             CloudDownload: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>,
             Cake: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M2 21h20"></path><path d="M7 8v2"></path><path d="M12 8v2"></path><path d="M17 8v2"></path><path d="M7 4h.01"></path><path d="M12 4h.01"></path><path d="M17 4h.01"></path></svg>,
             Search: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
-            Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
+            MessageSquare: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         };
 
         // --- 3. FUNÇÕES GLOBAIS ---
@@ -143,6 +146,14 @@
                 zapLimpo = '55' + zapLimpo;
             }
             return `https://wa.me/${zapLimpo}?text=${encodeURIComponent(mensagem)}`;
+        };
+
+        // Função de formatação para mostrar "1h30" ou "30min" bonitinho
+        const formatarDuracao = (horas) => {
+            if (horas === 0.5) return '30min';
+            if (horas === 1.5) return '1h30';
+            if (horas === 2.5) return '2h30';
+            return `${horas}h`;
         };
 
         const salvarAgendamentoPlanilha = async (dadosCliente) => {
@@ -180,71 +191,41 @@
             }
         };
 
-        async function chamarGemini(prompt, systemInstruction = "") {
-            const fullPrompt = systemInstruction ? `Instrução do Sistema: ${systemInstruction}\n\nUsuário: ${prompt}` : prompt;
-            try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }] })
-                });
-                if (!response.ok) {
-                    return "Opa, a IA está tirando um cochilo.";
-                }
-                const data = await response.json();
-                return data.candidates?.[0]?.content?.parts?.[0]?.text;
-            } catch (error) { 
-                return "Erro de conexão."; 
+        // =========================================================================
+        // LÓGICA DE GERAÇÃO FRACIONADA DE HORÁRIOS
+        // =========================================================================
+        const gerarHorarios = (dateStr) => {
+            if (!dateStr) return [];
+            const dia = new Date(dateStr + 'T12:00:00').getDay();
+            
+            let horaInicio = 0, minInicio = 0;
+            let horaFim = 0, minFim = 0;
+
+            // Regras fornecidas pela Letícia:
+            if (dia === 2) { horaInicio = 13; minInicio = 0; horaFim = 20; minFim = 0; } // Terça
+            else if (dia === 3) { horaInicio = 11; minInicio = 0; horaFim = 18; minFim = 0; } // Quarta
+            else if (dia === 4) { horaInicio = 13; minInicio = 0; horaFim = 20; minFim = 0; } // Quinta
+            else if (dia === 5) { horaInicio = 12; minInicio = 0; horaFim = 16; minFim = 30; } // Sexta
+            else if (dia === 6) { horaInicio = 9; minInicio = 0; horaFim = 14; minFim = 0; } // Sábado
+            else return []; // Domingo (0) e Segunda (1) fechado
+
+            const lista = [];
+            let minutosAtuais = horaInicio * 60 + minInicio;
+            const minutosFinais = horaFim * 60 + minFim;
+
+            // Gera horários de 30 em 30 minutos
+            while (minutosAtuais < minutosFinais) {
+                const h = Math.floor(minutosAtuais / 60);
+                const m = minutosAtuais % 60;
+                const horarioFormatado = `${h < 10 ? '0' + h : h}:${m === 0 ? '00' : m}`;
+                lista.push(horarioFormatado);
+                minutosAtuais += 30;
             }
-        }
+            return lista;
+        };
+
 
         // --- 4. COMPONENTES DE UI ---
-
-        function ChatbotIA() {
-            const [aberto, setAberto] = useState(false);
-            const [msg, setMsg] = useState('');
-            const [historico, setHistorico] = useState([{ role: 'bot', text: 'Olá! Sou a assistente virtual da Le. Tem alguma dúvida? 💖' }]);
-            const [loading, setLoading] = useState(false);
-            const msgEndRef = useRef(null);
-            useEffect(() => { msgEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [historico]);
-            
-            const enviarMsg = async () => {
-                if (!msg.trim()) return;
-                const novaMsg = { role: 'user', text: msg };
-                setHistorico(prev => [...prev, novaMsg]);
-                setMsg('');
-                setLoading(true);
-                const resposta = await chamarGemini(msg, "Você é a assistente virtual da Ls Cílios. Responda curto e simpática. Se não souber, peça para falar com a Le.");
-                setHistorico(prev => [...prev, { role: 'bot', text: resposta || "Desculpe, não entendi." }]);
-                setLoading(false);
-            };
-            
-            const irParaWhatsApp = () => {
-                const link = gerarLinkWhatsApp(CONFIG.telefoneProfissional, "Olá Le, tenho uma dúvida.");
-                if(link) window.open(link, '_blank');
-            };
-
-            return (
-                <React.Fragment>
-                    <button onClick={() => setAberto(!aberto)} className="fixed bottom-4 left-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-full shadow-lg z-50 hover:scale-105 transition-transform flex items-center gap-2 font-bold text-xs">{aberto ? <Icons.Close /> : <span className="text-xl">🤖</span>}{!aberto && "Dúvidas?"}</button>
-                    {aberto && (
-                        <div className="fixed bottom-20 left-4 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4" style={{maxHeight: '60vh'}}>
-                            <div className="bg-purple-600 p-3 text-white flex justify-between items-center"><span className="font-bold text-sm flex items-center gap-2">🤖 Assistente Ls Cílios</span><button onClick={() => setAberto(false)}><Icons.Close /></button></div>
-                            <div className="flex-1 p-3 overflow-y-auto bg-gray-50 space-y-3 text-xs">
-                                {historico.map((m, i) => (<div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[85%] p-2 rounded-xl ${m.role === 'user' ? 'bg-purple-100 text-purple-800 rounded-tr-none' : 'bg-white border border-gray-200 text-gray-600 rounded-tl-none'}`}>{m.text}</div></div>))}
-                                <div ref={msgEndRef} />
-                            </div>
-                            <div className="p-2 bg-gray-50 border-t border-gray-100 text-center"><button onClick={irParaWhatsApp} className="text-xs text-green-600 font-bold hover:underline flex items-center justify-center gap-1 w-full"><Icons.Whatsapp /> Falar com a Le no Zap</button></div>
-                            <div className="p-2 bg-white border-t border-gray-100 flex gap-2">
-                                <input type="text" className="flex-1 border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-purple-500" placeholder="Digite..." value={msg} onChange={(e) => setMsg(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && enviarMsg()} />
-                                <button onClick={enviarMsg} disabled={loading} className="bg-purple-600 text-white p-2 rounded-lg">➤</button>
-                            </div>
-                        </div>
-                    )}
-                </React.Fragment>
-            );
-        }
 
         function TelaFinanceiro({ listaClientes, despesas, setDespesas }) {
             const [novaDespesa, setNovaDespesa] = useState({ nome: '', valor: '', tipo: 'fixa' });
@@ -340,18 +321,6 @@
             );
         }
 
-        // LÓGICA PARA EXIBIR HORÁRIOS BASE
-        const gerarHorarios = (dateStr) => {
-            if (!dateStr) return [];
-            const dia = new Date(dateStr + 'T12:00:00').getDay();
-            if (dia === 0 || dia === 1) return []; 
-            const lista = [];
-            const inicio = dia === 2 || dia === 4 ? 9 : 10;
-            const fim = dia === 6 ? 14 : 18;
-            for (let h = inicio; h <= fim; h++) lista.push((h < 10 ? '0'+h : h) + ":00");
-            return lista;
-        };
-
         function ModalNovoAgendamentoManual({ isOpen, onClose, onSalvar, loading }) {
             const [nome, setNome] = useState('');
             const [whatsapp, setWhatsapp] = useState('');
@@ -392,7 +361,7 @@
                                 slots.forEach(slot => {
                                     const [sh, sm] = slot.split(':').map(Number);
                                     const slotStartMinutes = sh * 60 + sm;
-                                    const slotEndMinutes = slotStartMinutes + 60; // Duração de cada slot é 1 hr
+                                    const slotEndMinutes = slotStartMinutes + 30; // Blocos de 30 min
 
                                     const evStartMinutes = ev.startHour * 60 + ev.startMin;
                                     const evEndMinutes = ev.endHour * 60 + ev.endMin;
@@ -403,8 +372,6 @@
                                 });
                             }
                         });
-                    } else {
-                        console.error("Resposta inesperada da agenda:", eventos);
                     }
                     setHorariosOcupadosLocal(ocupados);
                 } catch (e) {
@@ -439,7 +406,7 @@
                     data: data,
                     hora: hora,
                     nascimento: sabeNascimento ? nascimento : "",
-                    duracaoTotal: 2, 
+                    duracaoTotal: servicoNome === "Design de Sobrancelhas" ? 0.5 : 2, 
                     tipoServico: "Agendamento Manual",
                     precoFinal: 0,
                     tipoAtendimento: "studio",
@@ -449,12 +416,11 @@
                 onSalvar(payload);
             };
 
-            let duracaoServico = 2; 
-            if (servicoNome === "Design de Sobrancelhas") duracaoServico = 1;
-            else if (servicoNome) {
-                const servicoEncontrado = CONFIG.servicos.find(s => s.nome === servicoNome);
-                if (servicoEncontrado) duracaoServico = Math.ceil(servicoEncontrado.duracao);
-            }
+            // Cálculo dos blocos que o serviço ocupa (Cada slot tem 30 min = 0.5h)
+            let duracaoServico = 2; // Padrão 2h para manual
+            if (servicoNome === "Design de Sobrancelhas") duracaoServico = 0.5;
+            
+            const slotsNecessarios = Math.ceil(duracaoServico / 0.5);
 
             return (
                 <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" onClick={onClose}>
@@ -507,13 +473,18 @@
                                         <p className="text-xs text-red-500 font-bold bg-red-50 p-2 rounded">Sem horários para este dia (Fechado).</p>
                                     ) : (
                                         <div className="grid grid-cols-4 gap-2 max-h-[120px] overflow-y-auto pr-1">
-                                            {horariosDisponiveis.map((h) => {
+                                            {horariosDisponiveis.map((h, index) => {
+                                                // MÁGICA: Verifica se tem tempo livre suficiente ANTES de fechar o salão
                                                 let isOcupado = false;
-                                                for (let i = 0; i < duracaoServico; i++) {
-                                                    const [hh] = h.split(':').map(Number);
-                                                    const hourToCheck = (hh + i < 10 ? '0' : '') + (hh + i) + ':00';
-                                                    if (horariosOcupadosLocal.includes(hourToCheck) || !horariosDisponiveis.includes(hourToCheck)) {
-                                                        isOcupado = true;
+                                                for (let i = 0; i < slotsNecessarios; i++) {
+                                                    const idxToCheck = index + i;
+                                                    if (idxToCheck >= horariosDisponiveis.length) {
+                                                        isOcupado = true; // Tempo do salão acaba antes do serviço terminar!
+                                                        break;
+                                                    }
+                                                    const hourToCheck = horariosDisponiveis[idxToCheck];
+                                                    if (horariosOcupadosLocal.includes(hourToCheck)) {
+                                                        isOcupado = true; // Bate em outro agendamento!
                                                         break;
                                                     }
                                                 }
@@ -557,10 +528,6 @@
             const [carregandoHorariosLocal, setCarregandoHorariosLocal] = useState(false);
             const [servicoExpandido, setServicoExpandido] = useState(null);
             const [modalDetalhes, setModalDetalhes] = useState(null); 
-            const [showModalIA, setShowModalIA] = useState(false);
-            const [inputIA, setInputIA] = useState('');
-            const [loadingIA, setLoadingIA] = useState(false);
-            const [respostaIA, setRespostaIA] = useState(null);
             const [depoimentoIndex, setDepoimentoIndex] = useState(0);
             const [modalConfirmacao, setModalConfirmacao] = useState(false);
             const [horarioPendente, setHorarioPendente] = useState('');
@@ -598,7 +565,7 @@
                                 slots.forEach(slot => {
                                     const [sh, sm] = slot.split(':').map(Number);
                                     const slotStartMinutes = sh * 60 + sm;
-                                    const slotEndMinutes = slotStartMinutes + 60; 
+                                    const slotEndMinutes = slotStartMinutes + 30; // 30 mins!
 
                                     const evStartMinutes = ev.startHour * 60 + ev.startMin;
                                     const evEndMinutes = ev.endHour * 60 + ev.endMin;
@@ -609,8 +576,6 @@
                                 });
                             }
                         });
-                    } else {
-                        console.error("Erro na resposta da agenda:", eventos);
                     }
                     setHorariosOcupadosLocal(ocupados);
                 } catch (e) {
@@ -625,7 +590,8 @@
                 if (tipo === 'cilios') { setDados({...dados, incluiSobrancelha: false}); setStep(1); } 
                 else if (tipo === 'sobrancelha') {
                     const s = {...CONFIG.sobrancelha, precos: { aplicacao: CONFIG.sobrancelha.preco, manutencao: CONFIG.sobrancelha.preco }};
-                    setDados({...dados, servicoObj: s, tipoServico: 'aplicacao', precoFinal: s.preco, incluiSobrancelha: false, duracaoTotal: s.duracao});
+                    // Sobrancelha = 0.5h (30 min)
+                    setDados({...dados, servicoObj: s, tipoServico: 'aplicacao', precoFinal: s.preco, incluiSobrancelha: false, duracaoTotal: 0.5});
                     setStep(2); 
                 } 
                 else if (tipo === 'combo') { setDados({...dados, incluiSobrancelha: true}); setStep(1); }
@@ -635,6 +601,7 @@
                 setDados(prev => ({ ...prev, incluiSobrancelha: !prev.incluiSobrancelha }));
             };
 
+            // LÓGICA MÁGICA DOS TEMPOS E PREÇOS 
             const selecionarServico = (servico, tipo) => {
                 let preco = servico.precos[tipo];
                 let isCombo = dados.incluiSobrancelha;
@@ -642,11 +609,21 @@
                 
                 if (servico.id === 999) { 
                     isCombo = false; 
-                    duracao = CONFIG.sobrancelha.duracao; 
+                    duracao = 0.5; // Sobrancelha: 30min
                 } else {
-                    if (isCombo) { duracao = 3; preco += CONFIG.sobrancelha.preco; } 
-                    else if (tipo === 'remocao') { duracao = 1; } 
-                    else { duracao = 2; }
+                    if (isCombo) { 
+                        duracao = 2; // Combo é sempre 2 horas de acordo com a Le!
+                        preco += CONFIG.sobrancelha.preco; 
+                    } 
+                    else if (tipo === 'aplicacao') { 
+                        duracao = 2; // Aplicação 2 horas
+                    } 
+                    else if (tipo === 'manutencao') { 
+                        duracao = 1.5; // Manutenção 1h30
+                    } 
+                    else if (tipo === 'remocao') { 
+                        duracao = 0.5; // Remoção 30 min
+                    }
                 }
                 
                 setDados({ ...dados, servicoObj: servico, tipoServico: tipo, precoFinal: preco, duracaoTotal: duracao, incluiSobrancelha: isCombo });
@@ -685,16 +662,8 @@
                 aoFinalizar(dadosParaSalvar);
             };
 
-            const consultarEstiloIA = async () => {
-                if (!inputIA.trim()) return;
-                setLoadingIA(true);
-                setRespostaIA(null);
-                const resp = await chamarGemini(inputIA, "Recomende um estilo de cílios do catálogo da Ls Cílios.");
-                setRespostaIA({ motivo: resp || "Recomendo o Volume Brasileiro, é super versátil!" });
-                setLoadingIA(false);
-            };
-
-            const duracaoNecessaria = Math.ceil(dados.duracaoTotal || 1);
+            // Cálculo dos blocos de 30 minutos (Ex: 2h / 0.5h = 4 blocos necessários)
+            const slotsNecessarios = Math.ceil((dados.duracaoTotal || 2) / 0.5);
 
             return (
                 <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-pink-100 relative min-h-[500px]">
@@ -725,7 +694,6 @@
                                 <button onClick={() => setStep(0)} className="text-xs text-gray-400 mb-2 hover:text-pink-500 flex items-center gap-1">← Voltar</button>
                                 <div className="flex justify-between items-center mb-4">
                                     <h2 className="text-xl font-bold text-gray-800">Escolha o Modelo</h2>
-                                    <button onClick={() => setShowModalIA(true)} className="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-full font-bold flex items-center gap-1 hover:bg-purple-200 transition-colors sparkle-icon"><Icons.Gemini /> Me ajude</button>
                                 </div>
                                 <div className="mb-4 p-3 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100 flex items-center justify-between shadow-sm">
                                     <div className="flex items-center gap-2"><span className="text-xl">✨</span><div><p className="text-sm font-bold text-gray-800">Adicionar Sobrancelha?</p><p className="text-xs text-gray-500">+ Design Simples (+R$35)</p></div></div>
@@ -753,7 +721,8 @@
                                 <div className="mb-4 bg-white border border-gray-100 rounded-xl p-3 shadow-sm">
                                     <h3 className="text-xs font-bold text-gray-500 mb-2 uppercase flex items-center gap-1">Antes de vir:</h3>
                                     <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-600">
-                                        <div className="flex items-center gap-1"><Icons.Clock /><span>Duração: {dados.duracaoTotal}h</span></div>
+                                        {/* MOSTRAMOS O TEMPO LINDINHO AQUI */}
+                                        <div className="flex items-center gap-1"><Icons.Clock /><span>Duração: {formatarDuracao(dados.duracaoTotal)}</span></div>
                                         <div className="flex items-center gap-1"><Icons.EyeOff /><span>Sem Rímel</span></div>
                                         <div className="flex items-center gap-1"><span>👓</span><span>Remover Lentes</span></div>
                                         <div className="flex items-center gap-1"><span>⏰</span><span>Tolerância 15min</span></div>
@@ -797,13 +766,18 @@
                                     {dados.data && (
                                         <div className="grid grid-cols-4 gap-2 pb-2 mt-2">
                                             {carregandoHorariosLocal ? <p className="col-span-4 text-center text-xs text-gray-400">Verificando agenda...</p> : 
-                                            horariosDisponiveis.map((h) => {
+                                            horariosDisponiveis.map((h, index) => {
+                                                // MÁGICA: Verifica se tem tempo livre suficiente ANTES de fechar o salão
                                                 let isOcupado = false;
-                                                for (let i = 0; i < duracaoNecessaria; i++) {
-                                                    const [hh] = h.split(':').map(Number);
-                                                    const hourToCheck = (hh + i < 10 ? '0' : '') + (hh + i) + ':00';
-                                                    if (horariosOcupadosLocal.includes(hourToCheck) || !horariosDisponiveis.includes(hourToCheck)) {
-                                                        isOcupado = true;
+                                                for (let i = 0; i < slotsNecessarios; i++) {
+                                                    const idxToCheck = index + i;
+                                                    if (idxToCheck >= horariosDisponiveis.length) {
+                                                        isOcupado = true; // O salão fecha antes de o serviço acabar!
+                                                        break;
+                                                    }
+                                                    const hourToCheck = horariosDisponiveis[idxToCheck];
+                                                    if (horariosOcupadosLocal.includes(hourToCheck)) {
+                                                        isOcupado = true; // Existe outro agendamento neste bloco!
                                                         break;
                                                     }
                                                 }
@@ -826,7 +800,7 @@
                             </div>
                         )}
                     </div>
-                    {/* MODAIS (Detalhes, Confirmação, IA) */}
+                    {/* MODAIS (Detalhes, Confirmação) */}
                     {modalDetalhes && (
                         <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 fade-in" onClick={() => setModalDetalhes(null)}>
                             <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
@@ -853,16 +827,6 @@
                             </div>
                         </div>
                     )}
-                    {showModalIA && (
-                        <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 fade-in" onClick={() => setShowModalIA(false)}>
-                            <div className="bg-white rounded-2xl w-full max-w-sm p-6 relative" onClick={e => e.stopPropagation()}>
-                                <h3 className="font-bold text-lg mb-2">Consultora IA</h3>
-                                <textarea className="w-full p-2 border rounded mb-2 text-sm" rows="3" placeholder="Ex: Quero algo natural..." value={inputIA} onChange={e => setInputIA(e.target.value)}></textarea>
-                                <button onClick={consultarEstiloIA} disabled={loadingIA} className="w-full bg-purple-600 text-white py-2 rounded mb-2">{loadingIA ? '...' : 'Analisar'}</button>
-                                {respostaIA && <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">{respostaIA.motivo}</p>}
-                            </div>
-                        </div>
-                    )}
                 </div>
             );
         }
@@ -877,13 +841,11 @@
             const [loadingPlanilha, setLoadingPlanilha] = useState(false);
             const [despesas, setDespesas] = useState([]); 
             
-            // Modais IA e Aniversário
-            const [modalAnaliseIA, setModalAnaliseIA] = useState(null); 
-            const [loadingMsgIA, setLoadingMsgIA] = useState(false);
+            // Modais e Aniversário
+            const [modalReconquistar, setModalReconquistar] = useState(null); 
             const [modalNiver, setModalNiver] = useState(null);
             const [temDesconto, setTemDesconto] = useState(false);
             const [valorDesconto, setValorDesconto] = useState(10);
-            const [postIA, setPostIA] = useState({ servico: '', tom: 'Divertido', legenda: '' });
             
             // Modais de Cadastro e Contato
             const [modalSelecionarContato, setModalSelecionarContato] = useState(false);
@@ -900,7 +862,6 @@
             const sincronizarGoogleAgenda = async () => { 
                 setLoadingSync(true); 
                 try {
-                    // Pede direto ao Script do Google os eventos do dia
                     const url = `${CONFIG.scriptGoogleUrl}?action=get_agenda&date=${dataLote}`;
                     const response = await fetch(url, { method: 'GET', redirect: 'follow' });
                     const responseText = await response.text();
@@ -967,7 +928,6 @@
             
             const iniciarConfirmacao = (cliente) => {
                 let zap = cliente.whatsapp;
-                
                 let zapLimpo = zap ? String(zap).replace(/\D/g, '') : '';
                 
                 if (zapLimpo.length < 10) {
@@ -1031,39 +991,31 @@
 
             const enviarMensagemNiver = () => {
                 if (!modalNiver) return;
-                const msg = `Parabéns ${modalNiver.nome}! 🎂🥳 Estamos enviando um presente especial de ${temDesconto ? valorDesconto + '% OFF' : 'uma surpresa'} para você realçar seu olhar! 🥰`;
-                const link = gerarLinkWhatsApp(modalNiver.zap, msg);
+                const primeiroNome = modalNiver.nome.split(' ')[0];
+                const msgDesconto = temDesconto ? valorDesconto + '% OFF' : 'uma surpresa';
+                const msgFinal = CONFIG.mensagensPadrao.aniversario.replace('{nome}', primeiroNome).replace('{desconto}', msgDesconto);
+                const link = gerarLinkWhatsApp(modalNiver.zap, msgFinal);
                 if(link) window.open(link, '_blank');
                 setModalNiver(null);
             };
 
-            const abrirModalAnalise = (cliente) => {
-                setModalAnaliseIA({ cliente: cliente, step: 'input', incentivo: '', resultado: '' });
+            // LÓGICA DE RECONQUISTA (SEM IA)
+            const abrirModalReconquistar = (cliente) => {
+                const primeiroNome = cliente.nome.split(' ')[0];
+                const msgBase = CONFIG.mensagensPadrao.reconquistar.replace('{nome}', primeiroNome).replace('{incentivo}', '');
+                setModalReconquistar({ cliente: cliente, incentivo: '', resultado: msgBase });
             };
 
-            const gerarAnaliseCliente = async () => {
-                if (!modalAnaliseIA || !modalAnaliseIA.cliente) return;
-                
-                setLoadingMsgIA(true);
-                setModalAnaliseIA(prev => ({ ...prev, step: 'loading' }));
-                
-                const promptIA = `Você é Leticia Souza (conhecida como Le), Lash Designer e dona do Studio Ls Cílios. Escreva uma mensagem de WhatsApp muito carinhosa para a cliente ${modalAnaliseIA.cliente.nome}, dizendo que sente falta dela. ${modalAnaliseIA.incentivo ? `Para incentivar o retorno, ofereça: ${modalAnaliseIA.incentivo}.` : 'Convide-a carinhosamente para agendar uma manutenção ou nova aplicação.'} 
-                REGRA ABSOLUTA: Assine a mensagem APENAS como "Com carinho, Le 💜". 
-                PROIBIDO: Não utilize colchetes [], chaves {}, espaços em branco como [Nome] ou qualquer texto genérico que precise ser preenchido. A mensagem deve estar 100% pronta para eu apenas copiar e enviar.`;
-
-                const resp = await chamarGemini(promptIA, "Especialista em Fidelização de Clientes");
-                
-                setModalAnaliseIA(prev => ({ 
-                    ...prev, 
-                    step: 'result', 
-                    resultado: resp || "Erro ao gerar mensagem. Tente novamente." 
-                }));
-                setLoadingMsgIA(false);
+            const atualizarMensagemReconquista = (incentivoTexto) => {
+                const primeiroNome = modalReconquistar.cliente.nome.split(' ')[0];
+                const textoIncentivoFinal = incentivoTexto ? `Preparei um mimo para você: ${incentivoTexto}. ` : '';
+                const msgBase = CONFIG.mensagensPadrao.reconquistar.replace('{nome}', primeiroNome).replace('{incentivo}', textoIncentivoFinal);
+                setModalReconquistar(prev => ({ ...prev, incentivo: incentivoTexto, resultado: msgBase }));
             };
 
             const enviarMensagemAnalise = () => {
-                if(!modalAnaliseIA || !modalAnaliseIA.cliente || !modalAnaliseIA.resultado) return;
-                const link = gerarLinkWhatsApp(modalAnaliseIA.cliente.zap, modalAnaliseIA.resultado);
+                if(!modalReconquistar || !modalReconquistar.cliente || !modalReconquistar.resultado) return;
+                const link = gerarLinkWhatsApp(modalReconquistar.cliente.zap, modalReconquistar.resultado);
                 if(link) window.open(link, '_blank');
             };
             
@@ -1126,7 +1078,8 @@
                                 <div key={i} className="p-3 rounded-xl border mb-2 bg-white flex justify-between items-center">
                                     <div className="flex flex-col"><p className="font-bold text-sm text-gray-700">{c.nome}</p><p className="text-[10px] text-gray-400">{c.zap}</p></div>
                                     <div className="flex gap-2">
-                                        <button onClick={() => abrirModalAnalise(c)} className="bg-purple-100 text-purple-600 py-1 px-2 rounded text-[10px] font-bold">Analisar</button>
+                                        {/* Botão de mensagem padrão de reconquista ao invés de IA */}
+                                        <button onClick={() => abrirModalReconquistar(c)} className="bg-purple-100 text-purple-600 py-1 px-2 rounded text-[10px] font-bold flex items-center gap-1"><Icons.MessageSquare /> Mensagem</button>
                                         {isAniversariante(c.nascimento) && <button onClick={() => abrirModalNiver(c)} className="bg-pink-100 text-pink-600 py-1 px-2 rounded text-[10px] font-bold flex items-center gap-1"><Icons.Cake /> Parabéns</button>}
                                     </div>
                                 </div>
@@ -1178,47 +1131,33 @@
                         </div>
                     )}
 
-                    {/* MODAL DE ANÁLISE IA MELHORADO */}
-                    {modalAnaliseIA && (
-                        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setModalAnaliseIA(null)}>
+                    {/* MODAL DE RECONQUISTA (SEM IA) */}
+                    {modalReconquistar && (
+                        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 fade-in" onClick={() => setModalReconquistar(null)}>
                             <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden relative" onClick={e => e.stopPropagation()}>
                                 <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 text-white font-bold flex justify-between items-center">
-                                    <h3 className="flex gap-2 items-center"><Icons.Analysis /> Reconquistar Cliente</h3>
-                                    <button onClick={()=>setModalAnaliseIA(null)}><Icons.Close /></button>
+                                    <h3 className="flex gap-2 items-center"><Icons.MessageSquare /> Reconquistar Cliente</h3>
+                                    <button onClick={()=>setModalReconquistar(null)}><Icons.Close /></button>
                                 </div>
                                 <div className="p-5 space-y-4">
-                                    {modalAnaliseIA.step === 'input' && (
-                                        <div className="fade-in">
-                                            <p className="text-sm text-gray-600 mb-3">O que você gostaria de oferecer para <strong>{modalAnaliseIA.cliente.nome.split(' ')[0]}</strong> voltar?</p>
-                                            <input 
-                                                type="text" 
-                                                placeholder="Ex: 15% de desconto, Design grátis, etc." 
-                                                className="w-full p-3 border rounded-xl text-sm mb-4"
-                                                value={modalAnaliseIA.incentivo}
-                                                onChange={e => setModalAnaliseIA({...modalAnaliseIA, incentivo: e.target.value})}
-                                            />
-                                            <button onClick={gerarAnaliseCliente} className="w-full bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 transition-all flex justify-center items-center gap-2 shadow-md">
-                                                <Icons.Gemini /> Gerar Mensagem Mágica
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {modalAnaliseIA.step === 'loading' && (
-                                        <div className="text-center py-8">
-                                            <div className="loader mx-auto mb-4 border-purple-500"></div>
-                                            <p className="text-sm text-purple-600 font-bold animate-pulse">Le, a IA está escrevendo...</p>
-                                        </div>
-                                    )}
-
-                                    {modalAnaliseIA.step === 'result' && (
-                                        <div className="fade-in">
-                                            <div className="bg-purple-50 p-2 rounded-lg border border-purple-100 mb-3"><p className="text-xs font-bold text-purple-700 flex items-center gap-1"><Icons.Check /> Mensagem Pronta!</p></div>
-                                            <textarea className="w-full h-40 p-3 border rounded-xl text-sm bg-gray-50 text-gray-700 mb-2 focus:outline-none focus:border-purple-300" value={modalAnaliseIA.resultado} onChange={e => setModalAnaliseIA({...modalAnaliseIA, resultado: e.target.value})}></textarea>
-                                            <button onClick={enviarMensagemAnalise} className="w-full mt-2 bg-[#25D366] text-white py-4 rounded-xl font-bold hover:bg-[#1ebd59] flex justify-center items-center gap-2 shadow-lg transition-transform hover:scale-105">
-                                                Enviar Agora <Icons.Whatsapp />
-                                            </button>
-                                        </div>
-                                    )}
+                                    <div className="fade-in">
+                                        <p className="text-sm text-gray-600 mb-3">O que você gostaria de oferecer para <strong>{modalReconquistar.cliente.nome.split(' ')[0]}</strong> voltar?</p>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Ex: 15% de desconto, Design grátis, etc." 
+                                            className="w-full p-3 border rounded-xl text-sm mb-4"
+                                            value={modalReconquistar.incentivo}
+                                            onChange={e => atualizarMensagemReconquista(e.target.value)}
+                                        />
+                                        
+                                        <div className="bg-purple-50 p-2 rounded-lg border border-purple-100 mb-3"><p className="text-xs font-bold text-purple-700 flex items-center gap-1"><Icons.Check /> Mensagem Padrão Pronta!</p></div>
+                                        
+                                        <textarea className="w-full h-32 p-3 border rounded-xl text-sm bg-gray-50 text-gray-700 mb-2 focus:outline-none focus:border-purple-300" value={modalReconquistar.resultado} onChange={e => setModalReconquistar({...modalReconquistar, resultado: e.target.value})}></textarea>
+                                        
+                                        <button onClick={enviarMensagemAnalise} className="w-full mt-2 bg-[#25D366] text-white py-4 rounded-xl font-bold hover:bg-[#1ebd59] flex justify-center items-center gap-2 shadow-lg transition-transform hover:scale-105">
+                                            Enviar Agora <Icons.Whatsapp />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1281,7 +1220,6 @@
                     {tela !== 'login' && tela !== 'profissional' && tela !== 'sucesso' && (
                         <div className="mt-8 text-center"><button onClick={() => setTela('login')} className="text-xs text-gray-300 flex items-center justify-center gap-1 mx-auto"><Icons.Lock /> Área Profissional</button></div>
                     )}
-                    <ChatbotIA />
                 </div>
             );
         }
