@@ -533,29 +533,26 @@
             const [horarioPendente, setHorarioPendente] = useState('');
             const [loadingSalvar, setLoadingSalvar] = useState(false);
             const [sabeNascimento, setSabeNascimento] = useState(false);
+            const [revalidando, setRevalidando] = useState(false); // revalidação no clique/save
 
             const hoje = new Date().toISOString().split('T')[0];
 
+            // Guarda contra RACE CONDITION: só a leitura mais recente pode escrever no estado.
+            const reqAtualRef = React.useRef(0);
+
             useEffect(() => { const interval = setInterval(() => { setDepoimentoIndex((prev) => (prev + 1) % CONFIG.depoimentos.length); }, 5000); return () => clearInterval(interval); }, []);
 
-            const verificarAgendaCliente = async (data) => {
-                setCarregandoHorariosLocal(true);
-                const slots = gerarHorarios(data);
-                setHorariosDisponiveis(slots);
-                
+            // Lê a agenda do Google e RETORNA os horários ocupados (não mexe no estado).
+            // Reutilizada na carga da data, na confirmação do horário e antes de salvar.
+            const lerOcupados = async (data, slots) => {
                 try {
-                    // LÊ A AGENDA DIRETO DO GOOGLE APPS SCRIPT
                     const url = `${CONFIG.scriptGoogleUrl}?action=get_agenda&date=${data}`;
-                    const response = await fetch(url, { method: 'GET', redirect: 'follow' });
+                    const response = await fetch(url, { method: 'GET', redirect: 'follow', cache: 'no-store' });
                     const responseText = await response.text();
-                    
                     let eventos = [];
-                    try {
-                        eventos = JSON.parse(responseText);
-                    } catch (e) {
-                         console.error("Não foi possível processar a resposta como JSON:", responseText);
-                    }
-                    
+                    try { eventos = JSON.parse(responseText); }
+                    catch (e) { console.error("Resposta não é JSON:", responseText); return { ok: false, ocupados: [] }; }
+
                     const ocupados = [];
                     if (Array.isArray(eventos)) {
                         eventos.forEach(ev => {
@@ -565,11 +562,9 @@
                                 slots.forEach(slot => {
                                     const [sh, sm] = slot.split(':').map(Number);
                                     const slotStartMinutes = sh * 60 + sm;
-                                    const slotEndMinutes = slotStartMinutes + 30; // 30 mins!
-
+                                    const slotEndMinutes = slotStartMinutes + 30;
                                     const evStartMinutes = ev.startHour * 60 + ev.startMin;
                                     const evEndMinutes = ev.endHour * 60 + ev.endMin;
-
                                     if (slotStartMinutes < evEndMinutes && slotEndMinutes > evStartMinutes) {
                                         if (!ocupados.includes(slot)) ocupados.push(slot);
                                     }
@@ -577,14 +572,38 @@
                             }
                         });
                     }
-                    setHorariosOcupadosLocal(ocupados);
+                    return { ok: true, ocupados };
                 } catch (e) {
                     console.error("Erro agenda cliente:", e);
+                    return { ok: false, ocupados: [] };
                 }
+            };
+
+            const verificarAgendaCliente = async (data) => {
+                const slots = gerarHorarios(data);
+                setHorariosDisponiveis(slots);
+                setHorariosOcupadosLocal([]); // zera enquanto carrega (evita horário fantasma)
+                if (slots.length === 0) { setCarregandoHorariosLocal(false); return; }
+
+                const ticket = ++reqAtualRef.current;
+                setCarregandoHorariosLocal(true);
+                const res = await lerOcupados(data, slots);
+                if (ticket !== reqAtualRef.current) return; // chegou uma leitura mais nova: descarta esta
+                setHorariosOcupadosLocal(res.ocupados);
                 setCarregandoHorariosLocal(false);
             };
 
             useEffect(() => { if (dados.data) { verificarAgendaCliente(dados.data); } }, [dados.data]);
+
+            // Um horário está indisponível se faltam blocos consecutivos livres ou o salão fecha antes.
+            const horarioIndisponivel = (index, listaOcupados) => {
+                for (let i = 0; i < slotsNecessarios; i++) {
+                    const idx = index + i;
+                    if (idx >= horariosDisponiveis.length) return true;
+                    if (listaOcupados.includes(horariosDisponiveis[idx])) return true;
+                }
+                return false;
+            };
 
             const selecionarCategoria = (tipo) => {
                 if (tipo === 'cilios') { setDados({...dados, incluiSobrancelha: false}); setStep(1); } 
@@ -636,7 +655,21 @@
                 setModalConfirmacao(true);
             };
 
-            const confirmarHorario = () => {
+            const confirmarHorario = async () => {
+                // REVALIDA na hora, direto no Google, antes de aceitar o horário.
+                setRevalidando(true);
+                const res = await lerOcupados(dados.data, horariosDisponiveis);
+                setRevalidando(false);
+                if (res.ok) {
+                    setHorariosOcupadosLocal(res.ocupados);
+                    const idx = horariosDisponiveis.indexOf(horarioPendente);
+                    if (idx === -1 || horarioIndisponivel(idx, res.ocupados)) {
+                        setModalConfirmacao(false);
+                        setDados(prev => ({ ...prev, hora: '' }));
+                        alert("Que pena! Esse horário acabou de ser preenchido 😔. Escolha outro, por favor.");
+                        return;
+                    }
+                }
                 setDados({ ...dados, hora: horarioPendente });
                 setModalConfirmacao(false);
             };
@@ -656,6 +689,22 @@
                 }
 
                 setLoadingSalvar(true);
+
+                // REVALIDAÇÃO FINAL antes de gravar: última barreira contra duas clientes
+                // fecharem o mesmo horário enquanto uma estava preenchendo os dados.
+                const slots = gerarHorarios(dados.data);
+                const res = await lerOcupados(dados.data, slots);
+                if (res.ok) {
+                    setHorariosOcupadosLocal(res.ocupados);
+                    const idx = slots.indexOf(dados.hora);
+                    if (idx === -1 || horarioIndisponivel(idx, res.ocupados)) {
+                        setDados(prev => ({ ...prev, hora: '' }));
+                        setLoadingSalvar(false);
+                        alert("Esse horário foi reservado por outra cliente enquanto você preenchia os dados 😔. Por favor, escolha outro horário.");
+                        return;
+                    }
+                }
+
                 const dadosParaSalvar = { ...dados, nascimento: sabeNascimento ? dados.nascimento : '' };
                 await salvarAgendamentoPlanilha(dadosParaSalvar);
                 setLoadingSalvar(false);
@@ -761,11 +810,20 @@
                                     )}
                                 </div>
                                 <div className="pt-2">
-                                    <label className="block text-xs font-bold text-gray-500 mb-1">ESCOLHA DATA E HORA</label>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <label className="block text-xs font-bold text-gray-500">ESCOLHA DATA E HORA</label>
+                                        {dados.data && (
+                                            <button type="button" onClick={() => verificarAgendaCliente(dados.data)} disabled={carregandoHorariosLocal || revalidando}
+                                                className="text-[11px] font-bold text-pink-500 disabled:text-gray-300">
+                                                {(carregandoHorariosLocal || revalidando) ? 'atualizando...' : '↻ atualizar horários'}
+                                            </button>
+                                        )}
+                                    </div>
                                     <input type="date" min={hoje} className="w-full p-3 bg-white rounded-xl border border-gray-200 mb-3 font-bold text-gray-700" value={dados.data} onChange={(e) => { setDados({...dados, data: e.target.value, hora: ''}); }} />
                                     {dados.data && (
                                         <div className="grid grid-cols-4 gap-2 pb-2 mt-2">
-                                            {carregandoHorariosLocal ? <p className="col-span-4 text-center text-xs text-gray-400">Verificando agenda...</p> : 
+                                            {(carregandoHorariosLocal || revalidando) ? <p className="col-span-4 text-center text-xs text-pink-500 font-bold py-3 animate-pulse">⏳ Verificando a agenda de verdade...</p> : 
+                                            horariosDisponiveis.length === 0 ? <p className="col-span-4 text-center text-xs text-red-500 font-bold bg-red-50 p-2 rounded">Sem horários neste dia (fechado).</p> :
                                             horariosDisponiveis.map((h, index) => {
                                                 // MÁGICA: Verifica se tem tempo livre suficiente ANTES de fechar o salão
                                                 let isOcupado = false;
@@ -793,7 +851,7 @@
                                             disabled={loadingSalvar}
                                             className={`w-full bg-gradient-to-r from-purple-600 to-purple-800 text-white font-bold py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 mt-2 flex items-center justify-center gap-2 ${loadingSalvar ? 'opacity-75 cursor-wait' : ''}`}
                                         >
-                                            {loadingSalvar ? 'Processando...' : 'AGENDAR E ENVIAR ZAP'} <Icons.Whatsapp />
+                                            {loadingSalvar ? 'Conferindo horário...' : 'AGENDAR E ENVIAR ZAP'} <Icons.Whatsapp />
                                         </button>
                                     </div>
                                 )}
@@ -821,8 +879,8 @@
                                 <h3 className="font-bold text-gray-800 mb-2">Confirmar Horário?</h3>
                                 <p className="text-sm text-gray-500 mb-6">Você escolheu as <strong className="text-pink-500">{horarioPendente}</strong>.</p>
                                 <div className="flex gap-3">
-                                    <button onClick={() => setModalConfirmacao(false)} className="flex-1 py-3 rounded-xl text-xs font-bold text-gray-400 bg-gray-100">Voltar</button>
-                                    <button onClick={confirmarHorario} className="flex-1 py-3 rounded-xl text-xs font-bold bg-pink-500 text-white">Confirmar</button>
+                                    <button onClick={() => setModalConfirmacao(false)} disabled={revalidando} className="flex-1 py-3 rounded-xl text-xs font-bold text-gray-400 bg-gray-100">Voltar</button>
+                                    <button onClick={confirmarHorario} disabled={revalidando} className="flex-1 py-3 rounded-xl text-xs font-bold bg-pink-500 text-white disabled:opacity-60">{revalidando ? 'Conferindo...' : 'Confirmar'}</button>
                                 </div>
                             </div>
                         </div>
