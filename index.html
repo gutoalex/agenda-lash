@@ -157,7 +157,8 @@
         };
 
         const salvarAgendamentoPlanilha = async (dadosCliente) => {
-            if (!CONFIG.scriptGoogleUrl) return true; 
+            // Sem backend configurado: devolve sucesso (modo demonstração)
+            if (!CONFIG.scriptGoogleUrl) return { ok: true, result: 'success' };
             try {
                 let nomeServico = dadosCliente.servico || (dadosCliente.servicoObj ? dadosCliente.servicoObj.nome : "Serviço Avulso");
                 if (dadosCliente.incluiSobrancelha && dadosCliente.servicoObj && dadosCliente.servicoObj.id !== 999) {
@@ -177,17 +178,27 @@
                     tipoAtendimento: dadosCliente.tipoAtendimento || "studio",
                     endereco: dadosCliente.endereco || ""
                 };
-                
-                await fetch(CONFIG.scriptGoogleUrl, {
+
+                // SEM 'no-cors': assim conseguimos LER a resposta do Apps Script e saber
+                // se o horário foi recusado (result: "ocupado") pela trava do backend.
+                const resp = await fetch(CONFIG.scriptGoogleUrl, {
                     method: 'POST',
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(payload)
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload),
+                    redirect: 'follow'
                 });
-                return true;
-            } catch (e) { 
+                const texto = await resp.text();
+                let json = {};
+                try { json = JSON.parse(texto); } catch (e) { json = { result: 'success' }; }
+
+                if (json.result === 'ocupado') {
+                    return { ok: false, ocupado: true, error: json.error || 'Horário ocupado.' };
+                }
+                return { ok: true, result: json.result || 'success' };
+            } catch (e) {
                 console.error("Erro ao salvar:", e);
-                return true; 
+                // Falha de rede: não bloqueia a cliente (comportamento anterior), mas sinaliza
+                return { ok: true, result: 'success', aviso: 'rede' };
             }
         };
 
@@ -706,8 +717,18 @@
                 }
 
                 const dadosParaSalvar = { ...dados, nascimento: sabeNascimento ? dados.nascimento : '' };
-                await salvarAgendamentoPlanilha(dadosParaSalvar);
+                const retorno = await salvarAgendamentoPlanilha(dadosParaSalvar);
                 setLoadingSalvar(false);
+
+                // O BACKEND é a autoridade final: se recusou (horário ocupado), não confirma.
+                if (retorno && retorno.ocupado) {
+                    setDados(prev => ({ ...prev, hora: '' }));
+                    // atualiza os horários para refletir o que acabou de ser ocupado
+                    verificarAgendaCliente(dados.data);
+                    alert(retorno.error || "Esse horário acabou de ser reservado por outra pessoa 😔. Por favor, escolha outro horário.");
+                    return;
+                }
+
                 aoFinalizar(dadosParaSalvar);
             };
 
@@ -971,14 +992,23 @@
 
             const handleSalvarAgendamentoManual = async (novoAgendamento) => {
                 setLoadingSalvarAgendamento(true);
-                
-                await salvarAgendamentoPlanilha(novoAgendamento);
-                await baixarClientesPlanilha(); 
-                
+
+                const retorno = await salvarAgendamentoPlanilha(novoAgendamento);
+
+                // Se o backend recusou por conflito, avisa a profissional e não fecha o modal
+                if (retorno && retorno.ocupado) {
+                    setLoadingSalvarAgendamento(false);
+                    alert(retorno.error || "Já existe um agendamento nesse horário. Escolha outro horário.");
+                    if (novoAgendamento.data === dataLote) sincronizarGoogleAgenda();
+                    return;
+                }
+
+                await baixarClientesPlanilha();
+
                 if (novoAgendamento.data === dataLote) {
                     sincronizarGoogleAgenda();
                 }
-                
+
                 setLoadingSalvarAgendamento(false);
                 setModalNovoAgendamento(false);
                 alert("Agendamento salvo com sucesso!");
