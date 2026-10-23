@@ -135,8 +135,18 @@
         };
 
         const validarEmail = (email) => {
-            if (!email) return true; 
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (!email) return true; // e-mail é opcional
+            // valida formato: algo@algo.dominio (sem espaços, com TLD de 2+ letras)
+            return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(String(email).trim());
+        };
+
+        // Celular BR válido: 10 ou 11 dígitos (DDD + número). Para 11 dígitos, o 3º deve ser 9 (celular).
+        const validarCelular = (tel) => {
+            const n = String(tel || "").replace(/\D/g, '');
+            if (n.length !== 10 && n.length !== 11) return false;
+            if (n.length === 11 && n[2] !== '9') return false;   // celular começa com 9 após o DDD
+            if (n[0] === '0') return false;                        // DDD não começa com 0
+            return true;
         };
 
         const gerarLinkWhatsApp = (numeroBruto, mensagem) => {
@@ -176,7 +186,9 @@
                     data: dadosCliente.data || "",
                     hora: dadosCliente.hora || "",
                     tipoAtendimento: dadosCliente.tipoAtendimento || "studio",
-                    endereco: dadosCliente.endereco || ""
+                    endereco: dadosCliente.endereco || "",
+                    // Se true, o Apps Script adiciona a cliente como convidada no evento (envia convite por e-mail)
+                    convidarNoCalendario: dadosCliente.convidarNoCalendario ? "sim" : "nao"
                 };
 
                 // SEM 'no-cors': assim conseguimos LER a resposta do Apps Script e saber
@@ -546,6 +558,10 @@
             const [sabeNascimento, setSabeNascimento] = useState(false);
             const [revalidando, setRevalidando] = useState(false); // revalidação no clique/save
 
+            // Pop-up "adicionar ao Google Agenda da cliente"
+            const [modalCalendario, setModalCalendario] = useState(false);
+            const [emailCalendario, setEmailCalendario] = useState('');
+
             const hoje = new Date().toISOString().split('T')[0];
 
             // Guarda contra RACE CONDITION: só a leitura mais recente pode escrever no estado.
@@ -690,15 +706,30 @@
                 setDados({ ...dados, whatsapp: formatted });
             };
 
-            const salvarEAvancar = async () => {
+            // PASSO 1: valida os campos e ABRE o pop-up do Google Agenda.
+            const salvarEAvancar = () => {
                 if (!dados.nome || !dados.whatsapp || !dados.data || !dados.hora) { alert("Preencha todos os campos obrigatórios!"); return; }
-                if (dados.whatsapp.length < 14) { alert("WhatsApp inválido!"); return; }
-                if (!validarEmail(dados.email)) { alert("Digite um e-mail válido."); return; }
+                if (!validarCelular(dados.whatsapp)) { alert("WhatsApp inválido. Informe DDD + número (ex: (11) 99999-9999)."); return; }
+                if (!validarEmail(dados.email)) { alert("O e-mail digitado não parece válido. Confira, por favor."); return; }
                 if (!dados.servicoObj) { alert("Erro: Serviço não selecionado."); return; }
-                if (dados.tipoAtendimento === 'domicilio' && (!dados.endereco || dados.endereco.trim().length < 10)) { 
-                    alert("Endereço muito curto. Por favor, preencha o endereço completo."); return; 
+                if (dados.tipoAtendimento === 'domicilio' && (!dados.endereco || dados.endereco.trim().length < 10)) {
+                    alert("Endereço muito curto. Por favor, preencha o endereço completo."); return;
                 }
+                // Pré-preenche o e-mail do pop-up com o que a cliente já digitou (se houver)
+                setEmailCalendario(dados.email || '');
+                setModalCalendario(true);
+            };
 
+            // PASSO 2: executa de fato (revalida o horário e salva). Chamado pelos botões do pop-up.
+            // convidar=true => cliente entra como convidada no evento (recebe no Google Agenda dela).
+            const executarAgendamento = async (convidar, emailInformado) => {
+                if (convidar) {
+                    if (!validarEmail(emailInformado) || !emailInformado) {
+                        alert("Para receber no seu Google Agenda, confirme um e-mail válido 💛");
+                        return;
+                    }
+                }
+                setModalCalendario(false);
                 setLoadingSalvar(true);
 
                 // REVALIDAÇÃO FINAL antes de gravar: última barreira contra duas clientes
@@ -716,14 +747,19 @@
                     }
                 }
 
-                const dadosParaSalvar = { ...dados, nascimento: sabeNascimento ? dados.nascimento : '' };
+                const emailFinal = convidar ? emailInformado : dados.email;
+                const dadosParaSalvar = {
+                    ...dados,
+                    email: emailFinal || '',
+                    nascimento: sabeNascimento ? dados.nascimento : '',
+                    convidarNoCalendario: convidar
+                };
                 const retorno = await salvarAgendamentoPlanilha(dadosParaSalvar);
                 setLoadingSalvar(false);
 
                 // O BACKEND é a autoridade final: se recusou (horário ocupado), não confirma.
                 if (retorno && retorno.ocupado) {
                     setDados(prev => ({ ...prev, hora: '' }));
-                    // atualiza os horários para refletir o que acabou de ser ocupado
                     verificarAgendaCliente(dados.data);
                     alert(retorno.error || "Esse horário acabou de ser reservado por outra pessoa 😔. Por favor, escolha outro horário.");
                     return;
@@ -906,6 +942,42 @@
                             </div>
                         </div>
                     )}
+
+                    {/* POP-UP: adicionar ao Google Agenda da cliente */}
+                    {modalCalendario && (
+                        <div className="fixed inset-0 bg-black/60 z-[80] flex items-center justify-center p-4 fade-in">
+                            <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-pink-100">
+                                <div className="text-center">
+                                    <div className="text-pink-500 text-3xl mb-2"><Icons.Calendar /></div>
+                                    <h3 className="font-bold text-gray-800 mb-1">Quer receber no seu Google Agenda?</h3>
+                                    <p className="text-xs text-gray-500 mb-4">Você recebe o convite por e-mail e, se precisar remarcar, fica sabendo automaticamente. 💜</p>
+                                </div>
+
+                                <label className="block text-xs font-bold text-gray-500 mb-1">Seu e-mail (Gmail)</label>
+                                <input
+                                    type="email"
+                                    className="w-full p-3 border rounded-xl text-sm mb-1"
+                                    placeholder="seuemail@gmail.com"
+                                    value={emailCalendario}
+                                    onChange={(e) => setEmailCalendario(e.target.value)}
+                                />
+                                <p className="text-[10px] text-gray-400 mb-4">Confirme se está correto antes de continuar.</p>
+
+                                <button
+                                    onClick={() => executarAgendamento(true, emailCalendario.trim())}
+                                    disabled={loadingSalvar}
+                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold py-3 rounded-xl mb-2 flex items-center justify-center gap-2 disabled:opacity-60">
+                                    <Icons.Calendar /> Sim, adicionar ao meu calendário
+                                </button>
+                                <button
+                                    onClick={() => executarAgendamento(false, '')}
+                                    disabled={loadingSalvar}
+                                    className="w-full bg-gray-100 text-gray-600 font-bold py-3 rounded-xl text-sm disabled:opacity-60">
+                                    Não, só quero agendar
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -932,6 +1004,41 @@
             const [modalNovoAgendamento, setModalNovoAgendamento] = useState(false);
             const [loadingSalvarAgendamento, setLoadingSalvarAgendamento] = useState(false);
 
+            // Confirmações marcadas pela Le (salvas LOCALMENTE neste aparelho).
+            // Chave = data|hora|nome ; valor = true. Relógio para atualizar a bolinha de urgência.
+            const [confirmadas, setConfirmadas] = useState(() => {
+                try { return JSON.parse(localStorage.getItem('ls_confirmadas') || '{}'); } catch (e) { return {}; }
+            });
+            const [agora, setAgora] = useState(Date.now());
+            useEffect(() => { const t = setInterval(() => setAgora(Date.now()), 60000); return () => clearInterval(t); }, []);
+
+            const chaveConfirma = (c) => `${dataLote}|${c.hora}|${c.nome}`;
+            const estaConfirmada = (c) => !!confirmadas[chaveConfirma(c)];
+            const marcarConfirmada = (c) => {
+                const novo = { ...confirmadas, [chaveConfirma(c)]: true };
+                setConfirmadas(novo);
+                localStorage.setItem('ls_confirmadas', JSON.stringify(novo));
+            };
+            const desmarcarConfirmada = (c) => {
+                const novo = { ...confirmadas };
+                delete novo[chaveConfirma(c)];
+                setConfirmadas(novo);
+                localStorage.setItem('ls_confirmadas', JSON.stringify(novo));
+            };
+
+            // Bolinha de urgência: calcula quanto falta para o atendimento e devolve cor + rótulo.
+            const urgenciaDoAtendimento = (c) => {
+                const [h, m] = (c.hora || '0:0').split(':').map(Number);
+                const [ano, mes, dia] = dataLote.split('-').map(Number);
+                const inicio = new Date(ano, mes - 1, dia, h || 0, m || 0).getTime();
+                const horas = (inicio - agora) / (1000 * 60 * 60);
+                if (horas < 0) return { cor: '#9ca3af', titulo: 'Já passou', pulse: false };       // cinza
+                if (horas < 12) return { cor: '#dc2626', titulo: 'Faltam menos de 12h', pulse: true }; // vermelho
+                if (horas < 24) return { cor: '#f97316', titulo: 'Faltam menos de 24h', pulse: false }; // laranja
+                if (horas < 72) return { cor: '#eab308', titulo: 'Faltam 1 a 3 dias', pulse: false };   // amarelo
+                return { cor: '#e5e7eb', titulo: 'Faltam mais de 3 dias', pulse: false };               // branco
+            };
+
             useEffect(() => {
                 const saved = localStorage.getItem('ls_despesas');
                 if(saved) setDespesas(JSON.parse(saved));
@@ -953,18 +1060,31 @@
 
                     if (Array.isArray(eventos)) {
                         const listaFinal = eventos.filter(ev => !ev.isAllDay).map(ev => {
-                            const whatsMatch = ev.description ? ev.description.match(/(?:Whats|Whatsapp)[a-z]*:\s*([+\d() -]+)/i) : null;
+                            const descricao = ev.description || "";
+                            const whatsMatch = descricao.match(/(?:Whats|Whatsapp)[a-z]*:\s*([+\d() -]+)/i);
                             const zap = whatsMatch ? whatsMatch[1].trim() : null;
+
+                            // Extrai Serviço e Valor da descrição do evento (gravados pelo backend)
+                            const servMatch = descricao.match(/Servi[çc]o:\s*(.+)/i);
+                            const servico = servMatch ? servMatch[1].trim() : "";
+                            const valorMatch = descricao.match(/Valor:\s*(R?\$?\s?[\d.,]+)/i);
+                            const valor = valorMatch ? valorMatch[1].trim() : "";
+
+                            // Nome: tira o prefixo "Cílios:" e também o " - Serviço" do final do título
+                            let nome = ev.title ? ev.title.replace(/^Cílios:\s*/i, '').trim() : 'Cliente';
+                            if (nome.includes(' - ')) nome = nome.split(' - ')[0].trim();
 
                             const loc = ev.location ? ev.location.toLowerCase() : "";
                             const tipo = (!loc || loc.length < 5 || loc.includes('studio') || loc.includes('prestes')) ? 'studio' : 'domicilio';
 
                             return {
                                 id: Math.random(),
-                                nome: ev.title ? ev.title.replace(/^Cílios:\s*/i, '').trim() : 'Cliente',
+                                nome: nome,
                                 hora: (ev.startHour < 10 ? '0'+ev.startHour : ev.startHour) + ":" + (ev.startMin < 10 ? '0'+ev.startMin : ev.startMin),
                                 tipo: tipo,
                                 whatsapp: zap,
+                                servico: servico,
+                                valor: valor,
                                 location: ev.location
                             };
                         });
@@ -1133,26 +1253,56 @@
                                 <Icons.Plus /> Agendar Manualmente
                             </button>
                             <div className="bg-gray-50 p-4 rounded-xl border flex gap-2"><input type="date" className="flex-1 p-2 rounded-lg border text-sm" value={dataLote} onChange={e => setDataLote(e.target.value)} /><button onClick={sincronizarGoogleAgenda} className="bg-blue-600 text-white px-3 rounded-lg text-xs font-bold">{loadingSync ? '...' : <Icons.Refresh />}</button></div>
+                            {/* Legenda da bolinha de urgência */}
+                            <div className="flex items-center gap-3 flex-wrap text-[10px] text-gray-500 px-1">
+                                <span className="font-bold">Urgência:</span>
+                                <span className="flex items-center gap-1"><span style={{width:10,height:10,borderRadius:'50%',background:'#e5e7eb',display:'inline-block',border:'1px solid #ccc'}}></span> +3 dias</span>
+                                <span className="flex items-center gap-1"><span style={{width:10,height:10,borderRadius:'50%',background:'#eab308',display:'inline-block'}}></span> 1-3 dias</span>
+                                <span className="flex items-center gap-1"><span style={{width:10,height:10,borderRadius:'50%',background:'#f97316',display:'inline-block'}}></span> -24h</span>
+                                <span className="flex items-center gap-1"><span style={{width:10,height:10,borderRadius:'50%',background:'#dc2626',display:'inline-block'}}></span> -12h</span>
+                            </div>
                             <div className="flex-1 overflow-y-auto space-y-2">
                                 {listaClientes.length === 0 && !loadingSync && (
                                     <p className="text-center text-gray-400 text-sm py-8">Nenhum cliente agendado para esta data.</p>
                                 )}
-                                {listaClientes.map((c) => (
-                                    <div key={c.id} className="p-3 rounded-xl border flex flex-col gap-2 bg-white">
+                                {listaClientes.map((c) => {
+                                    const u = urgenciaDoAtendimento(c);
+                                    const confirmada = estaConfirmada(c);
+                                    return (
+                                    <div key={c.id} className="p-3 rounded-xl border flex flex-col gap-2 bg-white" style={{ borderLeft: `5px solid ${u.cor}` }}>
                                         <div className="flex justify-between items-start">
-                                            <div>
-                                                <p className="font-bold text-sm text-gray-800">{c.nome}</p>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="bg-gray-100 text-xs px-1.5 rounded text-gray-600 font-bold">{c.hora}</span>
-                                                    <span className={`text-[10px] px-2 py-0.5 rounded ${c.tipo === 'domicilio' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                                                        {c.tipo === 'domicilio' ? '🏠 Casa' : '🏢 Studio'}
-                                                    </span>
+                                            <div className="flex items-start gap-2">
+                                                {/* Bolinha de urgência: branco -> vermelho conforme aproxima o horário */}
+                                                <span title={u.titulo} className={u.pulse ? 'animate-pulse' : ''}
+                                                    style={{ width: 14, height: 14, borderRadius: '50%', background: u.cor, display: 'inline-block', marginTop: 3, border: '1px solid rgba(0,0,0,0.1)', flexShrink: 0 }}></span>
+                                                <div>
+                                                    <p className="font-bold text-sm text-gray-800">{c.nome}</p>
+                                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                                        <span className="bg-gray-100 text-xs px-1.5 rounded text-gray-600 font-bold">{c.hora}</span>
+                                                        <span className={`text-[10px] px-2 py-0.5 rounded ${c.tipo === 'domicilio' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                                                            {c.tipo === 'domicilio' ? '🏠 Casa' : '🏢 Studio'}
+                                                        </span>
+                                                        {confirmada
+                                                            ? <span className="text-[10px] px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold">✅ Confirmada</span>
+                                                            : <span className="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-bold">⏳ Pendente</span>}
+                                                    </div>
+                                                    {(c.servico || c.valor) && (
+                                                        <p className="text-[11px] text-gray-500 mt-1">
+                                                            {c.servico}{c.servico && c.valor ? ' • ' : ''}{c.valor ? <b className="text-gray-700">{c.valor}</b> : ''}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onClick={() => iniciarConfirmacao(c)} className="w-full py-2 rounded-lg text-xs bg-green-500 text-white font-bold flex justify-center items-center gap-1 shadow-sm hover:bg-green-600 transition-all"><Icons.Whatsapp /> Confirmar</button>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => { iniciarConfirmacao(c); marcarConfirmada(c); }} className="flex-1 py-2 rounded-lg text-xs bg-green-500 text-white font-bold flex justify-center items-center gap-1 shadow-sm hover:bg-green-600 transition-all"><Icons.Whatsapp /> {confirmada ? 'Reenviar' : 'Confirmar'}</button>
+                                            {confirmada && (
+                                                <button onClick={() => desmarcarConfirmada(c)} title="Desmarcar confirmação" className="px-3 py-2 rounded-lg text-xs bg-gray-100 text-gray-500 font-bold hover:bg-gray-200">↺</button>
+                                            )}
+                                        </div>
                                     </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
